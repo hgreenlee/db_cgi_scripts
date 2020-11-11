@@ -22,7 +22,7 @@ from dbdict import databaseDict
 
 # Stage edit form.
 
-def substage_form(cnx, id, results_per_page, current_page):
+def substage_form(cnx, id, results_per_page, current_page, pattern):
 
     # Query substage from database.
 
@@ -119,14 +119,14 @@ def substage_form(cnx, id, results_per_page, current_page):
     # Add "Save" and "Back" buttons.
 
     print '<input type="submit" value="Save">'
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d' % (stage_id, results_per_page, current_page)
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % (stage_id, results_per_page, current_page, pattern)
     print '<input type="button" value="Back" onclick="window.open(\'%s\',\'_self\')">' % url
     print '</form>'
 
 
 # Main procedure.
 
-def main(id, results_per_page, current_page):
+def main(id, results_per_page, current_page, pattern):
 
     # Open database connection.
 
@@ -142,12 +142,12 @@ def main(id, results_per_page, current_page):
     print '<title>Substage Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d>Project list</a><br>' % \
-        (results_per_page, current_page)
+    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s>Project list</a><br>' % \
+        (results_per_page, current_page, pattern)
 
     # Generate main parg of html document.
 
-    substage_form(cnx, id, results_per_page, current_page)
+    substage_form(cnx, id, results_per_page, current_page, pattern)
 
     # Generate html document trailer.
     

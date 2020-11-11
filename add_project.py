@@ -21,7 +21,7 @@ from dbdict import databaseDict
 
 # Main procedure.
 
-def main(id, results_per_page, current_page):
+def main(id, results_per_page, current_page, pattern):
 
     # Open database connection.
 
@@ -30,8 +30,8 @@ def main(id, results_per_page, current_page):
     # Add project and redirect to project editor.
 
     project_id = dbutil.insert_blank_project(cnx)
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d' % \
-          (project_id, results_per_page, current_page)
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % \
+          (project_id, results_per_page, current_page, pattern)
 
     # Generate redirect page.
 

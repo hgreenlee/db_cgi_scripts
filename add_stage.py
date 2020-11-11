@@ -22,7 +22,7 @@ from dbdict import databaseDict
 
 # Main procedure.
 
-def main(id, results_per_page, current_page):
+def main(id, results_per_page, current_page, pattern):
 
     # Open database connection.
 
@@ -31,8 +31,8 @@ def main(id, results_per_page, current_page):
     # Add stage and redirect to stage editor.
 
     stage_id = dbutil.insert_blank_stage(cnx, id)
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d' % \
-          (stage_id, results_per_page, current_page)
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % \
+          (stage_id, results_per_page, current_page, pattern)
 
     # Generate redirect page.
 

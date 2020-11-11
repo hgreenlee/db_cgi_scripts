@@ -22,7 +22,7 @@ from dbdict import databaseDict
 
 # Stage edit form.
 
-def stage_form(cnx, id, results_per_page, current_page):
+def stage_form(cnx, id, results_per_page, current_page, pattern):
 
     # Query project name and id from database.
 
@@ -45,8 +45,8 @@ def stage_form(cnx, id, results_per_page, current_page):
     # Add button to insert another substage.
 
     print '<h2>Substages</h2>'
-    print '<form action="/cgi-bin/add_substage.py?id=%d&results_per_page=%d&page=%d" method="post" target="_blank" rel="noopener noreferer">' % \
-        (id, results_per_page, current_page)
+    print '<form action="/cgi-bin/add_substage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post" target="_blank" rel="noopener noreferer">' % \
+        (id, results_per_page, current_page, pattern)
     print '<input type="submit" value="Add Substage">'
     print '</form>'
     print '<br>'
@@ -71,14 +71,14 @@ def stage_form(cnx, id, results_per_page, current_page):
             substage_id = row[0]
             fclname = row[1]
             print '<td>%d</td>' % substage_id
-            print '<td><a href="https://microboone-exp.fnal.gov/cgi-bin/edit_substage.py?id=%d&results_per_page=%d&page=%d">%s</a></td>' % \
-                (substage_id, results_per_page, current_page, fclname)
+            print '<td><a href="https://microboone-exp.fnal.gov/cgi-bin/edit_substage.py?id=%d&results_per_page=%d&page=%d&pattern=%s">%s</a></td>' % \
+                (substage_id, results_per_page, current_page, pattern, fclname)
 
             # Add Clone button/column
 
             print '<td>'
-            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/clone_substage.py?id=%d&results_per_page=%d&page=%d" method="post">' % \
-                (substage_id, results_per_page, current_page)
+            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/clone_substage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
+                (substage_id, results_per_page, current_page, pattern)
             print '<input type="submit" value="Clone">'
             print '</form>'
             print '</td>'        
@@ -86,8 +86,8 @@ def stage_form(cnx, id, results_per_page, current_page):
             # Add Delete button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/delete_substage.py?id=%d&results_per_page=%d&page=%d" method="post">' % \
-                (substage_id, results_per_page, current_page)
+            print '<form action="/cgi-bin/delete_substage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
+                (substage_id, results_per_page, current_page, pattern)
             print '<input type="submit" value="Delete">'
             print '</form>'
             print '</td>'        
@@ -95,8 +95,8 @@ def stage_form(cnx, id, results_per_page, current_page):
             # Add Up button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/up_substage.py?id=%d&results_per_page=%d&page=%d" method="post">' % \
-                (substage_id, results_per_page, current_page)
+            print '<form action="/cgi-bin/up_substage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
+                (substage_id, results_per_page, current_page, pattern)
             print '<input type="submit" value="Up">'
             print '</form>'
             print '</td>'        
@@ -104,8 +104,8 @@ def stage_form(cnx, id, results_per_page, current_page):
             # Add Down button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/down_substage.py?id=%d&results_per_page=%d&page=%d" method="post">' % \
-                (substage_id, results_per_page, current_page)
+            print '<form action="/cgi-bin/down_substage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
+                (substage_id, results_per_page, current_page, pattern)
             print '<input type="submit" value="Down">'
             print '</form>'
             print '</td>'        
@@ -195,7 +195,7 @@ def stage_form(cnx, id, results_per_page, current_page):
     # Add "Save" and "Back" buttons.
 
     print '<input type="submit" value="Save">'
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d' % (project_id, results_per_page, current_page)
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % (project_id, results_per_page, current_page, pattern)
     print '<input type="button" value="Back" onclick="window.open(\'%s\',\'_self\')">' % url
     print '</form>'
 
@@ -204,7 +204,7 @@ def stage_form(cnx, id, results_per_page, current_page):
 
 # Main procedure.
 
-def main(id, results_per_page, current_page):
+def main(id, results_per_page, current_page, pattern):
 
     # Open database connection.
 
@@ -220,12 +220,12 @@ def main(id, results_per_page, current_page):
     print '<title>Stage Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d>Project list</a><br>' % \
-        (results_per_page, current_page)
+    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s>Project list</a><br>' % \
+        (results_per_page, current_page, pattern)
 
     # Generate main parg of html document.
 
-    stage_form(cnx, id, results_per_page, current_page)
+    stage_form(cnx, id, results_per_page, current_page, pattern)
 
     # Generate html document trailer.
     

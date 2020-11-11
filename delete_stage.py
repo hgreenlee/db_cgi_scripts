@@ -24,7 +24,7 @@ from dbdict import databaseDict
 
 # Main procedure.
 
-def main(id, confirm, results_per_page, current_page):
+def main(id, confirm, results_per_page, current_page, pattern):
 
     # Open database connection.
 
@@ -68,10 +68,10 @@ def main(id, confirm, results_per_page, current_page):
             # Generate a form with two buttons "Delete" and "Cancel."
 
             print '<br>'
-            print '<form action="/cgi-bin/delete_stage.py?id=%d&confirm=1&results_per_page=%d&page=%d" method="post">' % \
-                (id, results_per_page, current_page)
+            print '<form action="/cgi-bin/delete_stage.py?id=%d&confirm=1&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
+                (id, results_per_page, current_page, pattern)
             print '<input type="submit" value="Delete">'
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d' % (project_id, results_per_page, current_page)
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % (project_id, results_per_page, current_page, pattern)
             print '<input type="button" value="Cancel" onclick="window.open(\'%s\',\'_self\')">' % url
             print '</form>'
 
@@ -83,8 +83,8 @@ def main(id, confirm, results_per_page, current_page):
         # If confirm flag is nonzero, delete stage and redirect to project editor.
 
         dbutil.delete_stage(cnx, id)
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d' % \
-              (project_id, results_per_page, current_page)
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % \
+              (project_id, results_per_page, current_page, pattern)
 
         # Generate redirect page.
 

@@ -26,7 +26,7 @@ from dbdict import databaseDict
 
 # Main procedure.
 
-def main(id, results_per_page, current_page):
+def main(id, results_per_page, current_page, pattern):
 
     # Open database connection.
 

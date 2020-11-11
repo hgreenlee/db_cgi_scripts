@@ -22,7 +22,7 @@ from dbdict import databaseDict
 
 # Main procedure.
 
-def main(id, results_per_page, current_page):
+def main(id, results_per_page, current_page, pattern):
 
     # Open database connection.
 
@@ -31,8 +31,8 @@ def main(id, results_per_page, current_page):
     # Add substage and redirect to substage editor.
 
     substage_id = dbutil.insert_blank_substage(cnx, id)
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_substage.py?id=%d&results_per_page=%d&page=%d' % \
-          (substage_id, results_per_page, current_page)
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_substage.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % \
+          (substage_id, results_per_page, current_page, pattern)
 
     # Generate redirect page.
 

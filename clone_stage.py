@@ -21,7 +21,7 @@ import dbconfig, dbutil, dbargs
 
 # Main procedure.
 
-def main(stage_id, results_per_page, current_page):
+def main(stage_id, results_per_page, current_page, pattern):
 
     # Open database connection.
 
@@ -48,11 +48,11 @@ def main(stage_id, results_per_page, current_page):
 
     url = ''
     if clone_id > 0:
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d' % \
-              (clone_id, results_per_page, current_page)
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % \
+              (clone_id, results_per_page, current_page, pattern)
     else:
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d' % \
-              (project_id,results_per_page, current_page)
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % \
+              (project_id,results_per_page, current_page, pattern)
 
     print 'Content-type: text/html'
     print
