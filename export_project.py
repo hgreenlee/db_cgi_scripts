@@ -11,9 +11,10 @@
 #
 # CGI arguments:
 #
-# id - Project id.
+# id               - Project id.
 # results_per_page - Number of projects to display on each page.
-# page - Current page (starts at 1).
+# page             - Current page (starts at 1).
+# pattern          - Search pattern.
 #
 # Created: 15-Oct-2020  H. Greenlee
 #

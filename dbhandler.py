@@ -7,8 +7,8 @@
 #
 # CGI arguments:
 #
-# table - Table to update.
-# <column> - Value.
+# table    - Table to update.
+# <column> - Value.  Matched against column names stired in dictionary.
 #
 # Created: 20-Oct-2020  H. Greenlee
 #
@@ -128,10 +128,7 @@ if __name__ == "__main__":
 
     # Parse arguments.
 
-    argdict = {}
-    args = dbargs.get()
-    for key in args:
-        argdict[key] = args[key]
+    argdict = dbargs.get()
 
     # Call main procedure.
 
