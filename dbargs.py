@@ -40,7 +40,11 @@ def get():
 
     args = cgi.FieldStorage()
     for k in args:
-        result[k] = args[k].value
+        arg = args[k]
+        if type(arg) == type([]):
+            result[k] = arg[-1].value   # Give priority to last element of list.
+        else:
+            result[k] = arg.value
 
     # Parse CLI arguments.
 
