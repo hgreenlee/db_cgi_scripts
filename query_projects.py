@@ -189,7 +189,17 @@ def main(results_per_page, current_page, pattern):
 
     print '<form action="/cgi-bin/add_project.py?results_per_page=%d&page=%d&pattern=%s" method="post" target="_blank" rel="noopener noreferer">' % \
         (results_per_page, current_page, pattern)
-    print '<input type="submit" value="New Project">'
+    print '<label for="submit">Generate a new empty project: </label>'
+    print '<input type="submit" id="submit" value="New Project">'
+    print '</form>'
+    print '<p>'
+
+    # Add button to import a project from local xml file.
+
+    print '<form action="/cgi-bin/import_project.py?results_per_page=%d&page=%d&pattern=%s" method="post" target="_blank" rel="noopener noreferer">' % \
+        (results_per_page, current_page, pattern)
+    print '<label for="submit">Import project from local XML file: </label>'
+    print '<input type="submit" id="submit" value="Import Project">'
     print '</form>'
     print '<p>'
 
