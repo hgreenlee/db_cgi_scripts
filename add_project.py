@@ -22,7 +22,7 @@ from dbdict import databaseDict
 
 # Main procedure.
 
-def main(id, results_per_page, current_page, pattern):
+def main(results_per_page, current_page, pattern):
 
     # Open database connection.
 
@@ -73,4 +73,4 @@ if __name__ == "__main__":
 
     # Call main procedure.
 
-    main(id, results_per_page, current_page, pattern)
+    main(results_per_page, current_page, pattern)
