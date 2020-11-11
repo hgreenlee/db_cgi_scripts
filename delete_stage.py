@@ -73,8 +73,8 @@ def main(id, confirm, results_per_page, current_page, pattern):
             print '<form action="/cgi-bin/delete_stage.py?id=%d&confirm=1&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
                 (id, results_per_page, current_page, pattern)
             print '<input type="submit" value="Delete">'
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % (project_id, results_per_page, current_page, pattern)
-            print '<input type="button" value="Cancel" onclick="window.open(\'%s\',\'_self\')">' % url
+            print '<input type="submit" value="Cancel" formaction="/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s">' % \
+                (project_id, results_per_page, current_page, pattern)
             print '</form>'
 
         print '</body>'

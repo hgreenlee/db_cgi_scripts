@@ -64,8 +64,8 @@ def main(id, confirm, results_per_page, current_page, pattern):
             print '<form action="/cgi-bin/delete_project.py?id=%d&confirm=1&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
                 (id, results_per_page, current_page, pattern)
             print '<input type="submit" value="Delete">'
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % (id, results_per_page, current_page, pattern)
-            print '<input type="button" value="Cancel" onclick="window.open(\'%s\',\'_self\')">' % url
+            print '<input type="submit" value="Cancel" formaction="/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s">' % \
+                (results_per_page, current_page, pattern)
             print '</form>'
 
         print '</body>'
@@ -73,7 +73,7 @@ def main(id, confirm, results_per_page, current_page, pattern):
 
     else:
 
-        # If confirm flag is nonzero, delete project and generate an information page/form.
+        # If confirm flag is nonzero, delete project and redirect to project list.
 
         dbutil.delete_project(cnx, id)
         url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s' % \
@@ -95,8 +95,6 @@ def main(id, confirm, results_per_page, current_page, pattern):
         print '</body>'
         print '</html>'
 
-    # Generate html document trailer.
-    
 
 # End of definitions.  Executable code starts here.
 

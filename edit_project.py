@@ -196,8 +196,8 @@ def project_form(cnx, id, results_per_page, current_page, pattern):
     # Add "Save" and "Back" buttons.
 
     print '<input type="submit" value="Save">'
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % (id, results_per_page, current_page, pattern)
-    print '<input type="button" value="Back" onclick="window.open(\'%s\',\'_self\')">' % url
+    print '<input type="submit" value="Back" formaction="/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s">' % \
+        (results_per_page, current_page, pattern)
     print '</form>'
 
 
