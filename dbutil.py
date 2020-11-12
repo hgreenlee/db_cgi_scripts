@@ -10,6 +10,7 @@
 
 import sys
 from dbdict import databaseDict
+import xml.etree.ElementTree as ET
 
 # Convert bytes or unicode to default python str type.
 # Works on python 2 and python 3.
@@ -1467,3 +1468,305 @@ def insert_blank_project(cnx):
     return new_project_id
 
 
+# Import substage from substage xml element.
+# Returns newly inserted substage id.
+
+def import_substage(cnx, substage, stage_id, seqnum):
+
+    result = 0
+    c = cnx.cursor()
+
+    # Extract fcl name attribute.
+
+    fclname = substage.text
+
+    # Prepare query to insert this substage into database.
+
+    q = 'INSERT INTO substages SET stage_id=%d,seqnum=%d' % (stage_id, seqnum)
+    if fclname != '':
+        q += ',fclname=\'%s\'' % fclname
+
+    # Loop over dictionary elements for table stages.
+
+    for coltup in databaseDict['substages']:
+        colname = coltup[0]
+        coltag = coltup[1]
+        coltype = coltup[2]
+        colarray = coltup[3]
+        coldefault = coltup[5]
+        #print colname, coltag, coltype, colarray
+
+        # Hunt for subelements with matching tag.
+
+        if coltag != '':
+            if colarray == 0:
+
+                # Scalar types handled here.
+                # Get one subelement with matching tag, if any.
+
+                xmlpath = './%s' % coltag
+                child = substage.find(xmlpath)
+                if child != None:
+                    value = child.text
+                    if coltype[:3] == 'INT':
+                        q += ',%s=%d' % (colname, int(value))
+                    elif coltype[:6] == 'DOUBLE':
+                        q += ',%s=%8.6f' % (colname, float(value))
+                    elif coltype[:7] == 'VARCHAR':
+                        q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+                else:
+                    if coltype[:3] == 'INT':
+                        q += ',%s=%d' % (colname, coldefault)
+                    elif coltype[:6] == 'DOUBLE':
+                        q += ',%s=%8.6f' % (colname, coldefault)
+                    elif coltype[:7] == 'VARCHAR':
+                        q += ',%s=\'%s\'' % (colname, coldefault)
+
+            else:
+
+                # Arrays handled here.
+                # Get multiple subelements with matching tag.
+
+                values = []
+                children = substage.findall(coltag)
+                for child in children:
+                    values.append(child.text)
+                string_id = update_strings(cnx, values)
+                q += ',%s=%d' % (colname, string_id)
+                    
+    # Execute query.
+
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    substage_id = row[0]
+    result = substage_id
+
+    # Done
+
+    cnx.commit()
+    return result
+
+
+# Import stage from stage xml element.
+# Returns newly inserted stage id.
+
+def import_stage(cnx, stage, project_id, seqnum):
+
+    result = 0
+    c = cnx.cursor()
+
+    # Extract stage name attribute.
+
+    name = ''
+    if 'name' in stage.attrib:
+        name = stage.attrib['name']
+
+    # Prepare query to insert this stage into database.
+
+    q = 'INSERT INTO stages SET project_id=%d,seqnum=%d' % (project_id, seqnum)
+    if name != '':
+        q += ',name=\'%s\'' % name
+
+    # Loop over dictionary elements for table stages.
+
+    for coltup in databaseDict['stages']:
+        colname = coltup[0]
+        coltag = coltup[1]
+        coltype = coltup[2]
+        colarray = coltup[3]
+        coldefault = coltup[5]
+        #print colname, coltag, coltype, colarray, coldefault, type(coldefault)
+
+        # Hunt for subelements with matching tag.
+
+        if coltag != '':
+            if colarray == 0:
+
+                # Scalar types handled here.
+                # Get one subelement with matching tag, if any.
+
+                xmlpath = './%s' % coltag
+                child = stage.find(xmlpath)
+                if child != None:
+                    value = child.text
+                    if coltype[:3] == 'INT':
+                        q += ',%s=%d' % (colname, int(value))
+                    elif coltype[:6] == 'DOUBLE':
+                        q += ',%s=%8.6f' % (colname, float(value))
+                    elif coltype[:7] == 'VARCHAR':
+                        q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+                else:
+
+                    # If this same tag exists in the project definition, 
+                    # get the default value from the project id.
+
+                    inherit = False
+                    for ptup in databaseDict['projects']:
+                        if ptup[1] == coltag:
+                            inherit = True
+                            break
+                    if inherit:
+                        q2 = 'SELECT %s FROM projects WHERE id=%d' % (colname, project_id)
+                        c.execute(q2)
+                        row = c.fetchone()
+                        coldefault = row[0]
+
+                    if coltype[:3] == 'INT':
+                        q += ',%s=%d' % (colname, coldefault)
+                    elif coltype[:6] == 'DOUBLE':
+                        q += ',%s=%8.6f' % (colname, coldefault)
+                    elif coltype[:7] == 'VARCHAR':
+                        q += ',%s=\'%s\'' % (colname, coldefault)
+
+            else:
+
+                # Arrays handled here.
+                # Get multiple subelements with matching tag.
+
+                values = []
+                children = stage.findall(coltag)
+                for child in children:
+                    values.append(child.text)
+                string_id = update_strings(cnx, values)
+                q += ',%s=%d' % (colname, string_id)
+                    
+    # Execute query.
+
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    stage_id = row[0]
+    result = stage_id
+
+    # Insert substage subelements of this project.
+
+    seqnum = 0
+    for substage in stage.findall('fcl'):
+        seqnum += 1
+        import_substage(cnx, substage, stage_id, seqnum)
+
+    # Done
+
+    cnx.commit()
+    return result
+
+
+# Import project(s) from xml string.
+# Returns a list of newly inserted project ids.
+# Projects with matching names will not be reinserted.
+
+def import_project(cnx, xmlstring):
+
+    result = []
+    c = cnx.cursor()
+
+    # Parse the xml string, and extract the root element.
+
+    root = ET.fromstring(xmlstring)
+
+    # Loop over project elements in this xml file.
+
+    for prj in root.iter('project'):
+
+        # Extract project name attribute.
+
+        name = ''
+        if 'name' in prj.attrib:
+            name = prj.attrib['name']
+
+        # See if this project name alread exists.
+        # Ignore this project if it does.
+
+        q = 'SELECT COUNT(*) FROM projects WHERE name=\'%s\'' % name
+        c.execute(q)
+        row = c.fetchone()
+        n = int(row[0])
+        if n > 0:
+            break
+
+        # Prepare query to insert this project into database.
+
+        q = 'INSERT INTO projects SET'
+        if name != '':
+            q += ' name=\'%s\'' % name
+
+        # Loop over dictionary elements for table projects.
+
+        for coltup in databaseDict['projects']:
+            colname = coltup[0]
+            coltag = coltup[1]
+            coltype = coltup[2]
+            colarray = coltup[3]
+            coldefault = coltup[5]
+            #print colname, coltag, coltype, colarray
+
+            # Hunt for subelements with matching tag.
+
+            if coltag != '':
+                if colarray == 0:
+
+                    # Scalar types handled here.
+                    # Get one subelement with matching tag, if any.
+
+                    xmlpath = './%s' % coltag
+                    child = prj.find(xmlpath)
+                    if child != None:
+                        value = child.text
+                        if coltype[:3] == 'INT':
+                            q += ',%s=%d' % (colname, int(value))
+                        elif coltype[:6] == 'DOUBLE':
+                            q += ',%s=%8.6f' % (colname, float(value))
+                        elif coltype[:7] == 'VARCHAR':
+                            q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+                    else:
+                        if coltype[:3] == 'INT':
+                            q += ',%s=%d' % (colname, coldefault)
+                        elif coltype[:6] == 'DOUBLE':
+                            q += ',%s=%8.6f' % (colname, coldefault)
+                        elif coltype[:7] == 'VARCHAR':
+                            q += ',%s=\'%s\'' % (colname, coldefault)
+
+                else:
+
+                    # Arrays handled here.
+                    # Get multiple subelements with matching tag.
+
+                    values = []
+                    children = prj.findall(coltag)
+                    for child in children:
+                        values.append(child.text)
+                    string_id = update_strings(cnx, values)
+                    q += ',%s=%d' % (colname, string_id)
+                    
+        # Execute query.
+
+        c.execute(q)
+
+        # Get id of inserted row.
+
+        q = 'SELECT LAST_INSERT_ID()'
+        c.execute(q)
+        row = c.fetchone()
+        project_id = row[0]
+        result.append(project_id)
+
+        # Insert stage subelements of this project.
+
+        seqnum = 0
+        for stage in prj.findall('stage'):
+            seqnum += 1
+            import_stage(cnx, stage, project_id, seqnum)
+
+    # Done
+
+    cnx.commit()
+    return result
