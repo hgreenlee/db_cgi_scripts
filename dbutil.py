@@ -1675,7 +1675,7 @@ def import_project(cnx, xmlstring):
 
     # Loop over project elements in this xml file.
 
-    for prj in root.iter('project'):
+    for prj in root.getiterator('project'):
 
         # Extract project name attribute.
 
@@ -1683,14 +1683,11 @@ def import_project(cnx, xmlstring):
         if 'name' in prj.attrib:
             name = prj.attrib['name']
 
-        # See if this project name alread exists.
+        # See if this project name already exists.
         # Ignore this project if it does.
 
-        q = 'SELECT COUNT(*) FROM projects WHERE name=\'%s\'' % name
-        c.execute(q)
-        row = c.fetchone()
-        n = int(row[0])
-        if n > 0:
+        id = get_project_id(cnx, name)
+        if id > 0:
             break
 
         # Prepare query to insert this project into database.
@@ -1770,3 +1767,34 @@ def import_project(cnx, xmlstring):
 
     cnx.commit()
     return result
+
+
+# Extract project names from xml string.
+# Return list of project names.
+
+def xml_project_names(xmlstring):
+
+    result = []
+
+    # Parse the xml string, and extract the root element.
+
+    root = ET.fromstring(xmlstring)
+
+    # Loop over project elements in this xml file.
+
+    for prj in root.getiterator('project'):
+
+        # Extract project name attribute.
+
+        name = ''
+        if 'name' in prj.attrib:
+            name = prj.attrib['name']
+
+        if name != '':
+            result.append(name)
+
+    # Done
+
+    return result
+
+
