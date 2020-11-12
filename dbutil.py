@@ -12,6 +12,7 @@ import sys
 from dbdict import databaseDict
 import xml.etree.ElementTree as ET
 
+
 # Convert bytes or unicode to default python str type.
 # Works on python 2 and python 3.
 
@@ -48,6 +49,21 @@ def convert_str(s):
 
     return result
 
+
+# Convert argument dictionary to ampersand-separated list of key-value pairs.
+
+def convert_args(argdict):
+
+    result = ''
+
+    for key in argdict:
+        if result != '':
+            result += '&'
+        result += '%s=%s' % (convert_str(key), convert_str(argdict[key]))
+
+    # Done
+
+    return result
 
 
 # Check whether connection is read only or read/write.

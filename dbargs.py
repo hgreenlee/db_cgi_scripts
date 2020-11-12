@@ -30,6 +30,8 @@ import cgi
 import cgitb
 cgitb.enable()
 
+# Return argument dictionary consisting of all arguments.
+
 def get():
 
     # Initialize return value argument dictionary.
@@ -56,6 +58,42 @@ def get():
                 result[k] = kv[1]
             else:
                 result[k] = ''
+
+    # Done.
+
+    return result
+
+
+# Return argument dictionary consisting of only arguments used by query_projects.py.
+
+def get_qdict():
+
+    # Initialize return value argument dictionary.
+
+    result = {}
+
+    # Parse CGI arguments.
+
+    args = cgi.FieldStorage()
+    for k in args:
+        if k == 'results_per_page' or k == 'page' or k == 'pattern':
+            arg = args[k]
+            if type(arg) == type([]):
+                result[k] = arg[-1].value   # Give priority to last element of list.
+            else:
+                result[k] = arg.value
+
+    # Parse CLI arguments.
+
+    for arg in sys.argv[1:]:
+        kv = arg.split('=')
+        k = kv[0]
+        if k == 'results_per_page' or k == 'page' or k == 'pattern':
+            if k not in result:
+                if len(arg) > 1:
+                    result[k] = kv[1]
+                else:
+                    result[k] = ''
 
     # Done.
 
