@@ -7,10 +7,8 @@
 #
 # CGI arguments:
 #
-# id               - Project id.
-# results_per_page - Number of projects to display on each page.
-# page             - Current page (starts at 1).
-# pattern          - Search pattern.
+# id      - Project id.
+# <qdict> - Standard query_projects.py arguments.
 #
 # Created: 19-Oct-2020  H. Greenlee
 #
@@ -26,7 +24,7 @@ cgitb.enable()
 
 # Project edit form.
 
-def project_form(cnx, id, results_per_page, current_page, pattern):
+def project_form(cnx, id, qdict):
 
     # Query project name from database.
 
@@ -46,8 +44,8 @@ def project_form(cnx, id, results_per_page, current_page, pattern):
     # Add button to insert another stage.
 
     print '<h2>Stages</h2>'
-    print '<form action="/cgi-bin/add_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post" target="_blank" rel="noopener noreferer">' % \
-        (id, results_per_page, current_page, pattern)
+    print '<form action="/cgi-bin/add_stage.py?id=%d&%s" method="post" target="_blank" rel="noopener noreferer">' % \
+        (id, dbargs.convert_args(qdict))
     print '<input type="submit" value="Add Stage">'
     print '</form>'
     print '<br>'
@@ -72,14 +70,14 @@ def project_form(cnx, id, results_per_page, current_page, pattern):
             stage_id = row[0]
             stage_name = row[1]
             print '<td>%d</td>' % stage_id
-            print '<td><a target="_blank" rel="noopener noreferer" href="https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s">%s</a></td>' % \
-                (stage_id, results_per_page, current_page, pattern, stage_name)
+            print '<td><a target="_blank" rel="noopener noreferer" href="https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&%s">%s</a></td>' % \
+                (stage_id, dbargs.convert_args(qdict), stage_name)
 
             # Add Clone button/column
 
             print '<td>'
-            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/clone_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-                (stage_id, results_per_page, current_page, pattern)
+            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/clone_stage.py?id=%d&%s" method="post">' % \
+                (stage_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Clone">'
             print '</form>'
             print '</td>'        
@@ -87,8 +85,8 @@ def project_form(cnx, id, results_per_page, current_page, pattern):
             # Add Delete button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/delete_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-                (stage_id, results_per_page, current_page, pattern)
+            print '<form action="/cgi-bin/delete_stage.py?id=%d&%s" method="post">' % \
+                (stage_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Delete">'
             print '</form>'
             print '</td>'        
@@ -96,8 +94,8 @@ def project_form(cnx, id, results_per_page, current_page, pattern):
             # Add Up button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/up_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-                (stage_id, results_per_page, current_page, pattern)
+            print '<form action="/cgi-bin/up_stage.py?id=%d&%s" method="post">' % \
+                (stage_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Up">'
             print '</form>'
             print '</td>'        
@@ -105,8 +103,8 @@ def project_form(cnx, id, results_per_page, current_page, pattern):
             # Add Down button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/down_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-                (stage_id, results_per_page, current_page, pattern)
+            print '<form action="/cgi-bin/down_stage.py?id=%d&%s" method="post">' % \
+                (stage_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Down">'
             print '</form>'
             print '</td>'        
@@ -196,8 +194,8 @@ def project_form(cnx, id, results_per_page, current_page, pattern):
     # Add "Save" and "Back" buttons.
 
     print '<input type="submit" value="Save">'
-    print '<input type="submit" value="Back" formaction="/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s">' % \
-        (results_per_page, current_page, pattern)
+    print '<input type="submit" value="Back" formaction="/cgi-bin/query_projects.py?%s">' % \
+        dbargs.convert_args(qdict)
     print '</form>'
 
 
@@ -205,7 +203,7 @@ def project_form(cnx, id, results_per_page, current_page, pattern):
 
 # Main procedure.
 
-def main(id, results_per_page, current_page, pattern):
+def main(id, qdict):
 
     # Open database connection.
 
@@ -221,12 +219,12 @@ def main(id, results_per_page, current_page, pattern):
     print '<title>Project Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s>Project list</a><br>' % \
-        (results_per_page, current_page, pattern)
+    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s>Project list</a><br>' % \
+        dbargs.convert_args(qdict)
 
     # Generate main parg of html document.
 
-    project_form(cnx, id, results_per_page, current_page, pattern)
+    project_form(cnx, id, qdict)
 
     # Generate html document trailer.
     
@@ -240,21 +238,12 @@ if __name__ == "__main__":
 
     # Parse arguments.
 
-    
+    argdict = dbargs.get()
+    qdict = dbargs.extract_qdict(argdict)
     id = 0
-    results_per_page = 20
-    current_page = 1
-    pattern = ''
-    args = dbargs.get()
-    if 'id' in args:
-        id = int(args['id'])
-    if 'results_per_page' in args:
-        results_per_page = int(args['results_per_page'])
-    if 'page' in args:
-        current_page = int(args['page'])
-    if 'pattern' in args:
-        pattern = args['pattern']
+    if 'id' in argdict:
+        id = int(argdict['id'])
 
     # Call main procedure.
 
-    main(id, results_per_page, current_page, pattern)
+    main(id, qdict)

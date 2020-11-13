@@ -7,13 +7,11 @@
 #
 # CGI arguments:
 #
-# id               - Substage id.
-# confirm          - Confirm flag.
-#                    If value is zero, display a confirmation page.
-#                    If value is nonzero, delete substage.
-# results_per_page - Number of projects to display on each page.
-# page             - Current page (starts at 1).
-# pattern          - Search pattern.
+# id      - Substage id.
+# confirm - Confirm flag.
+#           If value is zero, display a confirmation page.
+#           If value is nonzero, delete substage.
+# <qdict> - Standard query_projects.py arguments.
 #
 # Created: 15-Oct-2020  H. Greenlee
 #
@@ -26,7 +24,7 @@ from dbdict import databaseDict
 
 # Main procedure.
 
-def main(id, confirm, results_per_page, current_page, pattern):
+def main(id, confirm, qdict):
 
     # Open database connection.
 
@@ -70,11 +68,11 @@ def main(id, confirm, results_per_page, current_page, pattern):
             # Generate a form with two buttons "Delete" and "Cancel."
 
             print '<br>'
-            print '<form action="/cgi-bin/delete_substage.py?id=%d&confirm=1&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-                (id, results_per_page, current_page, pattern)
+            print '<form action="/cgi-bin/delete_substage.py?id=%d&confirm=1&%s" method="post">' % \
+                (id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Delete">'
-            print '<input type="submit" value="Cancel" formaction="/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s">' % \
-                (stage_id, results_per_page, current_page, pattern)
+            print '<input type="submit" value="Cancel" formaction="/cgi-bin/edit_stage.py?id=%d&%s">' % \
+                (stage_id, dbargs.convert_args(qdict))
             print '</form>'
 
         print '</body>'
@@ -85,8 +83,8 @@ def main(id, confirm, results_per_page, current_page, pattern):
         # If confirm flag is nonzero, delete substage and redirect to stage editor.
 
         dbutil.delete_substage(cnx, id)
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % \
-              (stage_id, results_per_page, current_page, pattern)
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&%s' % \
+              (stage_id, dbargs.convert_args(qdict))
 
         # Generate redirect page.
 
@@ -114,24 +112,15 @@ if __name__ == "__main__":
 
     # Parse arguments.
 
-    
+    argdict = dbargs.get()
+    qdict = dbargs.extract_qdict(argdict)
     id = 0
     confirm = 0
-    results_per_page = 20
-    current_page = 1
-    pattern = ''
-    args = dbargs.get()
-    if 'id' in args:
-        id = int(args['id'])
-    if 'confirm' in args:
-        confirm = int(args['id'])
-    if 'results_per_page' in args:
-        results_per_page = int(args['results_per_page'])
-    if 'page' in args:
-        current_page = int(args['page'])
-    if 'pattern' in args:
-        pattern = args['pattern']
+    if 'id' in argdict:
+        id = int(argdict['id'])
+    if 'confirm' in argdict:
+        confirm = int(argdict['confirm'])
 
     # Call main procedure.
 
-    main(id, confirm, results_per_page, current_page, pattern)
+    main(id, confirm, qdata)

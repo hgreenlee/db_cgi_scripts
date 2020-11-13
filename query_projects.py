@@ -9,9 +9,7 @@
 #
 # CGI arguments:
 #
-# results_per_page - Number of projects to display on each page.
-# page             - Current page (starts at 1).
-# pattern          - Search pattern.
+# <qdict> - Standard query_projects.py arguments.
 #
 # Created: 15-Oct-2020  H. Greenlee
 #
@@ -159,7 +157,13 @@ def page_links(results_per_page, current_page, max_page, pattern):
 
 # Main procedure.
 
-def main(results_per_page, current_page, pattern):
+def main(qdict):
+
+    # Extract arguments.
+
+    results_per_page = qdict['results_per_page']
+    current_page = qdict['page']
+    pattern = qdict['pattern']
 
     # Open database connection and query projects.
 
@@ -277,17 +281,9 @@ if __name__ == "__main__":
 
     # Parse arguments.
 
-    results_per_page = 20
-    current_page = 1
-    pattern = ''
-    args = dbargs.get()
-    if 'results_per_page' in args:
-        results_per_page = int(args['results_per_page'])
-    if 'page' in args:
-        current_page = int(args['page'])
-    if 'pattern' in args:
-        pattern = args['pattern']
+    argdict = dbargs.get()
+    qdict = dbargs.extract_qdict(argdict)
 
     # Call main procedure.
 
-    main(results_per_page, current_page, pattern)
+    main(qdict)

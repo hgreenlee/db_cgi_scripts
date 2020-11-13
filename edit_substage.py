@@ -7,10 +7,8 @@
 #
 # CGI arguments:
 #
-# id               - Subtage id.
-# results_per_page - Number of stages to display on each page.
-# page             - Current page (starts at 1).
-# pattern          - Search pattern.
+# id      - Subtage id.
+# <qdict> - Standard query_projects.py arguments.
 #
 # Created: 19-Oct-2020  H. Greenlee
 #
@@ -23,7 +21,7 @@ from dbdict import databaseDict
 
 # Stage edit form.
 
-def substage_form(cnx, id, results_per_page, current_page, pattern):
+def substage_form(cnx, id, qdict):
 
     # Query substage from database.
 
@@ -120,14 +118,14 @@ def substage_form(cnx, id, results_per_page, current_page, pattern):
     # Add "Save" and "Back" buttons.
 
     print '<input type="submit" value="Save">'
-    print '<input type="submit" value="Back" formaction="/cgi-bin/edit_stage.py?id=%d&results_per_page=%d&page=%d&pattern=%s">' % \
-        (stage_id, results_per_page, current_page, pattern)
+    print '<input type="submit" value="Back" formaction="/cgi-bin/edit_stage.py?id=%d&%s">' % \
+        (stage_id, dbargs.convert_args(qdict))
     print '</form>'
 
 
 # Main procedure.
 
-def main(id, results_per_page, current_page, pattern):
+def main(id, qdict):
 
     # Open database connection.
 
@@ -143,12 +141,12 @@ def main(id, results_per_page, current_page, pattern):
     print '<title>Substage Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s>Project list</a><br>' % \
-        (results_per_page, current_page, pattern)
+    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s>Project list</a><br>' % \
+        dbargs.convert_args(qdict)
 
     # Generate main parg of html document.
 
-    substage_form(cnx, id, results_per_page, current_page, pattern)
+    substage_form(cnx, id, qdict)
 
     # Generate html document trailer.
     
@@ -162,21 +160,12 @@ if __name__ == "__main__":
 
     # Parse arguments.
 
-    
+    argdict = dbargs.get()
+    qdict = dbargs.extract_qdict(argdict)
     id = 0
-    results_per_page = 20
-    current_page = 1
-    pattern = ''
-    args = dbargs.get()
-    if 'id' in args:
-        id = int(args['id'])
-    if 'results_per_page' in args:
-        results_per_page = int(args['results_per_page'])
-    if 'page' in args:
-        current_page = int(args['page'])
-    if 'pattern' in args:
-        pattern = args['pattern']
+    if 'id' in argdict:
+        id = int(argdict['id'])
 
     # Call main procedure.
 
-    main(id, results_per_page, current_page, pattern)
+    main(id, qdict)

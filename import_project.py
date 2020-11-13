@@ -7,10 +7,8 @@
 #
 # CGI arguments:
 #
-# file             - Local xml file name.
-# results_per_page - Number of projects to display on each page.
-# page             - Current page (starts at 1).
-# pattern          - Search pattern.
+# file    - Local xml file data.
+# <qdict> - Standard query_projects.py arguments.
 #
 # Created: 15-Oct-2020  H. Greenlee
 #
@@ -23,7 +21,7 @@ from dbdict import databaseDict
 
 # Main procedure.
 
-def main(xmldata, results_per_page, current_page, pattern):
+def main(xmldata, qdict):
 
     # Open database connection.
 
@@ -45,11 +43,11 @@ def main(xmldata, results_per_page, current_page, pattern):
         # Generate a form with file dialog and two buttons "Import" and "Cancel."
 
         print '<form action="/cgi-bin/import_project.py" method="post" enctype="multipart/form-data">'
-        print '<input type="hidden" name="results_per_page" value="%d">' % results_per_page
-        print '<input type="hidden" name="page" value="%d">' % current_page
-        print '<input type="hidden" name="pattern" value="%s">' % pattern
-        print '<label for="filename">Choose input xml file</label>'
-        print '<input type="file" id="filename" name="file" accept=".xml">'
+        for key in qdict:
+            print '<input type="hidden" name="%s" value="%s">' % (dbutil.convert_str(key),
+                                                                  dbutil.convert_str(qdict[key]))
+        print '<label for="xmldata">Choose input xml file</label>'
+        print '<input type="file" id="xmldata" name="data" accept=".xml">'
         print '<br>'
         print '<input type="submit" value="Import">'
         print '<input type="submit" value="Cancel" formaction="/cgi-bin/query_projects.py">'
@@ -70,8 +68,8 @@ def main(xmldata, results_per_page, current_page, pattern):
 
             # XML error.
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s' % \
-                  (results_per_page, current_page, pattern)
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s' % \
+                  dbargs.convert_args(qdict)
             print 'Content-type: text/html'
             print
             print '<!DOCTYPE html>'
@@ -101,8 +99,8 @@ def main(xmldata, results_per_page, current_page, pattern):
             # All project names are already in database.
             # Generate informative page.
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s' % \
-                  (results_per_page, current_page, pattern)
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s' % \
+                  dbargs.convert_args(qdict)
             print 'Content-type: text/html'
             print
             print '<!DOCTYPE html>'
@@ -135,8 +133,8 @@ def main(xmldata, results_per_page, current_page, pattern):
             # Redirect to project editor.
 
             project_id = ids[0]
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % \
-                  (project_id, results_per_page, current_page, pattern)
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&%s' % \
+                  (project_id, dbargs.convert_args(qdict))
             print 'Content-type: text/html'
             print
             print '<!DOCTYPE html>'
@@ -155,8 +153,8 @@ def main(xmldata, results_per_page, current_page, pattern):
 
             # Import failed.
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s' % \
-                  (results_per_page, current_page, pattern)
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s' % \
+                  dbargs.convert_args(qdict)
             print 'Content-type: text/html'
             print
             print '<!DOCTYPE html>'
@@ -181,20 +179,12 @@ if __name__ == "__main__":
 
     # Parse arguments.
 
+    argdict = dbargs.get()
+    qdict = dbargs.extract_qdict(argdict)
     xmldata = ''
-    results_per_page = 20
-    current_page = 1
-    pattern = ''
-    args = dbargs.get()
-    if 'file' in args:
-        xmldata = args['file']
-    if 'results_per_page' in args:
-        results_per_page = int(args['results_per_page'])
-    if 'page' in args:
-        current_page = int(args['page'])
-    if 'pattern' in args:
-        pattern = args['pattern']
+    if 'data' in argdict:
+        xmldata = argdict['data']
 
     # Call main procedure.
 
-    main(xmldata, results_per_page, current_page, pattern)
+    main(xmldata, qdict)

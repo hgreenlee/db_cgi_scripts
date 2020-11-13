@@ -7,10 +7,8 @@
 #
 # CGI arguments:
 #
-# id               - Project id.
-# results_per_page - Number of projects to display on each page.
-# page             - Current page (starts at 1).
-# pattern          - Search pattern.
+# id      - Project id.
+# <qdict> - Standard query_projects.py arguments.
 #
 # Created: 19-Oct-2020  H. Greenlee
 #
@@ -22,7 +20,7 @@ import dbconfig, dbutil, dbargs
 
 # Main procedure.
 
-def main(project_id, results_per_page, current_page, pattern):
+def main(project_id, qdict):
 
     # Open database connection.
 
@@ -60,11 +58,11 @@ def main(project_id, results_per_page, current_page, pattern):
 
     url = ''
     if clone_id > 0:
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s' % \
-              (clone_id, results_per_page, current_page, pattern)
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&%s' % \
+              (clone_id, dbargs.convert_args(qdict))
     else:
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s' % \
-              (results_per_page, current_page, pattern)
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s' % \
+              dbargs.convert_args(qdict)
 
     print 'Content-type: text/html'
     print
@@ -91,21 +89,12 @@ if __name__ == "__main__":
 
     # Parse arguments.
 
+    argdict = dbargs.get()
+    qdict = dbargs.extract_qdict(argdict)
     id = 0
-    name = ''
-    results_per_page = 20
-    current_page = 1
-    pattern = ''
-    args = dbargs.get()
-    if 'id' in args:
-        id = int(args['id'])
-    if 'results_per_page' in args:
-        results_per_page = int(args['results_per_page'])
-    if 'page' in args:
-        current_page = int(args['page'])
-    if 'pattern' in args:
-        pattern = args['pattern']
+    if 'id' in argdict:
+        id = int(argdict['id'])
 
     # Call main procedure.
 
-    main(id, results_per_page, current_page, pattern)
+    main(id, qdict)

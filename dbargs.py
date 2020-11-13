@@ -26,9 +26,27 @@
 #==============================================================================
 
 import sys
+import dbutil
 import cgi
 import cgitb
 cgitb.enable()
+
+
+# Convert argument dictionary to ampersand-separated list of key-value pairs.
+
+def convert_args(argdict):
+
+    result = ''
+
+    for key in argdict:
+        if result != '':
+            result += '&'
+        result += '%s=%s' % (dbutil.convert_str(key), dbutil.convert_str(argdict[key]))
+
+    # Done
+
+    return result
+
 
 # Return argument dictionary consisting of all arguments.
 
@@ -52,51 +70,69 @@ def get():
 
     for arg in sys.argv[1:]:
         kv = arg.split('=')
-        k = kv[0]
-        if k not in result:
-            if len(arg) > 1:
+        if len(kv) > 1:
+            k = kv[0]
+            if k not in result:
                 result[k] = kv[1]
-            else:
-                result[k] = ''
 
     # Done.
 
     return result
 
 
-# Return argument dictionary consisting of only arguments used by query_projects.py.
+# Extract dictionary arguments consisting only of arguments used by query_projects.py.
+# All arguments get a default value.
 
-def get_qdict():
+def extract_qdict(argdict):
 
     # Initialize return value argument dictionary.
 
     result = {}
 
-    # Parse CGI arguments.
+    # Parse arguments
 
-    args = cgi.FieldStorage()
-    for k in args:
-        if k == 'results_per_page' or k == 'page' or k == 'pattern':
-            arg = args[k]
-            if type(arg) == type([]):
-                result[k] = arg[-1].value   # Give priority to last element of list.
-            else:
-                result[k] = arg.value
+    for k in argdict:
+
+        # Integer arguments.
+
+        if k == 'results_per_page' or k == 'page':
+            result[k] = int(argdict[k])
+
+        # String arguments.
+
+        elif k == 'pattern':
+            result[k] = argdict[k]
 
     # Parse CLI arguments.
 
     for arg in sys.argv[1:]:
         kv = arg.split('=')
-        k = kv[0]
-        if k == 'results_per_page' or k == 'page' or k == 'pattern':
-            if k not in result:
-                if len(arg) > 1:
+        if len(kv) > 1:
+            k = kv[0]
+
+            # Integer arguments (convert to integer).
+
+            if k == 'results_per_page' or k == 'page':
+                if k not in result:
+                    result[k] = int(kv[1])
+
+            # String arguments.
+
+            elif k == 'pattern':
+                if k not in result:
                     result[k] = kv[1]
-                else:
-                    result[k] = ''
+
+    # Add default values for certain arguments.
+
+    if not 'results_per_page' in result:
+        result['results_per_page'] = 20
+    if not 'page' in result:
+        result['page'] = 1
+    if not 'pattern' in result:
+        result['pattern'] = ''
 
     # Done.
 
     return result
 
-    
+
