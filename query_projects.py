@@ -245,6 +245,15 @@ def main(qdict):
         print '</form>'
         print '</td>'        
 
+        # Add POMS button/column
+
+        print '<td>'
+        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/export_poms.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
+            (id, results_per_page, current_page, pattern)
+        print '<input type="submit" value="POMS">'
+        print '</form>'
+        print '</td>'        
+
         # Add Clone button/column
 
         print '<td>'

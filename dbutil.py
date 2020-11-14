@@ -9,6 +9,7 @@
 #==============================================================================
 
 import sys
+import dbconfig
 from dbdict import databaseDict
 import xml.etree.ElementTree as ET
 
@@ -495,6 +496,97 @@ def export_project(cnx, project_id, xml):
     xml.write('</job>\n')
     return
 
+
+# Export poms ini file corresponding to project.
+
+def export_poms_project(cnx, project_id, ini):
+
+    # Query information about this project.
+
+    c = cnx.cursor()
+    q = '''SELECT name, release_tag, poms_campaign, poms_login_setup, poms_job_type 
+           FROM projects WHERE id=%d''' % project_id
+    c.execute(q)
+    row = c.fetchone()
+    name = row[0]
+    version = row[1]
+    poms_campaign = row[2]
+    poms_login_setup = row[3]
+    poms_job_type = row[4]
+    if poms_campaign == '':
+        poms_campaign = name
+
+    # Query stage names and ids corresonding to this project.
+
+    stage_ids = []
+    stage_names = []
+    q = 'SELECT id, name FROM stages WHERE project_id=%d' % project_id
+    c.execute(q)
+    rows = c.fetchall()
+    for row in rows:
+        stage_ids.append(row[0])
+        stage_names.append(row[1])
+
+    # Campaign section.
+
+    ini.write('[campaign]\n')
+    ini.write('experiment=%s\n' % dbconfig.experiment)
+    ini.write('poms_role=production\n')
+    ini.write('name=%s\n' % poms_campaign)
+    ini.write('stage=Active\n')
+    ini.write('campaign_keywords={}\n')
+    ini.write('campaign_stage_list=%s\n' % ','.join(stage_names))
+    ini.write('\n')
+
+    # Campaign defaults section.
+
+    ini.write('[campaign_defaults]\n')
+    ini.write('vo_role=Production\n')
+    ini.write('software_version=v1_0\n')
+    ini.write('dataset_or_split_data=\n')
+    ini.write('cs_split_type=\n')
+    ini.write('completion_type=located\n')
+    ini.write('completion_pct=95\n')
+    ini.write('param_overrides=[]\n')
+    ini.write('test_param_overrides=[]\n')
+    ini.write('merge_overrides=\n')
+    ini.write('login_setup=generic\n')
+    ini.write('job_type=generic\n')
+    ini.write('stage_type=regular\n')
+    ini.write('output_ancestor_depth=1\n')
+    ini.write('\n')
+
+    # Loop over stages.
+
+    for stage_id in stage_ids:
+
+        # Query information about this stage.
+
+        q = 'SELECT name, poms_stage FROM stages WHERE id=%d' % stage_id
+        c.execute(q)
+        row = c.fetchone()
+        stage_name = row[0]
+        poms_stage = row[1]
+        if poms_stage == '':
+            poms_stage = stage_name
+
+        # Campaign stage section.
+
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/export_project.py?id=%d' % project_id
+        ini.write('[campaign_stage %s]\n' % poms_stage)
+        ini.write('software_version=%s\n' % version)
+        ini.write('dataset_or_split_data=\n')
+        ini.write('cs_split_type=draining\n')
+        ini.write('completion_type=located\n')
+        ini.write('param_overrides=[["--xml", "%s"], ["--stage", "%s"]]\n' % (url, stage_name))
+        ini.write('login_setup=%s\n' % poms_login_setup)
+        ini.write('job_type=%s\n' % poms_job_type)
+        ini.write('merge_overrides=False\n')
+        ini.write('stage_type=regular\n')
+        ini.write('\n')
+
+        
+        
 
 # Delete substage.
 

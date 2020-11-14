@@ -1,16 +1,16 @@
 #! /usr/bin/python
 #==============================================================================
 #
-# Name: export_project.py
+# Name: export_poms.py
 #
-# Purpose: CGI script to export a project to XML to standard output.
+# Purpose: CGI script to export a project to a POMS ini file to standard putput.
 #
 # CGI arguments:
 #
 # id      - Project id.
 # <qdict> - Standard query_projects.py arguments.
 #
-# Created: 15-Oct-2020  H. Greenlee
+# Created: 14-Nov-2020  H. Greenlee
 #
 #==============================================================================
 
@@ -33,7 +33,7 @@ def main(id, qdict):
 
     # Generate html document header.
 
-    print 'Content-type: text/xml'
+    print 'Content-type: text/plain'
     print
 
     # Generate main parg of html document.
@@ -44,9 +44,9 @@ def main(id, qdict):
 
         # Generate XML.
 
-        xml = StringIO.StringIO()
-        dbutil.export_project(cnx, id, xml)
-        print xml.getvalue()
+        ini = StringIO.StringIO()
+        dbutil.export_poms_project(cnx, id, ini)
+        print ini.getvalue()
 
     # Done.
 
