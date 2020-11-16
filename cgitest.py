@@ -88,6 +88,13 @@ try:
 except:
         print 'Import failed.<br>'
 
+print 'Trying to import pycurl<br>'
+try:
+        import pycurl
+        print 'Import successful.<br>'
+except:
+        print 'Import failed.<br>'
+
 #
 #  Show passed cgi arguments.
 #

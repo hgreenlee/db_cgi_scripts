@@ -26,16 +26,9 @@ cgitb.enable()
 
 def project_form(cnx, id, qdict):
 
-    # Query project name from database.
+    # Get project name.
 
-    c = cnx.cursor()
-    q = 'SELECT id,name FROM projects WHERE id=%d' % id
-    c.execute(q)
-    rows = c.fetchall()
-    if len(rows) == 0:
-        raise IOError('Unable to fetch project id %d' % id)
-    row = rows[0]
-    name = row[1]
+    name = dbutil.get_project_name(cnx, id)
 
     # Generate form.
 
@@ -52,6 +45,7 @@ def project_form(cnx, id, qdict):
 
     # Query stage ids belonging to this project.
 
+    c = cnx.cursor()
     q = 'SELECT id, name FROM stages WHERE project_id=%d ORDER BY seqnum' % id
     c.execute(q)
     rows = c.fetchall()
@@ -69,8 +63,8 @@ def project_form(cnx, id, qdict):
             print '<tr>'
             stage_id = row[0]
             stage_name = row[1]
-            print '<td>%d</td>' % stage_id
-            print '<td><a target="_blank" rel="noopener noreferer" href="https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&%s">%s</a></td>' % \
+            print '<td align="center">%d</td>' % stage_id
+            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
                 (stage_id, dbargs.convert_args(qdict), stage_name)
 
             # Add Clone button/column

@@ -33,12 +33,12 @@
 
 # Tables in creation order:
 
-tables = ['projects', 'stages', 'substages', 'strings']
+tables = ['projects', 'stages', 'substages', 'strings', 'datasets']
 
 # Database dictionary.
 
 databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Project ID', 0),
-                             ('name', '',  'VARCHAR(100) NOT NULL', 0, 'Project name', ''),
+                             ('name', '',  'VARCHAR(1000) NOT NULL', 0, 'Project name', ''),
                              ('num_events', 'numevents', 'INT', 0, 'Number of events', 0),
                              ('num_jobs', 'numjobs', 'INT', 0, 'number of jobs', 1),
                              ('max_files_per_job', 'maxfilesperjob', 'INT', 0, 'Maximum files per job', 0),
@@ -143,5 +143,11 @@ databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT
                               ('', '', 'FOREIGN KEY (stage_id) REFERENCES stages (id)', 0, '', 0)],
                 'strings': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'String ID', 0),
                             ('array_id', '', 'INT NOT NULL', 0, 'Array ID', 0),
-                            ('value', '', 'VARCHAR(1000) NOT NULL', 0, 'String value', '')]}
+                            ('value', '', 'VARCHAR(1000) NOT NULL', 0, 'String value', '')],
+                'datasets': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Dataset ID', 0),
+                             ('name', '', 'VARCHAR(1000) NOT NULL', 0, 'Dataset name', ''),
+                             ('project_id', '', 'INT NOT NULL', 0, 'Parent project ID', 0),
+                             ('type', '', 'VARCHAR(100)', 0, 'Dataset type', ''),
+                             ('files', '', 'INT', 0, 'Event count', 0),
+                             ('events', '', 'INT', 0, 'Event count', 0)]}
 

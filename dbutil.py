@@ -84,6 +84,8 @@ def get_tables(cnx):
 
 def list_projects(cnx):
 
+    result = []
+
     # Query projects from database.
 
     c = cnx.cursor()
@@ -92,11 +94,32 @@ def list_projects(cnx):
     rows = c.fetchall()
     for row in rows:
         project_name = row[0]
-        print project_name
+        result.append(project_name)
 
     # Done.
 
-    return
+    return result
+
+
+# List datasets.
+
+def list_datasets(cnx):
+
+    result = []
+
+    # Query datasets from database.
+
+    c = cnx.cursor()
+    q = 'SELECT name FROM datasets'
+    c.execute(q)
+    rows = c.fetchall()
+    for row in rows:
+        dataset_name = row[0]
+        result.append(dataset_name)
+
+    # Done.
+
+    return result
 
 
 # Get project id.
@@ -507,7 +530,8 @@ def export_poms_project(cnx, project_id, ini):
     q = '''SELECT name, release_tag, poms_campaign, poms_login_setup, poms_job_type 
            FROM projects WHERE id=%d''' % project_id
     c.execute(q)
-    row = c.fetchone()
+    rows = c.fetchall()
+    row = rows[0]
     name = row[0]
     version = row[1]
     poms_campaign = row[2]
@@ -564,7 +588,8 @@ def export_poms_project(cnx, project_id, ini):
 
         q = 'SELECT name, poms_stage FROM stages WHERE id=%d' % stage_id
         c.execute(q)
-        row = c.fetchone()
+        rows = c.fetchall()
+        row = rows[0]
         stage_name = row[0]
         poms_stage = row[1]
         if poms_stage == '':
@@ -917,329 +942,6 @@ def free_seqnum_stage(cnx, project_id, seqnum):
     return
 
 
-# Insert blank substage into database.
-# Fields are filled with default values.
-# Substage id of newly added substage is returned.
-
-def insert_blank_substage(cnx, stage_id):
-
-    c = cnx.cursor()
-
-    # Query the maximum sequence number for this stage.
-
-    q = 'SELECT MAX(seqnum) FROM substages WHERE stage_id=%d' % stage_id
-    c.execute(q)
-    row = c.fetchone()
-    seqnum = row[0]
-    new_seqnum = 0
-    if seqnum == None:
-        new_seqnum = 1
-    else:
-        new_seqnum = seqnum + 1
-
-    # Prepare query to insert stage row.
-
-    q = '''INSERT INTO substages SET
-            fclname=\'%s\',
-            stage_id=%d,
-            seqnum=%d,
-            init_sources=%d,
-            end_scripts=%d,
-            projectname=\'%s\',
-            stagename=\'%s\',
-            version=\'%s\',
-            output=\'%s\',
-            exe=\'%s\'
-            ''' % ('blank.fcl',
-                   stage_id,
-                   new_seqnum,
-                   0,
-                   0,
-                   '',
-                   '',
-                   '',
-                   '',
-                   '')
-    c.execute(q)
-
-    # Get id of inserted row.
-
-    q = 'SELECT LAST_INSERT_ID()'
-    c.execute(q)
-    row = c.fetchone()
-    new_substage_id = row[0]
-
-    # Done.
-
-    cnx.commit()
-    return new_substage_id
-
-
-# Insert blank stage into database.
-# Fields are filled with default values.
-# Stage id of newly added stage is returned.
-
-def insert_blank_stage(cnx, project_id):
-
-    c = cnx.cursor()
-
-    # Query the maximum sequence number for this stage.
-
-    q = 'SELECT MAX(seqnum) FROM stages WHERE project_id=%d' % project_id
-    c.execute(q)
-    row = c.fetchone()
-    seqnum = row[0]
-    new_seqnum = 0
-    if seqnum == None:
-        new_seqnum = 1
-    else:
-        new_seqnum = seqnum + 1
-
-    # Prepare query to insert stage row.
-
-    q = '''INSERT INTO stages SET
-            name=\'%s\',
-            project_id=%d,
-            seqnum=%d,
-            batchname=\'%s\',
-            poms_stage=\'%s\',
-            outdir=\'%s\',
-            logdir=\'%s\',
-            workdir=\'%s\',
-            bookdir=\'%s\',
-            dirlevels=%d,
-            dirsize=%d,
-            inputdef=\'%s\',
-            recurdef=\'%s\',
-            ana=%d,
-            recur=%d,
-            recurtype=\'%s\',
-            recurlimit=%d,
-            filelistdef=%d,
-            prestart=%d,
-            activebase=\'%s\',
-            dropboxwait=%g,
-            prestagefraction=%g,
-            maxfluxfilemb=%d,
-            num_jobs=%d,
-            num_events=%d,
-            max_files_per_job=%d,
-            target_size=%d,
-            defname=\'%s\',
-            ana_defname=\'%s\',
-            data_tier=\'%s\',
-            ana_data_tier=\'%s\',
-            submit_script=\'%s\',
-            merge=\'%s\',
-            anamerge=\'%s\',
-            resource=\'%s\',
-            lines_=\'%s\',
-            site=\'%s\',
-            blacklist=\'%s\',
-            cpu=%d,
-            disk=\'%s\',
-            memory=%d,
-            TFileName=\'%s\',
-            jobsub=\'%s\',
-            jobsub_start=\'%s\',
-            jobsub_timeout=%d,
-            schema_=\'%s\',
-            validate_on_worker=%d,
-            copy_to_fts=%d,
-            script=\'%s\',
-            start_script=\'%s\',
-            stop_script=\'%s\',
-            data_streams=%d,
-            ana_data_streams=%d,
-            init_scripts=%d,
-            init_sources=%d,
-            end_scripts=%d
-            ''' % ('blank',
-                   project_id,
-                   new_seqnum,
-                   '',
-                   '',
-                   '',
-                   '',
-                   '',
-                   '',
-                   1,
-                   100,
-                   '',
-                   '',
-                   0,
-                   0,
-                   'child',
-                   0,
-                   1,
-                   1,
-                   '',
-                   3,
-                   1,
-                   0,
-                   100,
-                   1000000000,
-                   1,
-                   0,
-                   '',
-                   '',
-                   'reconstructed',
-                   'root-tuple',
-                   '',
-                   '',
-                   '',
-                   '',
-                   '',
-                   '',
-                   '',
-                   0,
-                   '',
-                   2000,
-                   '',
-                   '--append_condor_requirements=\\\'(TARGET.HAS_CVMFS_uboone_opensciencegrid_org==true)&amp;&amp;(TARGET.HAS_CVMFS_uboone_osgstorage_org==true)\\\' --subgroup=prod --expected-lifetime=long',
-                   '--subgroup=prod --site=FermiGrid --expected-lifetime=long',
-                   0,
-                   'root',
-                   1,
-                   0,
-                   'condor_lar.sh',
-                   'condor_start_project.sh',
-                   'condor_stop_project.sh',
-                   0,
-                   0,
-                   0,
-                   0,
-                   0)
-    c.execute(q)
-
-    # Get id of inserted row.
-
-    q = 'SELECT LAST_INSERT_ID()'
-    c.execute(q)
-    row = c.fetchone()
-    new_stage_id = row[0]
-
-    # Done.
-
-    cnx.commit()
-    return new_stage_id
-
-
-# Insert blank project into database.
-# Fields are filled with default values.
-# Project id of newly added project is returned.
-
-def insert_blank_project(cnx):
-
-    c = cnx.cursor()
-
-    # Generate unique project name.
-
-    n = 1
-    done = False
-    project_name = ''
-    while not done:
-
-        if n == 1:
-            project_name = 'blank'
-        else:
-            project_name = 'blank%d' % n
-
-        # See if this candidate name already exists.
-
-        q = 'SELECT COUNT(*) FROM projects WHERE name=\'%s\'' % project_name
-        c.execute(q)
-        row = c.fetchone()
-        count = row[0]
-        if count == 0:
-            done = True
-        else:
-            n += 1
-
-    # Prepare query to insert project row.
-
-    q = '''INSERT INTO projects SET
-           name=\'%s\',
-           num_events=%d,
-           num_jobs=%d,
-           max_files_per_job=%d,
-           os=\'%s\',
-           resource=\'%s\',
-           role=\'%s\',
-           lines_=\'%s\',
-           server=\'%s\',
-           site=\'%s\',
-           blacklist=\'%s\',
-           cpu=%d,
-           disk=\'%s\',
-           memory=%d,
-           merge=\'%s\',
-           anamerge=\'%s\',
-           release_tag=\'%s\',
-           release_qual=\'%s\',
-           version=\'%s\',
-           local_release_tar=\'%s\',
-           poms_login_setup=\'%s\',
-           poms_job_type=\'%s\',
-           poms_campaign=\'%s\',
-           file_type=\'%s\',
-           run_type=\'%s\',
-           run_number=%d,
-           script=\'%s\',
-           validate_on_worker=%d,
-           copy_to_fts=%d,
-           start_script=\'%s\',
-           stop_script=\'%s\',
-           ups=%d,
-           fcldir=%d
-           ''' % (project_name,
-                  1000000000,
-                  100,
-                  1,
-                  'SL7',
-                  'DEDICATED,OPPORTUNISTIC,OFFSITE',
-                  'Production',
-                  '',
-                  '',
-                  '',
-                  '',
-                  0,
-                  '',
-                  0,
-                  '',
-                  '',
-                  'v08_00_00_xx',
-                  'e17:prof',
-                  'prof_v08_00_00_xx',
-                  '',
-                  '',
-                  '',
-                  '',
-                  'data/mc/overlay',
-                  'physics',
-                  0,
-                  'condor_lar.sh',
-                  1,
-                  0,
-                  'condor_start_project.sh',
-                  'condor_stop_project.sh',
-                  0,
-                  0)
-    c.execute(q)
-
-    # Get id of inserted row.
-
-    q = 'SELECT LAST_INSERT_ID()'
-    c.execute(q)
-    row = c.fetchone()
-    new_project_id = row[0]
-
-    # Done.
-
-    cnx.commit()
-    return new_project_id
-
-
 # Import substage from substage xml element.
 # Returns newly inserted substage id.
 
@@ -1372,6 +1074,14 @@ def import_stage(cnx, stage, project_id, seqnum):
                         q += ',%s=%8.6f' % (colname, float(value))
                     elif coltype[:7] == 'VARCHAR':
                         q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+
+                        # Add datasets.
+
+                        if (colname == 'defname' or colname == 'ana_defname') and value != '':
+                            add_dataset(cnx, project_id, 'output', value)
+                        if colname == 'inputdef' and value != '':
+                            add_dataset(cnx, project_id, 'input', value)
+
                 else:
 
                     # If this same tag exists in the project definition, 
@@ -1385,7 +1095,8 @@ def import_stage(cnx, stage, project_id, seqnum):
                     if inherit:
                         q2 = 'SELECT %s FROM projects WHERE id=%d' % (colname, project_id)
                         c.execute(q2)
-                        row = c.fetchone()
+                        rows = c.fetchall()
+                        row = rows[0]
                         coldefault = row[0]
 
                     if coltype[:3] == 'INT':
@@ -1568,5 +1279,58 @@ def xml_project_names(xmlstring):
     # Done
 
     return result
+
+
+# Add dataset assicuated with project, if not already present.
+# Return id of newly added or already existing dataset.
+
+def add_dataset(cnx, project_id, dataset_type, dataset_name):
+
+    result = 0
+
+    # Query whether this dataset name already exists.
+
+    c = cnx.cursor()
+    q = 'SELECT id, project_id, name FROM datasets WHERE project_id=%d AND type=\'%s\' AND name=\'%s\'' % \
+        (project_id, dataset_type, dataset_name)
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) > 0 :
+        result = rows[0][0]
+    else:
+
+        # Construct a query to insert dataset.
+
+        q = 'INSERT INTO datasets SET project_id=%d,type=\'%s\',name=\'%s\',files=0,events=0' % \
+            (project_id, dataset_type, dataset_name)
+        c.execute(q)
+
+        # Get id of inserted row.
+
+        q = 'SELECT LAST_INSERT_ID()'
+        c.execute(q)
+        row = c.fetchone()
+        result = row[0]
+
+    # Done.
+
+    cnx.commit()
+    return result
+
+
+# Delete dataset.
+
+def delete_dataset(cnx, dataset_id):
+
+    # Delete dataset.
+
+    c = cnx.cursor()
+    q = 'DELETE FROM datasets WHERE id=%d' % dataset_id
+    c.execute(q)
+
+    # Done.
+
+    cnx.commit()
+    return
 
 

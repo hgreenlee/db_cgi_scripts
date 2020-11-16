@@ -15,7 +15,7 @@
 #
 #==============================================================================
 
-import sys, os
+import sys, os, copy
 import dbconfig, dbargs
 
 
@@ -66,7 +66,9 @@ def search_panel(results_per_page, pattern):
 
 # Generate page links.
 
-def page_links(results_per_page, current_page, max_page, pattern):
+def page_links(qdict, max_page):
+
+    current_page = qdict['page']
 
     # Base url.
 
@@ -97,8 +99,10 @@ def page_links(results_per_page, current_page, max_page, pattern):
     if current_page == 1:
         disabled = 'disabled'
     print '<td>'
-    print '<form action="/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-        (results_per_page, 1, pattern)
+    new_qdict = copy.deepcopy(qdict)
+    new_qdict['page'] = 1
+    print '<form action="/cgi-bin/query_projects.py?%s" method="post">' % \
+        dbargs.convert_args(new_qdict)
     print '<input type="submit" value="<<" %s>' % disabled
     print '</form>'
     print '</td>'
@@ -107,8 +111,10 @@ def page_links(results_per_page, current_page, max_page, pattern):
 
     prev_page = max(current_page-1, 1)
     print '<td>'
-    print '<form action="/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-        (results_per_page, prev_page, pattern)
+    new_qdict = copy.deepcopy(qdict)
+    new_qdict['page'] = prev_page
+    print '<form action="/cgi-bin/query_projects.py?%s" method="post">' % \
+        dbargs.convert_args(new_qdict)
     print '<input type="submit" value="<" %s>' % disabled
     print '</form>'
     print '</td>'
@@ -117,8 +123,10 @@ def page_links(results_per_page, current_page, max_page, pattern):
 
     for page in range(min_link, max_link+1):
         if page != current_page:
-            print '<td align="center" style="width:25px;"><a href="%s?results_per_page=%d&page=%d&pattern=%s">%d</a></td>' % \
-                (url, results_per_page, page, pattern, page)
+            new_qdict = copy.deepcopy(qdict)
+            new_qdict['page'] = page
+            print '<td align="center" style="width:25px;"><a href="%s?%s">%d</a></td>' % \
+                (url, dbargs.convert_args(new_qdict), page)
         else:
             print '<th align="center" style="width:25px;">%d</th>' % page
 
@@ -130,8 +138,10 @@ def page_links(results_per_page, current_page, max_page, pattern):
         disabled = 'disabled'
     next_page = min(current_page+1, max_page)
     print '<td>'
-    print '<form action="/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-        (results_per_page, next_page, pattern)
+    new_qdict = copy.deepcopy(qdict)
+    new_qdict['page'] = next_page
+    print '<form action="/cgi-bin/query_projects.py?%s" method="post">' % \
+        dbargs.convert_args(new_qdict)
     print '<input type="submit" value=">" %s>' % disabled
     print '</form>'
     print '</td>'
@@ -139,8 +149,10 @@ def page_links(results_per_page, current_page, max_page, pattern):
     # Link to last page.
 
     print '<td>'
-    print '<form action="/cgi-bin/query_projects.py?results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-        (results_per_page, max_page, pattern)
+    new_qdict = copy.deepcopy(qdict)
+    new_qdict['page'] = max_page
+    print '<form action="/cgi-bin/query_projects.py?%s" method="post">' % \
+        dbargs.convert_args(new_qdict)
     print '<input type="submit" value=">>" %s >' % disabled
     print '</form>'
     print '</td>'
@@ -191,8 +203,8 @@ def main(qdict):
 
     # Add button to create new project.
 
-    print '<form action="/cgi-bin/add_project.py?results_per_page=%d&page=%d&pattern=%s" method="post" target="_blank" rel="noopener noreferer">' % \
-        (results_per_page, current_page, pattern)
+    print '<form action="/cgi-bin/add_project.py?%s" method="post" target="_blank" rel="noopener noreferer">' % \
+        dbargs.convert_args(qdict)
     print '<label for="submit">Generate a new empty project: </label>'
     print '<input type="submit" id="submit" value="New Project">'
     print '</form>'
@@ -200,8 +212,8 @@ def main(qdict):
 
     # Add button to import a project from local xml file.
 
-    print '<form action="/cgi-bin/import_project.py?results_per_page=%d&page=%d&pattern=%s" method="post" target="_blank" rel="noopener noreferer">' % \
-        (results_per_page, current_page, pattern)
+    print '<form action="/cgi-bin/import_project.py?%s" method="post" target="_blank" rel="noopener noreferer">' % \
+        dbargs.convert_args(qdict)
     print '<label for="submit">Import project from local XML file: </label>'
     print '<input type="submit" id="submit" value="Import Project">'
     print '</form>'
@@ -217,15 +229,18 @@ def main(qdict):
 
     # Generate upper navigation panel.
 
-    page_links(results_per_page, current_page, max_page, pattern)
+    page_links(qdict, max_page)
 
     # Project table.
 
     print '<table border=1 style="border-collapse:collapse">'
     print '<tr>'
     print '<th>Project ID</th>'
-    print '<th>Project Name</th>'
+    print '<th>Project Name (Datasets)</th>'
     print '</tr>'
+
+    # Loop over projects.
+
     for i in range((current_page-1) * results_per_page, 
                    min(current_page * results_per_page, len(prjs))):
         prj = prjs[i]
@@ -233,14 +248,17 @@ def main(qdict):
         id = prj[0]
         name = prj[1]
         print '<td align="center">%d</td>' % id
-        print '<td>&nbsp;<a target=_blank rel="noopener noreferer" href=https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s>%s</a>&nbsp;</td>' % \
-            (id, results_per_page, current_page, pattern, name)
+
+        # Add link to datasets page with project name.
+
+        print '<td>&nbsp;<a target=_blank rel="noopener noreferer" href=https://microboone-exp.fnal.gov/cgi-bin/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
+            (id, dbargs.convert_args(qdict), name)
 
         # Add XML button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/export_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-            (id, results_per_page, current_page, pattern)
+        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/export_project.py?id=%d&%s" method="post">' % \
+            (id, dbargs.convert_args(qdict))
         print '<input type="submit" value="XML">'
         print '</form>'
         print '</td>'        
@@ -248,17 +266,26 @@ def main(qdict):
         # Add POMS button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/export_poms.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-            (id, results_per_page, current_page, pattern)
+        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/export_poms.py?id=%d&%s" method="post">' % \
+            (id, dbargs.convert_args(qdict))
         print '<input type="submit" value="POMS">'
+        print '</form>'
+        print '</td>'        
+
+        # Add Edit button/column
+
+        print '<td>'
+        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/edit_project.py?id=%d&%s" method="post">' % \
+            (id, dbargs.convert_args(qdict))
+        print '<input type="submit" value="Edit">'
         print '</form>'
         print '</td>'        
 
         # Add Clone button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/clone_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-            (id, results_per_page, current_page, pattern)
+        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/clone_project.py?id=%d&%s" method="post">' % \
+            (id, dbargs.convert_args(qdict))
         print '<input type="submit" value="Clone">'
         print '</form>'
         print '</td>'        
@@ -266,8 +293,8 @@ def main(qdict):
         # Add Delete button/column
 
         print '<td>'
-        print '<form action="/cgi-bin/delete_project.py?id=%d&results_per_page=%d&page=%d&pattern=%s" method="post">' % \
-            (id, results_per_page, current_page, pattern)
+        print '<form action="/cgi-bin/delete_project.py?id=%d&%s" method="post">' % \
+            (id, dbargs.convert_args(qdict))
         print '<input type="submit" value="Delete">'
         print '</form>'
         print '</td>'        
@@ -276,7 +303,7 @@ def main(qdict):
 
     # Add lower navigation panel.
 
-    page_links(results_per_page, current_page, max_page, pattern)
+    page_links(qdict, max_page)
 
     # Generate html document trailer.
     

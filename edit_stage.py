@@ -69,8 +69,8 @@ def stage_form(cnx, id, qdict):
             print '<tr>'
             substage_id = row[0]
             fclname = row[1]
-            print '<td>%d</td>' % substage_id
-            print '<td><a href="https://microboone-exp.fnal.gov/cgi-bin/edit_substage.py?id=%d&%s">%s</a></td>' % \
+            print '<td align="center">%d</td>' % substage_id
+            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="https://microboone-exp.fnal.gov/cgi-bin/edit_substage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
                 (substage_id, dbargs.convert_args(qdict), fclname)
 
             # Add Clone button/column
@@ -173,6 +173,13 @@ def stage_form(cnx, id, qdict):
                     print '<input type="text" id="%s" name="%s" size=80 value="%s">' % \
                         (colname, colname, row[n])
 
+                    # Add datasets.
+
+                    if (colname == 'defname' or colname == 'ana_defname') and row[n] != '':
+                        dbutil.add_dataset(cnx, project_id, 'output', row[n])
+                    if colname == 'inputdef' and row[n] != '':
+                        dbutil.add_dataset(cnx, project_id, 'input', row[n])
+
             else:
 
                 # Array columns.
@@ -207,7 +214,7 @@ def main(id, qdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = True)
+    cnx = dbconfig.connect(readonly = False)
 
     # Generate html document header.
 

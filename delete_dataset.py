@@ -1,19 +1,19 @@
 #! /usr/bin/python
 #==============================================================================
 #
-# Name: delete_substage.py
+# Name: delete_dataset.py
 #
-# Purpose: CGI script to delete a substage from database.
+# Purpose: CGI script to delete a dataset from database.
 #
 # CGI arguments:
 #
-# id      - Substage id.
+# id      - Dataset id.
 # confirm - Confirm flag.
 #           If value is zero, display a confirmation page.
-#           If value is nonzero, delete substage.
+#           If value is nonzero, delete dataset.
 # <qdict> - Standard query_projects.py arguments.
 #
-# Created: 15-Oct-2020  H. Greenlee
+# Created: 16-Oct-2020  H. Greenlee
 #
 #==============================================================================
 
@@ -30,17 +30,17 @@ def main(id, confirm, qdict):
 
     cnx = dbconfig.connect(readonly = False)
 
-    # Query the fclname and stage id.
+    # Query the dataset name and project id.
 
     c = cnx.cursor()
-    q = 'SELECT id,fclname,stage_id FROM substages WHERE id=%d' % id
+    q = 'SELECT id, name, project_id FROM datasets WHERE id=%d' % id
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
-        raise IOError('Unable to fetch substage id %d' % id)
+        raise IOError('Unable to fetch dataset id %d' % id)
     row = rows[0]
-    fclname = row[1]
-    stage_id = row[2]
+    dataset_name = row[1]
+    project_id = row[2]
 
     # Check confirm flag.
 
@@ -53,26 +53,26 @@ def main(id, confirm, qdict):
         print '<!DOCTYPE html>'
         print '<html>'
         print '<head>'
-        print '<title>Delete Substage</title>'
+        print '<title>Delete Dataset</title>'
         print '</head>'
         print '<body>'
 
-        if id == 0 or fclname == '':
+        if id == 0:
 
-            print 'No such substage.'
+            print 'No such dataset.'
 
         else:
 
-            print 'Delete substage %s?' % fclname
+            print 'Delete dataset %s?' % dataset_name
 
             # Generate a form with two buttons "Delete" and "Cancel."
 
             print '<br>'
-            print '<form action="/cgi-bin/delete_substage.py?id=%d&confirm=1&%s" method="post">' % \
+            print '<form action="/cgi-bin/delete_dataset.py?id=%d&confirm=1&%s" method="post">' % \
                 (id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Delete">'
-            print '<input type="submit" value="Cancel" formaction="/cgi-bin/edit_stage.py?id=%d&%s">' % \
-                (stage_id, dbargs.convert_args(qdict))
+            print '<input type="submit" value="Cancel" formaction="/cgi-bin/edit_datasets.py?id=%d&%s">' % \
+                (project_id, dbargs.convert_args(qdict))
             print '</form>'
 
         print '</body>'
@@ -80,11 +80,11 @@ def main(id, confirm, qdict):
 
     else:
 
-        # If confirm flag is nonzero, delete substage and redirect to stage editor.
+        # If confirm flag is nonzero, delete dataset and redirect to datasets editor.
 
-        dbutil.delete_substage(cnx, id)
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&%s' % \
-              (stage_id, dbargs.convert_args(qdict))
+        dbutil.delete_dataset(cnx, id)
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_datasets.py?id=%d&%s' % \
+              (project_id, dbargs.convert_args(qdict))
 
         # Generate redirect page.
 
@@ -96,7 +96,7 @@ def main(id, confirm, qdict):
         print '<meta http-equiv="refresh" content="0; url=%s" />' % url
         print '</head>'
         print '<body>'
-        print 'Deleted substage %s.' % fclname
+        print 'Deleted dataset %s.' % dataset_name
         print '<br><br>'
         print 'If page does not automatically reload click this <a href=%s>link</a>' % url
         print '</body>'
