@@ -1281,36 +1281,55 @@ def xml_project_names(xmlstring):
     return result
 
 
-# Add dataset assicuated with project, if not already present.
-# Return id of newly added or already existing dataset.
+# Add dataset assicuated with project.
+# Duplicates are allowed.
 
 def add_dataset(cnx, project_id, dataset_type, dataset_name):
 
     result = 0
 
-    # Query whether this dataset name already exists.
+    # Query the maximum sequence number for this stage.
 
     c = cnx.cursor()
-    q = 'SELECT id, project_id, name FROM datasets WHERE project_id=%d AND type=\'%s\' AND name=\'%s\'' % \
-        (project_id, dataset_type, dataset_name)
+    q = 'SELECT MAX(seqnum) FROM datasets WHERE project_id=%d AND type=\'%s\'' % \
+        (project_id, dataset_type)
     c.execute(q)
-    rows = c.fetchall()
-    if len(rows) > 0 :
-        result = rows[0][0]
+    row = c.fetchone()
+    seqnum = row[0]
+    new_seqnum = 0
+    if seqnum == None:
+        new_seqnum = 1
     else:
+        new_seqnum = seqnum + 1
 
-        # Construct a query to insert dataset.
+    # Construct a query to insert dataset.
 
-        q = 'INSERT INTO datasets SET project_id=%d,type=\'%s\',name=\'%s\',files=0,events=0' % \
-            (project_id, dataset_type, dataset_name)
-        c.execute(q)
+    q = 'INSERT INTO datasets SET project_id=%d,type=\'%s\',name=\'%s\',seqnum=%d' % \
+        (project_id, dataset_type, dataset_name, new_seqnum)
 
-        # Get id of inserted row.
+    # Loop over remaining fields.
 
-        q = 'SELECT LAST_INSERT_ID()'
-        c.execute(q)
-        row = c.fetchone()
-        result = row[0]
+    cols = databaseDict['datasets']
+    for n in range(5, len(cols)):
+        coltup = cols[n]
+        colname = coltup[0]
+        coltype = coltup[2]
+        coldefault = coltup[5]
+        if coltype[:3] == 'INT':
+            q += ',%s=%d' % (colname, coldefault)
+        elif coltype[:7] == 'VARCHAR':
+            q += ',%s=\'%s\'' % (colname, coldefault)
+        elif coltype[:6] == 'DOUBLE':
+            q += ',%s=%8.6f' % (colname, coldefault)
+
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    result = row[0]
 
     # Done.
 
@@ -1333,4 +1352,176 @@ def delete_dataset(cnx, dataset_id):
     cnx.commit()
     return
 
+
+# Insert blank substage into database.
+# Fields are filled with default values.
+# Substage id of newly added substage is returned.
+
+def insert_blank_substage(cnx, stage_id):
+
+    c = cnx.cursor()
+
+    # Query the maximum sequence number for this stage.
+
+    q = 'SELECT MAX(seqnum) FROM substages WHERE stage_id=%d' % stage_id
+    c.execute(q)
+    row = c.fetchone()
+    seqnum = row[0]
+    new_seqnum = 0
+    if seqnum == None:
+        new_seqnum = 1
+    else:
+        new_seqnum = seqnum + 1
+
+    # Prepare query to insert stage row.
+
+    q = 'INSERT INTO substages SET fclname=\'blank.fcl\', stage_id=%d, seqnum=%d' % (stage_id, new_seqnum)
+
+    # Loop over remaining fields.
+
+    cols = databaseDict['substages']
+    for n in range(4, len(cols)):
+        coltup = cols[n]
+        colname = coltup[0]
+        coltype = coltup[2]
+        coldefault = coltup[5]
+        if coltype[:3] == 'INT':
+            q += ',%s=%d' % (colname, coldefault)
+        elif coltype[:7] == 'VARCHAR':
+            q += ',%s=\'%s\'' % (colname, coldefault)
+        elif coltype[:6] == 'DOUBLE':
+            q += ',%s=%8.6f' % (colname, coldefault)
+
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    new_substage_id = row[0]
+
+    # Done.
+
+    cnx.commit()
+    return new_substage_id
+
+
+# Insert blank stage into database.
+# Fields are filled with default values.
+# Stage id of newly added stage is returned.
+
+def insert_blank_stage(cnx, project_id):
+
+    c = cnx.cursor()
+
+    # Query the maximum sequence number for this stage.
+
+    q = 'SELECT MAX(seqnum) FROM stages WHERE project_id=%d' % project_id
+    c.execute(q)
+    row = c.fetchone()
+    seqnum = row[0]
+    new_seqnum = 0
+    if seqnum == None:
+        new_seqnum = 1
+    else:
+        new_seqnum = seqnum + 1
+
+    # Prepare query to insert stage row.
+
+    q = 'INSERT INTO stages SET name=\'blank\', project_id=%d, seqnum=%d' % (project_id, new_seqnum)
+
+    # Loop over remaining fields.
+
+    cols = databaseDict['stages']
+    for n in range(4, len(cols)):
+        coltup = cols[n]
+        colname = coltup[0]
+        coltype = coltup[2]
+        coldefault = coltup[5]
+        if coltype[:3] == 'INT':
+            q += ',%s=%d' % (colname, coldefault)
+        elif coltype[:7] == 'VARCHAR':
+            q += ',%s=\'%s\'' % (colname, coldefault)
+        elif coltype[:6] == 'DOUBLE':
+            q += ',%s=%8.6f' % (colname, coldefault)
+
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    new_stage_id = row[0]
+
+    # Done.
+
+    cnx.commit()
+    return new_stage_id
+
+
+# Insert blank project into database.
+# Fields are filled with default values.
+# Project id of newly added project is returned.
+
+def insert_blank_project(cnx):
+
+    c = cnx.cursor()
+
+    # Generate unique project name.
+
+    n = 1
+    done = False
+    project_name = ''
+    while not done:
+
+        if n == 1:
+            project_name = 'blank'
+        else:
+            project_name = 'blank%d' % n
+
+        # See if this candidate name already exists.
+
+        q = 'SELECT COUNT(*) FROM projects WHERE name=\'%s\'' % project_name
+        c.execute(q)
+        row = c.fetchone()
+        count = row[0]
+        if count == 0:
+            done = True
+        else:
+            n += 1
+
+    # Prepare query to insert project row.
+
+    q = 'INSERT INTO projects SET name=\'%s\'' % project_name
+
+    # Loop over remaining fields.
+
+    cols = databaseDict['projects']
+    for n in range(2, len(cols)):
+        coltup = cols[n]
+        colname = coltup[0]
+        coltype = coltup[2]
+        coldefault = coltup[5]
+        if coltype[:3] == 'INT':
+            q += ',%s=%d' % (colname, coldefault)
+        elif coltype[:7] == 'VARCHAR':
+            q += ',%s=\'%s\'' % (colname, coldefault)
+        elif coltype[:6] == 'DOUBLE':
+            q += ',%s=%8.6f' % (colname, coldefault)
+
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    new_project_id = row[0]
+
+    # Done.
+
+    cnx.commit()
+    return new_project_id
 

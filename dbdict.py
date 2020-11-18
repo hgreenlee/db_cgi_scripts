@@ -147,6 +147,7 @@ databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT
                 'datasets': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Dataset ID', 0),
                              ('name', '', 'VARCHAR(1000) NOT NULL', 0, 'Dataset name', ''),
                              ('project_id', '', 'INT NOT NULL', 0, 'Parent project ID', 0),
+                             ('seqnum', '', 'INT', 0, 'Sequence number', 0),
                              ('type', '', 'VARCHAR(100)', 0, 'Dataset type', ''),
                              ('files', '', 'INT', 0, 'Event count', 0),
                              ('events', '', 'INT', 0, 'Event count', 0)]}

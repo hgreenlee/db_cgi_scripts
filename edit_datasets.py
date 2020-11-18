@@ -35,141 +35,114 @@ def datasets_form(cnx, project_id, qdict):
 
     print '<h2>Datasets for Project %s</h2>' % name
 
-    # Input datasets.
-
-    print '<h3>Input Datasets</h3>'
-
-    # Add button to add input dataset.
-
-    print '<form action="/cgi-bin/add_dataset.py?id=%d&type=input&%s" method="post">' % \
-        (project_id, dbargs.convert_args(qdict))
-    print '<label for="submit">Add Input Dataset: </label>'
-    print '<input type="submit" id="submit" value="Add">'
-    print '</form>'
-    print '<p>'
-
-    # Query datasets belonging to this project.
-
     c = cnx.cursor()
-    q = 'SELECT id, name, files, events FROM datasets WHERE project_id=%d AND type=\'input\'' % project_id
-    c.execute(q)
-    rows = c.fetchall()
 
-    # Make dataset table.
+    for dataset_type in ('input', 'output'):
+        title_type = dataset_type[0].upper() + dataset_type[1:]
+    
+        # Section title.
 
-    print '<table border=1 style="border-collapse:collapse">'
-    print '<tr>'
-    print '<th>Dataset ID</th>'
-    print '<th>Dataset Name</th>'
-    print '<th>Files</th>'
-    print '<th>Events</th>'    
-    print '</tr>'
+        print '<h3>%s Datasets</h3>' % title_type
 
-    for row in rows:
+        # Add button to add dataset.
+
+        print '<form action="/cgi-bin/add_dataset.py?id=%d&type=%s&%s" method="post">' % \
+            (project_id, dataset_type, dbargs.convert_args(qdict))
+        print '<label for="submit">Add %s Dataset: </label>' % title_type
+        print '<input type="submit" id="submit" value="Add">'
+        print '</form>'
+        print '<p>'
+
+        # Query datasets belonging to this project and type.
+
+        q = 'SELECT id, name, files, events FROM datasets WHERE project_id=%d AND type=\'%s\' ORDER BY seqnum' % \
+            (project_id, dataset_type)
+        c.execute(q)
+        rows = c.fetchall()
+
+        # Make dataset table.
+
+        print '<table border=1 style="border-collapse:collapse">'
         print '<tr>'
-        dataset_id = row[0]
-        dataset_name = row[1]
-        nfile = row[2]
-        nev = row[3]
-        print '<td align="center">%d</td>' % dataset_id
-        print '<td>&nbsp;<a href=%s/definitions/name/%s>%s</a>&nbsp;</td>' % \
-            (dbconfig.samweb_url, dataset_name, dataset_name)
-        print '<td align="right">&nbsp;%d&nbsp;</td>' % nfile
-        print '<td align="right">&nbsp;%d&nbsp;</td>' % nev
-
-        # Add Update button/column
-
-        print '<td>'
-        print '<form action="/cgi-bin/edit_datasets.py?id=%d&update=%d&%s" method="post">' % \
-            (project_id, dataset_id, dbargs.convert_args(qdict))
-        print '<input type="submit" value="Update">'
-        print '</form>'
-        print '</td>'        
-
-        # Add Delete button/column
-
-        print '<td>'
-        print '<form action="/cgi-bin/delete_dataset.py?id=%d&%s" method="post">' % \
-            (dataset_id, dbargs.convert_args(qdict))
-        print '<input type="submit" value="Delete">'
-        print '</form>'
-        print '</td>'        
-
-        # Finish row.
-
+        print '<th>Dataset ID</th>'
+        print '<th>Dataset Name</th>'
+        print '<th>Files</th>'
+        print '<th>Events</th>'    
         print '</tr>'
 
-    # Finish table.
+        for row in rows:
+            print '<tr>'
+            dataset_id = row[0]
+            dataset_name = row[1]
+            nfile = row[2]
+            nev = row[3]
+            print '<td align="center">%d</td>' % dataset_id
+            print '<td>&nbsp;<a href=%s/definitions/name/%s>%s</a>&nbsp;</td>' % \
+                (dbconfig.samweb_url, dataset_name, dataset_name)
+            print '<td align="right">&nbsp;%d&nbsp;</td>' % nfile
+            print '<td align="right">&nbsp;%d&nbsp;</td>' % nev
 
-    print '</table>'
+            # Add Update button/column
 
-    # Output datasets.
+            print '<td>'
+            print '<form action="/cgi-bin/edit_datasets.py?id=%d&update=%d&%s" method="post">' % \
+                (project_id, dataset_id, dbargs.convert_args(qdict))
+            print '<input type="submit" value="Update">'
+            print '</form>'
+            print '</td>'        
 
-    print '<h3>Output Datasets</h3>'
+            # Add Edit button/column
 
-    # Add button to add output dataset.
+            print '<td>'
+            print '<form action="/cgi-bin/edit_dataset.py?id=%d&%s" method="post">' % \
+                (dataset_id, dbargs.convert_args(qdict))
+            print '<input type="submit" value="Edit">'
+            print '</form>'
+            print '</td>'        
 
-    print '<form action="/cgi-bin/add_dataset.py?id=%d&type=output&%s" method="post">' % \
-        (project_id, dbargs.convert_args(qdict))
-    print '<label for="submit">Add Output Dataset: </label>'
-    print '<input type="submit" id="submit" value="Add">'
-    print '</form>'
-    print '<p>'
+            # Add Clone button/column
 
-    # Query datasets belonging to this project.
+            print '<td>'
+            print '<form action="/cgi-bin/clone_dataset.py?id=%d&%s" method="post">' % \
+                (dataset_id, dbargs.convert_args(qdict))
+            print '<input type="submit" value="Clone">'
+            print '</form>'
+            print '</td>'        
 
-    c = cnx.cursor()
-    q = 'SELECT id, name, files, events FROM datasets WHERE project_id=%d AND type=\'output\'' % project_id
-    c.execute(q)
-    rows = c.fetchall()
+            # Add Delete button/column
 
-    # Make dataset table.
+            print '<td>'
+            print '<form action="/cgi-bin/delete_dataset.py?id=%d&%s" method="post">' % \
+                (dataset_id, dbargs.convert_args(qdict))
+            print '<input type="submit" value="Delete">'
+            print '</form>'
+            print '</td>'        
 
-    print '<table border=1 style="border-collapse:collapse">'
-    print '<tr>'
-    print '<th>Dataset ID</th>'
-    print '<th>Dataset Name</th>'
-    print '<th>Files</th>'
-    print '<th>Events</th>'    
-    print '</tr>'
+            # Add Up button/column
 
-    for row in rows:
-        print '<tr>'
-        dataset_id = row[0]
-        dataset_name = row[1]
-        nfile = row[2]
-        nev = row[3]
-        print '<td align="center">%d</td>' % dataset_id
-        print '<td>&nbsp;<a href=%s/definitions/name/%s>%s</a>&nbsp;</td>' % \
-            (dbconfig.samweb_url, dataset_name, dataset_name)
-        print '<td align="right">&nbsp;%d&nbsp;</td>' % nfile
-        print '<td align="right">&nbsp;%d&nbsp;</td>' % nev
+            print '<td>'
+            print '<form action="/cgi-bin/up_dataset.py?id=%d&%s" method="post">' % \
+                (dataset_id, dbargs.convert_args(qdict))
+            print '<input type="submit" value="Up">'
+            print '</form>'
+            print '</td>'        
 
-        # Add Update button/column
+            # Add Down button/column
 
-        print '<td>'
-        print '<form action="/cgi-bin/edit_datasets.py?id=%d&update=%d&%s" method="post">' % \
-            (project_id, dataset_id, dbargs.convert_args(qdict))
-        print '<input type="submit" value="Update">'
-        print '</form>'
-        print '</td>'        
+            print '<td>'
+            print '<form action="/cgi-bin/down_dataset.py?id=%d&%s" method="post">' % \
+                (dataset_id, dbargs.convert_args(qdict))
+            print '<input type="submit" value="Down">'
+            print '</form>'
+            print '</td>'        
 
-        # Add Delete button/column
+            # Finish row.
 
-        print '<td>'
-        print '<form action="/cgi-bin/delete_dataset.py?id=%d&%s" method="post">' % \
-            (dataset_id, dbargs.convert_args(qdict))
-        print '<input type="submit" value="Delete">'
-        print '</form>'
-        print '</td>'        
+            print '</tr>'
 
-        # Finish row.
+        # Finish table.
 
-        print '</tr>'
-
-    # Finish table.
-
-    print '</table>'
+        print '</table>'
 
 
 
