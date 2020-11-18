@@ -879,7 +879,7 @@ def free_seqnum_substage(cnx, stage_id, seqnum):
 
     # See if this sequence number is already used.
 
-    q = 'SELECT COUNT(*) FROM substages WHERE stage_id=%d and seqnum=%d' % (stage_id, seqnum)
+    q = 'SELECT COUNT(*) FROM substages WHERE stage_id=%d AND seqnum=%d' % (stage_id, seqnum)
     c.execute(q)
     row = c.fetchone()
     n = row[0]
@@ -888,7 +888,7 @@ def free_seqnum_substage(cnx, stage_id, seqnum):
         # Got a match.
         # Query all sequence numbers equal or greater.
 
-        q = 'SELECT id, stage_id, seqnum FROM substages WHERE stage_id=%d and seqnum>=%d' % \
+        q = 'SELECT id, stage_id, seqnum FROM substages WHERE stage_id=%d AND seqnum>=%d' % \
             (stage_id, seqnum)
         c.execute(q)
         rows = c.fetchall()
@@ -915,7 +915,7 @@ def free_seqnum_stage(cnx, project_id, seqnum):
 
     # See if this sequence number is already used.
 
-    q = 'SELECT COUNT(*) FROM stages WHERE project_id=%d and seqnum=%d' % (project_id, seqnum)
+    q = 'SELECT COUNT(*) FROM stages WHERE project_id=%d AND seqnum=%d' % (project_id, seqnum)
     c.execute(q)
     row = c.fetchone()
     n = row[0]
@@ -924,7 +924,7 @@ def free_seqnum_stage(cnx, project_id, seqnum):
         # Got a match.
         # Query all sequence numbers equal or greater.
 
-        q = 'SELECT id, project_id, seqnum FROM stages WHERE project_id=%d and seqnum>=%d' % \
+        q = 'SELECT id, project_id, seqnum FROM stages WHERE project_id=%d AND seqnum>=%d' % \
             (project_id, seqnum)
         c.execute(q)
         rows = c.fetchall()
@@ -1524,4 +1524,99 @@ def insert_blank_project(cnx):
 
     cnx.commit()
     return new_project_id
+
+
+# Make sure the specified dataset sequence number is not used.
+# If it is already used, increment all sequence numbers equal or larger by one.
+
+def free_seqnum_dataset(cnx, project_id, dataset_type, seqnum):
+
+    c = cnx.cursor()
+
+    # See if this sequence number is already used.
+
+    q = 'SELECT COUNT(*) FROM datasets WHERE project_id=%d AND type=\'%s\' AND seqnum=%d' % \
+        (project_id, dataset_type, seqnum)
+    c.execute(q)
+    row = c.fetchone()
+    n = row[0]
+    if n > 0:
+
+        # Got a match.
+        # Query all sequence numbers equal or greater.
+
+        q = 'SELECT id, project_id, type, seqnum FROM datasets WHERE project_id=%d AND type=\'%s\' AND seqnum>=%d' % \
+            (project_id, dataset_type, seqnum)
+        c.execute(q)
+        rows = c.fetchall()
+        for row in rows:
+            dataset_id = row[0]
+            seq = row[3]
+
+            # Increment sequence number.
+
+            q = 'UPDATE datasets SET seqnum=%d WHERE id=%d' % (seq+1, dataset_id)
+            c.execute(q)
+
+    # Done.
+
+    return
+
+
+# Clone dataset row.
+
+def clone_dataset(cnx, dataset_id):
+
+    # Query full dataset row from database.
+
+    c = cnx.cursor()
+    q = 'SELECT * FROM datasets WHERE id=%d' % dataset_id
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) == 0:
+        raise IOError('Unable to fetch dataset id %d' % dataset_id)
+    row = rows[0]
+    dataset_name = row[1]
+    project_id = row[2]
+    seqnum = row[3]
+    dataset_type = row[4]
+
+    # Increment sequence number, and make sure the new sequence number of free.
+
+    seqnum += 1
+    free_seqnum_dataset(cnx, project_id, dataset_type, seqnum)
+
+    # Construct query to insert a new row into datasets table that is
+    # a copy of the row that we just read.
+
+    cols = databaseDict['datasets']
+    q = 'INSERT INTO datasets SET name=\'%s\',project_id=%d,seqnum=%d,type=\'%s\'' % \
+        (dataset_name, project_id, seqnum, dataset_type)
+    for n in range(5, len(cols)):
+        coltup = cols[n]
+        colname = coltup[0]
+        coltype = coltup[2]
+        colarray = coltup[3]
+        if colarray:
+            q += ',%s=%d' % (colname, row[n])
+        elif coltype[:3] == 'INT':
+            q += ',%s=%d' % (colname, row[n])
+        elif coltype[:7] == 'VARCHAR':
+            q += ',%s=\'%s\'' % (colname, row[n])
+        elif coltype[:6] == 'DOUBLE':
+            q += ',%s=%8.6f' % (colname, row[n])
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    new_dataset_id = row[0]
+
+    # Done.
+
+    cnx.commit()
+    return new_dataset_id
+
 
