@@ -56,6 +56,7 @@ def main(project_id, dataset_name, dataset_type, qdict):
         print '<br>'
         print '<input type="submit" value="Add">'
         print '<input type="submit" value="Cancel" formaction="/cgi-bin/edit_datasets.py">'
+        print '</form>'
         print '</body>'
         print '</html>'
 

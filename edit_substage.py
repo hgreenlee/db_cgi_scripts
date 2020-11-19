@@ -56,7 +56,7 @@ def substage_form(cnx, id, qdict):
 
     # Add hidden input field to store table name.
 
-    print '<input type="hidden" id="table" name="table" value="substages" %s>'
+    print '<input type="hidden" id="table" name="table" value="substages">'
 
     # Loop over fields of this stage.
     # Put fields in a table.

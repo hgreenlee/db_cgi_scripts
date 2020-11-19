@@ -8,6 +8,7 @@
 # CGI arguments:
 #
 # table    - Table to update.
+# id       - Row id.
 # <column> - Value.  Matched against column names stired in dictionary.
 #
 # Created: 20-Oct-2020  H. Greenlee
