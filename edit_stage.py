@@ -156,7 +156,7 @@ def stage_form(cnx, id, qdict):
 
             print '<tr>'
             print '<td>'
-            print '<label for="%s">%s:</label>' % (colname, coldesc)
+            print '<label for="%s">%s: </label>' % (colname, coldesc)
             print '</td>'
             print '<td>'
             if colarray == 0:

@@ -46,7 +46,7 @@ def main(xmldata, qdict):
         for key in qdict:
             print '<input type="hidden" name="%s" value="%s">' % (dbutil.convert_str(key),
                                                                   dbutil.convert_str(qdict[key]))
-        print '<label for="xmldata">Choose input xml file</label>'
+        print '<label for="xmldata">Choose input xml file: </label>'
         print '<input type="file" id="xmldata" name="data" accept=".xml">'
         print '<br>'
         print '<input type="submit" value="Import">'

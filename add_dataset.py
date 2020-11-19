@@ -51,7 +51,7 @@ def main(project_id, dataset_name, dataset_type, qdict):
                                                                   dbutil.convert_str(qdict[key]))
         print '<input type="hidden" name="id" value=%d>' % project_id
         print '<input type="hidden" name="type" value=\'%s\'>' % dataset_type
-        print '<label for="dataset_name">Dataset Name</label>'
+        print '<label for="dataset_name">Dataset Name: </label>'
         print '<input type="text" id="dataset_name" name="name">'
         print '<br>'
         print '<input type="submit" value="Add">'

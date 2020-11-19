@@ -57,7 +57,7 @@ def main(dataset_id, dataset_name, qdict):
         
         # Generate a form with text dialog and two buttons "Save" and "Cancel."
 
-        print '<h2>Edit dataset</h2>'
+        print '<h2>Edit Dataset Name</h2>'
         print '<form action="/cgi-bin/edit_dataset.py" method="post">'
 
         # Add qdict hidden fields.
@@ -73,8 +73,9 @@ def main(dataset_id, dataset_name, qdict):
         # Add one-line text field for dataset name, pre-filled with current name.
         # This is the only visible and editable field for this form.
 
-        print '<label for="dataset_name">Dataset Name</label>'
-        print '<input type="text" id="dataset_name" name="name" value="%s">' % current_dataset_name
+        print '<label for="dataset_name">Dataset Name: </label>'
+        print '<input type="text" id="dataset_name" name="name" value="%s" size=80>' % \
+            current_dataset_name
         print '<br>'
 
         # Add save and cancel buttons.

@@ -51,9 +51,9 @@ def search_panel(results_per_page, pattern):
     # Add form for pattern match and results per page.
 
     print '<form action="/cgi-bin/query_projects.py" method="post">'
-    print '<label for="pattern">Match:</label>'
+    print '<label for="pattern">Match: </label>'
     print '<input type="text" id="pattern" name="pattern" size=30 value="%s">' % pattern
-    print '<label for="rpp">Projects per page:</label>'
+    print '<label for="rpp">Projects per page: </label>'
     print '<input type="text" id="rpp" name="results_per_page" size=6 value=%d><br>' % \
         results_per_page
     print '<input type="submit" value="Search">'
