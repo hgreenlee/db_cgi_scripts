@@ -64,10 +64,10 @@ def datasets_form(cnx, project_id, qdict):
 
         print '<table border=1 style="border-collapse:collapse">'
         print '<tr>'
-        print '<th>Dataset ID</th>'
-        print '<th>Dataset Name</th>'
-        print '<th>Files</th>'
-        print '<th>Events</th>'    
+        print '<th>&nbsp;Dataset ID&nbsp;</th>'
+        print '<th>&nbsp;Dataset Name&nbsp;</th>'
+        print '<th>&nbsp;Files&nbsp;</th>'
+        print '<th>&nbsp;Events&nbsp;</th>'    
         print '</tr>'
 
         for row in rows:

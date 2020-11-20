@@ -280,10 +280,10 @@ def main(qdict):
 
     print '<table border=1 style="border-collapse:collapse">'
     print '<tr>'
-    print '<th>Project ID</th>'
-    print '<th>Project Name (Datasets)</th>'
+    print '<th>&nbsp;Project ID&nbsp;</th>'
+    print '<th>&nbsp;Project Name (Datasets)&nbsp;</th>'
     print '<th>&nbsp;Physics Group&nbsp;</th>'
-    print '<th>Status</th>'
+    print '<th>&nbsp;Status&nbsp;</th>'
     print '</tr>'
 
     # Loop over projects.

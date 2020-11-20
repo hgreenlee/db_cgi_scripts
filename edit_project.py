@@ -56,8 +56,8 @@ def project_form(cnx, id, qdict):
 
         print '<table border=1 style="border-collapse:collapse">'
         print '<tr>'
-        print '<th>Stage ID</th>'
-        print '<th>Stage Name</th>'
+        print '<th>&nbsp;Stage ID&nbsp;</th>'
+        print '<th>&nbsp;Stage Name&nbsp;</th>'
         print '</tr>'
 
         for row in rows:

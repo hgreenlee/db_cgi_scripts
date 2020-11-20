@@ -61,8 +61,8 @@ def stage_form(cnx, id, qdict):
 
         print '<table border=1 style="border-collapse:collapse">'
         print '<tr>'
-        print '<th>Substage ID</th>'
-        print '<th>FCL</th>'
+        print '<th>&nbsp;Substage ID&nbsp;</th>'
+        print '<th>&nbsp;FCL&nbsp;</th>'
         print '</tr>'
 
         for row in rows:
