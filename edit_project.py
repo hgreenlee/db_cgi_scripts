@@ -17,6 +17,7 @@
 import sys, os
 import dbconfig, dbutil, dbargs
 from dbdict import databaseDict
+from dbdict import pulldowns
 import cgi
 import cgitb
 cgitb.enable()
@@ -158,14 +159,23 @@ def project_form(cnx, id, qdict):
                 # Scalar column.
 
                 if coltype[0:3] == 'INT':
-                    print '<input type="number" id="%s" name="%s" size=80 value="%d" %s>' % \
+                    print '<input type="number" id="%s" name="%s" size=10 value="%d" %s>' % \
                         (colname, colname, row[n], readonly)
                 elif coltype[0:6] == 'DOUBLE':
-                    print '<input type="text" id="%s" name="%s" size=80 value="%8.6f">' % \
+                    print '<input type="text" id="%s" name="%s" size=10 value="%8.6f">' % \
                         (colname, colname, row[n])
                 elif coltype[0:7] == 'VARCHAR':
-                    print '<input type="text" id="%s" name="%s" size=80 value="%s">' % \
-                        (colname, colname, row[n])
+                    if colname in pulldowns:
+                        print '<select id="%s" name="%s">' % (colname, colname)
+                        for value in pulldowns[colname]:
+                            sel = ''
+                            if value == row[n]:
+                                sel = 'selected'
+                            print '<option value="%s" %s>%s</option>' % (value, sel, value)
+                        print '</select>'
+                    else:
+                        print '<input type="text" id="%s" name="%s" size=100 value="%s">' % \
+                            (colname, colname, row[n])
 
             else:
 

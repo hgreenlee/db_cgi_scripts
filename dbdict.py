@@ -35,15 +35,25 @@
 
 tables = ['projects', 'stages', 'substages', 'strings', 'datasets']
 
+# Pull downs.
+
+pulldowns = {'physics_group': ['', 'OSC', 'XS', 'APE', 'DPC', 'Common'],
+             'status':        ['', 'Requested', 'Approved', 'Processing', 'Completed']}
+
 # Database dictionary.
 
 databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Project ID', 0),
                              ('name', '',  'VARCHAR(1000) NOT NULL', 0, 'Project name', ''),
+                             ('poms_campaign', 'poms/campaign', 'VARCHAR(1000)', 0, 'POMS campaign', ''),
+                             ('poms_login_setup', 'poms/loginsetup', 'VARCHAR(1000)', 0, 'POMS login/stup', ''),
+                             ('poms_job_type', 'poms/jobtype', 'VARCHAR(1000)', 0, 'POMS job type', ''),
+                             ('physics_group', 'physicsgroup', 'VARCHAR(100)', 0, 'Physics Group', ''),
+                             ('status', 'status', 'VARCHAR(100)', 0, 'Status', ''),
                              ('num_events', 'numevents', 'INT', 0, 'Number of events', 0),
                              ('num_jobs', 'numjobs', 'INT', 0, 'number of jobs', 1),
                              ('max_files_per_job', 'maxfilesperjob', 'INT', 0, 'Maximum files per job', 0),
                              ('os', 'os', 'VARCHAR(1000)', 0, 'OS', ''),
-                             ('resource', 'resource', 'VARCHAR(1000)', 0, 'Jobsub resource', 'DEDICATED,OPPORTUNISTIC'),
+                             ('resource', 'resource', 'VARCHAR(1000)', 0, 'Jobsub resource', 'DEDICATED,OPPORTUNISTIC,OFFSITE'),
                              ('role', 'role', 'VARCHAR(1000)', 0, 'Role', ''),
                              ('lines_', 'lines', 'VARCHAR(1000)', 0, 'Jobsub lines', ''),
                              ('server', 'server', 'VARCHAR(1000)', 0, 'Jobsub server', '-'),
@@ -58,9 +68,6 @@ databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT
                              ('release_qual', 'larsoft/qual', 'VARCHAR(1000)', 0, 'Release qualifier', ''),
                              ('version', 'version', 'VARCHAR(1000)', 0, 'Sam version', ''),
                              ('local_release_tar', 'larsoft/local', 'VARCHAR(1000)', 0, 'Local release tarball', ''),
-                             ('poms_login_setup', 'poms/loginsetup', 'VARCHAR(1000)', 0, 'POMS login/stup', ''),
-                             ('poms_job_type', 'poms/jobtype', 'VARCHAR(1000)', 0, 'POMS job type', ''),
-                             ('poms_campaign', 'poms/campaign', 'VARCHAR(1000)', 0, 'POMS campaign', ''),
                              ('file_type', 'filetype', 'VARCHAR(1000)', 0, 'Sam file type', ''),
                              ('run_type', 'runtype', 'VARCHAR(1000)', 0, 'Sam run type', ''),
                              ('run_number', 'runnumber', 'INT', 0, 'Run number', 0),

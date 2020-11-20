@@ -151,7 +151,7 @@ def stage_form(cnx, id, qdict):
             # Set readonly attribute
 
             readonly = ''
-            if colname == 'id':
+            if colname == 'id' or colname == 'project_id':
                 readonly = 'readonly'
 
             print '<tr>'
@@ -164,13 +164,13 @@ def stage_form(cnx, id, qdict):
                 # Scalar column.
 
                 if coltype[0:3] == 'INT':
-                    print '<input type="number" id="%s" name="%s" size=80 value="%d" %s>' % \
+                    print '<input type="number" id="%s" name="%s" size=10 value="%d" %s>' % \
                         (colname, colname, row[n], readonly)
                 elif coltype[0:6] == 'DOUBLE':
-                    print '<input type="text" id="%s" name="%s" size=80 value="%8.6f">' % \
+                    print '<input type="text" id="%s" name="%s" size=100 value="%8.6f">' % \
                         (colname, colname, row[n])
                 elif coltype[0:7] == 'VARCHAR':
-                    print '<input type="text" id="%s" name="%s" size=80 value="%s">' % \
+                    print '<input type="text" id="%s" name="%s" size=100 value="%s">' % \
                         (colname, colname, row[n])
 
                     # Add datasets.

@@ -100,7 +100,7 @@ def extract_qdict(argdict):
 
         # String arguments.
 
-        elif k == 'pattern':
+        elif k == 'pattern' or k == 'group' or k == 'status':
             result[k] = argdict[k]
 
     # Parse CLI arguments.
@@ -118,7 +118,7 @@ def extract_qdict(argdict):
 
             # String arguments.
 
-            elif k == 'pattern':
+            elif k == 'pattern' or k == 'group' or k == 'status':
                 if k not in result:
                     result[k] = kv[1]
 
@@ -130,6 +130,10 @@ def extract_qdict(argdict):
         result['page'] = 1
     if not 'pattern' in result:
         result['pattern'] = ''
+    if not 'group' in result:
+        result['group'] = ''
+    if not 'status' in result:
+        result['status'] = ''
 
     # Done.
 

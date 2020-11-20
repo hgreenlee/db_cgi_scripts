@@ -17,27 +17,38 @@
 
 import sys, os, copy
 import dbconfig, dbargs
+from dbdict import pulldowns
 
 
 # Return list of projects.
 
-def list_projects(cnx, pattern):
+def list_projects(cnx, pattern, group, status):
 
     result = []
 
     # Query projects from database.
 
     c = cnx.cursor()
-    q = 'SELECT id, name FROM projects'
+    q = 'SELECT id, name, physics_group, status FROM projects'
+    con = 'WHERE'
     if pattern != '':
-        q += ' WHERE name LIKE \'%%%s%%\'' % pattern
+        q += ' %s name LIKE \'%%%s%%\'' % (con, pattern)
+        con = 'AND'
+    if group != '':
+        q += ' %s physics_group=\'%s\'' % (con, group)
+        con = 'AND'
+    if status != '':
+        q += ' %s status=\'%s\'' % (con, status)
+        con = 'AND'
     q += ' ORDER BY id'
     c.execute(q)
     rows = c.fetchall()
     for row in rows:
         id = row[0]
         name = row[1]
-        result.append((id, name))
+        physics_group = row[2]
+        status = row[3]
+        result.append((id, name, physics_group, status))
 
     # Done.
 
@@ -46,16 +57,48 @@ def list_projects(cnx, pattern):
 
 # Generate search panel.
 
-def search_panel(results_per_page, pattern):
+def search_panel(results_per_page, pattern, group, status):
 
     # Add form for pattern match and results per page.
 
     print '<form action="/cgi-bin/query_projects.py" method="post">'
+
+    # Add pattern wildcard input.
+
     print '<label for="pattern">Match: </label>'
     print '<input type="text" id="pattern" name="pattern" size=30 value="%s">' % pattern
+
+    # Add physics group drop down.
+
+    print '<label for="group">Physics Group: </label>'
+    print '<select id="group" name="group">'
+    for value in pulldowns['physics_group']:
+        sel = ''
+        if value == group:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (value, sel, value)
+    print '</select>'
+
+    # Add status drop down.
+
+    print '<label for="status">Status: </label>'
+    print '<select id="status" name="status">'
+    for value in pulldowns['status']:
+        sel = ''
+        if value == status:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (value, sel, value)
+    print '</select>'
+
+    # Add results per page input.
+
     print '<label for="rpp">Projects per page: </label>'
-    print '<input type="text" id="rpp" name="results_per_page" size=6 value=%d><br>' % \
+    print '<input type="text" id="rpp" name="results_per_page" size=6 value=%d>' % \
         results_per_page
+
+    # Second line, search button.
+
+    print '<br>'
     print '<input type="submit" value="Search">'
     print '</form>'
 
@@ -176,6 +219,8 @@ def main(qdict):
     results_per_page = qdict['results_per_page']
     current_page = qdict['page']
     pattern = qdict['pattern']
+    group = qdict['group']
+    status = qdict['status']
 
     # Open database connection and query projects.
 
@@ -183,7 +228,7 @@ def main(qdict):
 
     # Get list of projects.
 
-    prjs = list_projects(cnx, pattern)
+    prjs = list_projects(cnx, pattern, group, status)
     max_page = (len(prjs) + results_per_page - 1) / results_per_page
 
     # Generate html document header.
@@ -221,7 +266,7 @@ def main(qdict):
 
     # Generate search panel form.
 
-    search_panel(results_per_page, pattern)
+    search_panel(results_per_page, pattern, group, status)
 
     # Display number of results.
 
@@ -237,6 +282,8 @@ def main(qdict):
     print '<tr>'
     print '<th>Project ID</th>'
     print '<th>Project Name (Datasets)</th>'
+    print '<th>&nbsp;Physics Group&nbsp;</th>'
+    print '<th>Status</th>'
     print '</tr>'
 
     # Loop over projects.
@@ -247,12 +294,19 @@ def main(qdict):
         print '<tr>'
         id = prj[0]
         name = prj[1]
+        physics_group = prj[2]
+        status = prj[3]
         print '<td align="center">%d</td>' % id
 
         # Add link to datasets page with project name.
 
         print '<td>&nbsp;<a target=_blank rel="noopener noreferer" href=https://microboone-exp.fnal.gov/cgi-bin/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
             (id, dbargs.convert_args(qdict), name)
+
+        # Add physics group and status.
+
+        print '<td align="center">&nbsp;%s&nbsp;</td>' % physics_group
+        print '<td align="center">&nbsp;%s&nbsp;</td>' % status
 
         # Add XML button/column
 

@@ -74,7 +74,7 @@ def main(dataset_id, dataset_name, qdict):
         # This is the only visible and editable field for this form.
 
         print '<label for="dataset_name">Dataset Name: </label>'
-        print '<input type="text" id="dataset_name" name="name" value="%s" size=80>' % \
+        print '<input type="text" id="dataset_name" name="name" value="%s" size=100>' % \
             current_dataset_name
         print '<br>'
 
