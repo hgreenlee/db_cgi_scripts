@@ -46,7 +46,7 @@ def datasets_form(cnx, project_id, qdict):
 
         # Add button to add dataset.
 
-        print '<form action="/cgi-bin/add_dataset.py?id=%d&type=%s&%s" method="post">' % \
+        print '<form action="/cgi-bin/db/add_dataset.py?id=%d&type=%s&%s" method="post">' % \
             (project_id, dataset_type, dbargs.convert_args(qdict))
         print '<label for="submit">Add %s Dataset: </label>' % title_type
         print '<input type="submit" id="submit" value="Add">'
@@ -85,7 +85,7 @@ def datasets_form(cnx, project_id, qdict):
             # Add Update button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/edit_datasets.py?id=%d&update=%d&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/edit_datasets.py?id=%d&update=%d&%s" method="post">' % \
                 (project_id, dataset_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Update">'
             print '</form>'
@@ -94,7 +94,7 @@ def datasets_form(cnx, project_id, qdict):
             # Add Edit button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/edit_dataset.py?id=%d&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/edit_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Edit">'
             print '</form>'
@@ -103,7 +103,7 @@ def datasets_form(cnx, project_id, qdict):
             # Add Clone button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/clone_dataset.py?id=%d&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/clone_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Clone">'
             print '</form>'
@@ -112,7 +112,7 @@ def datasets_form(cnx, project_id, qdict):
             # Add Delete button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/delete_dataset.py?id=%d&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/delete_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Delete">'
             print '</form>'
@@ -121,7 +121,7 @@ def datasets_form(cnx, project_id, qdict):
             # Add Up button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/up_dataset.py?id=%d&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/up_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Up">'
             print '</form>'
@@ -130,7 +130,7 @@ def datasets_form(cnx, project_id, qdict):
             # Add Down button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/down_dataset.py?id=%d&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/down_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Down">'
             print '</form>'
@@ -211,7 +211,7 @@ def main(project_id, update_id, qdict):
 
         else:
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_datasets.py?id=%d&%s' % \
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s' % \
                   (project_id, dbargs.convert_args(qdict))
             print 'Content-type: text/html'
             print
@@ -238,7 +238,7 @@ def main(project_id, update_id, qdict):
     print '<title>Project Datasets Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s>Project list</a><br>' % \
+    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s>Project list</a><br>' % \
         dbargs.convert_args(qdict)
 
     # Generate main parg of html document.

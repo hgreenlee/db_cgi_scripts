@@ -597,7 +597,7 @@ def export_poms_project(cnx, project_id, ini):
 
         # Campaign stage section.
 
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/export_project.py?id=%d' % project_id
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/db/export_project.py?id=%d' % project_id
         ini.write('[campaign_stage %s]\n' % poms_stage)
         ini.write('software_version=%s\n' % version)
         ini.write('dataset_or_split_data=\n')

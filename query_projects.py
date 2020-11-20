@@ -61,7 +61,7 @@ def search_panel(results_per_page, pattern, group, status):
 
     # Add form for pattern match and results per page.
 
-    print '<form action="/cgi-bin/query_projects.py" method="post">'
+    print '<form action="/cgi-bin/db/query_projects.py" method="post">'
 
     # Add pattern wildcard input.
 
@@ -115,7 +115,7 @@ def page_links(qdict, max_page):
 
     # Base url.
 
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py'
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py'
 
     # Calculate which pages to display.
     # Display some number of links centered around the current page.
@@ -144,7 +144,7 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = 1
-    print '<form action="/cgi-bin/query_projects.py?%s" method="post">' % \
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
         dbargs.convert_args(new_qdict)
     print '<input type="submit" value="<<" %s>' % disabled
     print '</form>'
@@ -156,7 +156,7 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = prev_page
-    print '<form action="/cgi-bin/query_projects.py?%s" method="post">' % \
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
         dbargs.convert_args(new_qdict)
     print '<input type="submit" value="<" %s>' % disabled
     print '</form>'
@@ -183,7 +183,7 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = next_page
-    print '<form action="/cgi-bin/query_projects.py?%s" method="post">' % \
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
         dbargs.convert_args(new_qdict)
     print '<input type="submit" value=">" %s>' % disabled
     print '</form>'
@@ -194,7 +194,7 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = max_page
-    print '<form action="/cgi-bin/query_projects.py?%s" method="post">' % \
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
         dbargs.convert_args(new_qdict)
     print '<input type="submit" value=">>" %s >' % disabled
     print '</form>'
@@ -248,7 +248,7 @@ def main(qdict):
 
     # Add button to create new project.
 
-    print '<form action="/cgi-bin/add_project.py?%s" method="post" target="_blank" rel="noopener noreferer">' % \
+    print '<form action="/cgi-bin/db/add_project.py?%s" method="post" target="_blank" rel="noopener noreferer">' % \
         dbargs.convert_args(qdict)
     print '<label for="submit">Generate a new empty project: </label>'
     print '<input type="submit" id="submit" value="New Project">'
@@ -257,7 +257,7 @@ def main(qdict):
 
     # Add button to import a project from local xml file.
 
-    print '<form action="/cgi-bin/import_project.py?%s" method="post" target="_blank" rel="noopener noreferer">' % \
+    print '<form action="/cgi-bin/db/import_project.py?%s" method="post" target="_blank" rel="noopener noreferer">' % \
         dbargs.convert_args(qdict)
     print '<label for="submit">Import project from local XML file: </label>'
     print '<input type="submit" id="submit" value="Import Project">'
@@ -300,7 +300,7 @@ def main(qdict):
 
         # Add link to datasets page with project name.
 
-        print '<td>&nbsp;<a target=_blank rel="noopener noreferer" href=https://microboone-exp.fnal.gov/cgi-bin/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
+        print '<td>&nbsp;<a target=_blank rel="noopener noreferer" href=https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
             (id, dbargs.convert_args(qdict), name)
 
         # Add physics group and status.
@@ -311,7 +311,7 @@ def main(qdict):
         # Add XML button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/export_project.py?id=%d&%s" method="post">' % \
+        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/export_project.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<input type="submit" value="XML">'
         print '</form>'
@@ -320,7 +320,7 @@ def main(qdict):
         # Add POMS button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/export_poms.py?id=%d&%s" method="post">' % \
+        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/export_poms.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<input type="submit" value="POMS">'
         print '</form>'
@@ -329,7 +329,7 @@ def main(qdict):
         # Add Edit button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/edit_project.py?id=%d&%s" method="post">' % \
+        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/edit_project.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<input type="submit" value="Edit">'
         print '</form>'
@@ -338,7 +338,7 @@ def main(qdict):
         # Add Clone button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/clone_project.py?id=%d&%s" method="post">' % \
+        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/clone_project.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<input type="submit" value="Clone">'
         print '</form>'
@@ -347,7 +347,7 @@ def main(qdict):
         # Add Delete button/column
 
         print '<td>'
-        print '<form action="/cgi-bin/delete_project.py?id=%d&%s" method="post">' % \
+        print '<form action="/cgi-bin/db/delete_project.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<input type="submit" value="Delete">'
         print '</form>'

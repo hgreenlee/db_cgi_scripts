@@ -30,7 +30,7 @@ def main(id, qdict):
     # Add stage and redirect to stage editor.
 
     stage_id = dbutil.insert_blank_stage(cnx, id)
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&%s' % \
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_stage.py?id=%d&%s' % \
           (stage_id, dbargs.convert_args(qdict))
 
     # Generate redirect page.

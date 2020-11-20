@@ -44,7 +44,7 @@ def stage_form(cnx, id, qdict):
     # Add button to insert another substage.
 
     print '<h2>Substages</h2>'
-    print '<form action="/cgi-bin/add_substage.py?id=%d&%s" method="post" target="_blank" rel="noopener noreferer">' % \
+    print '<form action="/cgi-bin/db/add_substage.py?id=%d&%s" method="post" target="_blank" rel="noopener noreferer">' % \
         (id, dbargs.convert_args(qdict))
     print '<input type="submit" value="Add Substage">'
     print '</form>'
@@ -70,13 +70,13 @@ def stage_form(cnx, id, qdict):
             substage_id = row[0]
             fclname = row[1]
             print '<td align="center">%d</td>' % substage_id
-            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="https://microboone-exp.fnal.gov/cgi-bin/edit_substage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
+            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="https://microboone-exp.fnal.gov/cgi-bin/db/edit_substage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
                 (substage_id, dbargs.convert_args(qdict), fclname)
 
             # Add Clone button/column
 
             print '<td>'
-            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/clone_substage.py?id=%d&%s" method="post">' % \
+            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/clone_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Clone">'
             print '</form>'
@@ -85,7 +85,7 @@ def stage_form(cnx, id, qdict):
             # Add Delete button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/delete_substage.py?id=%d&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/delete_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Delete">'
             print '</form>'
@@ -94,7 +94,7 @@ def stage_form(cnx, id, qdict):
             # Add Up button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/up_substage.py?id=%d&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/up_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Up">'
             print '</form>'
@@ -103,7 +103,7 @@ def stage_form(cnx, id, qdict):
             # Add Down button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/down_substage.py?id=%d&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/down_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Down">'
             print '</form>'
@@ -128,7 +128,7 @@ def stage_form(cnx, id, qdict):
         raise IOError('Unable to fetch stage id %d' % id)
     row = rows[0]
 
-    print '<form action="/cgi-bin/dbhandler.py" method="post">'
+    print '<form action="/cgi-bin/db/dbhandler.py" method="post">'
 
     # Add hidden input field to store table name.
 
@@ -201,7 +201,7 @@ def stage_form(cnx, id, qdict):
     # Add "Save" and "Back" buttons.
 
     print '<input type="submit" value="Save">'
-    print '<input type="submit" value="Back" formaction="/cgi-bin/edit_project.py?id=%d&%s">' % \
+    print '<input type="submit" value="Back" formaction="/cgi-bin/db/edit_project.py?id=%d&%s">' % \
         (project_id, dbargs.convert_args(qdict))
     print '</form>'
 
@@ -226,7 +226,7 @@ def main(id, qdict):
     print '<title>Stage Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s>Project list</a><br>' % \
+    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s>Project list</a><br>' % \
         dbargs.convert_args(qdict)
 
     # Generate main parg of html document.

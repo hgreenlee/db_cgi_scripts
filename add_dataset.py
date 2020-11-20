@@ -45,7 +45,7 @@ def main(project_id, dataset_name, dataset_type, qdict):
         # Generate a form with file dialog and two buttons "Import" and "Cancel."
 
         print '<h2>Add %s dataset</h2>' % dataset_type
-        print '<form action="/cgi-bin/add_dataset.py" method="post">'
+        print '<form action="/cgi-bin/db/add_dataset.py" method="post">'
         for key in qdict:
             print '<input type="hidden" name="%s" value="%s">' % (dbutil.convert_str(key),
                                                                   dbutil.convert_str(qdict[key]))
@@ -55,7 +55,7 @@ def main(project_id, dataset_name, dataset_type, qdict):
         print '<input type="text" id="dataset_name" name="name">'
         print '<br>'
         print '<input type="submit" value="Add">'
-        print '<input type="submit" value="Cancel" formaction="/cgi-bin/edit_datasets.py">'
+        print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/edit_datasets.py">'
         print '</form>'
         print '</body>'
         print '</html>'
@@ -70,7 +70,7 @@ def main(project_id, dataset_name, dataset_type, qdict):
             # This dataset name is already used.
             # Generate informative page.
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_datasets.py?id=%d&%s' % \
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s' % \
                   (project_id, dbargs.convert_args(qdict))
             print 'Content-type: text/html'
             print
@@ -92,7 +92,7 @@ def main(project_id, dataset_name, dataset_type, qdict):
             # Insert succeeded.
             # Redirect to dataset list.
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_datasets.py?id=%d&%s' % \
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s' % \
                   (project_id, dbargs.convert_args(qdict))
             print 'Content-type: text/html'
             print

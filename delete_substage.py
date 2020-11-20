@@ -68,10 +68,10 @@ def main(id, confirm, qdict):
             # Generate a form with two buttons "Delete" and "Cancel."
 
             print '<br>'
-            print '<form action="/cgi-bin/delete_substage.py?id=%d&confirm=1&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/delete_substage.py?id=%d&confirm=1&%s" method="post">' % \
                 (id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Delete">'
-            print '<input type="submit" value="Cancel" formaction="/cgi-bin/edit_stage.py?id=%d&%s">' % \
+            print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/edit_stage.py?id=%d&%s">' % \
                 (stage_id, dbargs.convert_args(qdict))
             print '</form>'
 
@@ -83,7 +83,7 @@ def main(id, confirm, qdict):
         # If confirm flag is nonzero, delete substage and redirect to stage editor.
 
         dbutil.delete_substage(cnx, id)
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&%s' % \
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_stage.py?id=%d&%s' % \
               (stage_id, dbargs.convert_args(qdict))
 
         # Generate redirect page.

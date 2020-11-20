@@ -52,7 +52,7 @@ def substage_form(cnx, id, qdict):
     print '<h2>Project %s</h2>' % project_name
     print '<h2>Stage %s</h2>' % stage_name
     print '<h2>FCL %s</h2>' % fclname
-    print '<form action="/cgi-bin/dbhandler.py" method="post">'
+    print '<form action="/cgi-bin/db/dbhandler.py" method="post">'
 
     # Add hidden input field to store table name.
 
@@ -118,7 +118,7 @@ def substage_form(cnx, id, qdict):
     # Add "Save" and "Back" buttons.
 
     print '<input type="submit" value="Save">'
-    print '<input type="submit" value="Back" formaction="/cgi-bin/edit_stage.py?id=%d&%s">' % \
+    print '<input type="submit" value="Back" formaction="/cgi-bin/db/edit_stage.py?id=%d&%s">' % \
         (stage_id, dbargs.convert_args(qdict))
     print '</form>'
 
@@ -141,7 +141,7 @@ def main(id, qdict):
     print '<title>Substage Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s>Project list</a><br>' % \
+    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s>Project list</a><br>' % \
         dbargs.convert_args(qdict)
 
     # Generate main parg of html document.

@@ -59,10 +59,10 @@ def main(id, confirm, qdict):
             # Generate a form with two buttons "Delete" and "Cancel."
 
             print '<br>'
-            print '<form action="/cgi-bin/delete_project.py?id=%d&confirm=1&%s" method="post">' % \
+            print '<form action="/cgi-bin/db/delete_project.py?id=%d&confirm=1&%s" method="post">' % \
                 (id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Delete">'
-            print '<input type="submit" value="Cancel" formaction="/cgi-bin/query_projects.py?%s">' % \
+            print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/query_projects.py?%s">' % \
                 dbargs.convert_args(qdict)
             print '</form>'
 
@@ -74,7 +74,7 @@ def main(id, confirm, qdict):
         # If confirm flag is nonzero, delete project and redirect to project list.
 
         dbutil.delete_project(cnx, id)
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s' % \
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s' % \
               dbargs.convert_args(qdict)
 
         # Generate redirect page.

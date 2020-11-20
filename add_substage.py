@@ -30,7 +30,7 @@ def main(id, qdict):
     # Add substage and redirect to substage editor.
 
     substage_id = dbutil.insert_blank_substage(cnx, id)
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_substage.py?id=%d&%s' % \
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_substage.py?id=%d&%s' % \
           (substage_id, dbargs.convert_args(qdict))
 
     # Generate redirect page.

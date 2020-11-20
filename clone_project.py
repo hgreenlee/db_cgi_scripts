@@ -58,10 +58,10 @@ def main(project_id, qdict):
 
     url = ''
     if clone_id > 0:
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&%s' % \
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_project.py?id=%d&%s' % \
               (clone_id, dbargs.convert_args(qdict))
     else:
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s' % \
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s' % \
               dbargs.convert_args(qdict)
 
     print 'Content-type: text/html'

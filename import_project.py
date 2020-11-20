@@ -42,7 +42,7 @@ def main(xmldata, qdict):
         
         # Generate a form with file dialog and two buttons "Import" and "Cancel."
 
-        print '<form action="/cgi-bin/import_project.py" method="post" enctype="multipart/form-data">'
+        print '<form action="/cgi-bin/db/import_project.py" method="post" enctype="multipart/form-data">'
         for key in qdict:
             print '<input type="hidden" name="%s" value="%s">' % (dbutil.convert_str(key),
                                                                   dbutil.convert_str(qdict[key]))
@@ -50,7 +50,7 @@ def main(xmldata, qdict):
         print '<input type="file" id="xmldata" name="data" accept=".xml">'
         print '<br>'
         print '<input type="submit" value="Import">'
-        print '<input type="submit" value="Cancel" formaction="/cgi-bin/query_projects.py">'
+        print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/query_projects.py">'
         print '</body>'
         print '</html>'
 
@@ -68,7 +68,7 @@ def main(xmldata, qdict):
 
             # XML error.
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s' % \
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s' % \
                   dbargs.convert_args(qdict)
             print 'Content-type: text/html'
             print
@@ -99,7 +99,7 @@ def main(xmldata, qdict):
             # All project names are already in database.
             # Generate informative page.
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s' % \
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s' % \
                   dbargs.convert_args(qdict)
             print 'Content-type: text/html'
             print
@@ -133,7 +133,7 @@ def main(xmldata, qdict):
             # Redirect to project editor.
 
             project_id = ids[0]
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_project.py?id=%d&%s' % \
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_project.py?id=%d&%s' % \
                   (project_id, dbargs.convert_args(qdict))
             print 'Content-type: text/html'
             print
@@ -153,7 +153,7 @@ def main(xmldata, qdict):
 
             # Import failed.
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py?%s' % \
+            url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s' % \
                   dbargs.convert_args(qdict)
             print 'Content-type: text/html'
             print

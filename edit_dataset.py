@@ -58,7 +58,7 @@ def main(dataset_id, dataset_name, qdict):
         # Generate a form with text dialog and two buttons "Save" and "Cancel."
 
         print '<h2>Edit Dataset Name</h2>'
-        print '<form action="/cgi-bin/edit_dataset.py" method="post">'
+        print '<form action="/cgi-bin/db/edit_dataset.py" method="post">'
 
         # Add qdict hidden fields.
 
@@ -81,7 +81,7 @@ def main(dataset_id, dataset_name, qdict):
         # Add save and cancel buttons.
 
         print '<input type="submit" value="Save">'
-        print '<input type="submit" value="Cancel" formaction="/cgi-bin/edit_datasets.py?id=%d">' % \
+        print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/edit_datasets.py?id=%d">' % \
         project_id
         print '</form>'
         print '</body>'
@@ -97,7 +97,7 @@ def main(dataset_id, dataset_name, qdict):
 
         # Redirect to dataset list.
 
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_datasets.py?id=%d&%s' % \
+        url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s' % \
               (project_id, dbargs.convert_args(qdict))
         print 'Content-type: text/html'
         print

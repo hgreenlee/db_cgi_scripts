@@ -62,7 +62,7 @@ def main(substage_id, qdict):
     # the newly created document.
 
     url = ''
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/edit_stage.py?id=%d&%s' % \
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_stage.py?id=%d&%s' % \
           (stage_id, dbargs.convert_args(qdict))
     print 'Content-type: text/html'
     print

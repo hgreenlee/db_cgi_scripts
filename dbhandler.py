@@ -99,7 +99,7 @@ def main(argdict):
 
     # Calculate redirect url.
 
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/query_projects.py'
+    url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py'
     if os.environ.has_key('HTTP_REFERER'):
         url = os.environ['HTTP_REFERER']
 
