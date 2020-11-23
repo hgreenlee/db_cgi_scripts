@@ -24,7 +24,7 @@ def main(dataset_id, qdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = False)
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
 
     # Query the project id, dataset type, and sequence number.
 

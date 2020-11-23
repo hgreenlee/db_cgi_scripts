@@ -25,7 +25,7 @@ def main(id, qdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = False)
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
 
     # Add stage and redirect to stage editor.
 

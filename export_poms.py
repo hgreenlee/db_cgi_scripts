@@ -25,7 +25,7 @@ def main(id, qdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = True)
+    cnx = dbconfig.connect(readonly = True, devel = qdict['dev'])
 
     # Get project name.
 

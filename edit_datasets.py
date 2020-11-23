@@ -152,7 +152,7 @@ def main(project_id, update_id, qdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = False)
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
 
     # See if we want to update any dataset.
 

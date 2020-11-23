@@ -24,7 +24,7 @@ def main(stage_id, qdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = False)
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
 
     # Query the stage name and project id.
 

@@ -24,7 +24,7 @@ def main(qdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = False)
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
 
     # Add project and redirect to project editor.
 

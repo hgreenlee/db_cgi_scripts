@@ -26,7 +26,7 @@ def main(project_id, dataset_name, dataset_type, qdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = False)
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
     c = cnx.cursor()
 
     if dataset_name == '':

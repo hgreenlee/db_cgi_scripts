@@ -26,7 +26,7 @@ def main(dataset_id, dataset_name, qdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = False)
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
     c = cnx.cursor()
 
     # Query the current dataset name, and project id.

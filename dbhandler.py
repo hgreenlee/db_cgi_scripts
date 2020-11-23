@@ -26,7 +26,7 @@ def main(argdict):
 
     # Open database connection.
 
-    cnx = dbconfig.connect(readonly = False)
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
 
     # Get table name and id (primary key).
     # Both of these values should exist and be non-null, or else operation will fail.

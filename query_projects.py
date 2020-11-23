@@ -224,7 +224,7 @@ def main(qdict):
 
     # Open database connection and query projects.
 
-    cnx = dbconfig.connect(readonly = True)
+    cnx = dbconfig.connect(readonly = True, devel = qdict['dev'])
 
     # Get list of projects.
 

@@ -95,7 +95,7 @@ def extract_qdict(argdict):
 
         # Integer arguments.
 
-        if k == 'results_per_page' or k == 'page':
+        if k == 'results_per_page' or k == 'page' or k == 'dev':
             result[k] = int(argdict[k])
 
         # String arguments.
@@ -112,7 +112,7 @@ def extract_qdict(argdict):
 
             # Integer arguments (convert to integer).
 
-            if k == 'results_per_page' or k == 'page':
+            if k == 'results_per_page' or k == 'page' or k == 'dev':
                 if k not in result:
                     result[k] = int(kv[1])
 
@@ -128,6 +128,8 @@ def extract_qdict(argdict):
         result['results_per_page'] = 20
     if not 'page' in result:
         result['page'] = 1
+    if not 'dev' in result:
+        result['dev'] = 0
     if not 'pattern' in result:
         result['pattern'] = ''
     if not 'group' in result:
