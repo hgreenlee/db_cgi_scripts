@@ -134,6 +134,11 @@ def stage_form(cnx, id, qdict):
 
     print '<input type="hidden" id="table" name="table" value="stages">'
 
+    # Add hidden qdict input fields.
+
+    for key in qdict:
+        print '<input type="hidden" name="%s" value="%s">' % (dbutil.convert_str(key),
+                                                              dbutil.convert_str(qdict[key]))
     # Loop over fields of this stage.
     # Put fields in a table.
 

@@ -38,7 +38,15 @@ tables = ['projects', 'stages', 'substages', 'strings', 'datasets']
 # Pull downs.
 
 pulldowns = {'physics_group': ['', 'OSC', 'XS', 'APE', 'DPC', 'Common'],
-             'status':        ['', 'Requested', 'Approved', 'Processing', 'Completed']}
+             'status':        ['', 'Requested', 'Approved', 'Processing', 'Suspended', 'Completed']}
+
+# Status colors.
+
+colors = {'Requested':  '#a0ffff',
+          'Approved':   '#ffd090',
+          'Processing': '#ffff90',
+          'Suspended':  '#ffc0c0',
+          'Completed':  '#c0ffb0'}
 
 # Database dictionary.
 

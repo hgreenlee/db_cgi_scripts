@@ -50,7 +50,8 @@ def main(xmldata, qdict):
         print '<input type="file" id="xmldata" name="data" accept=".xml">'
         print '<br>'
         print '<input type="submit" value="Import">'
-        print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/query_projects.py">'
+        print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/query_projects.py?%s">' % \
+            dbargs.convert_args(qdict)
         print '</body>'
         print '</html>'
 

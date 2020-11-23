@@ -18,6 +18,7 @@
 import sys, os, copy
 import dbconfig, dbargs
 from dbdict import pulldowns
+from dbdict import colors
 
 
 # Return list of projects.
@@ -57,11 +58,15 @@ def list_projects(cnx, pattern, group, status):
 
 # Generate search panel.
 
-def search_panel(results_per_page, pattern, group, status):
+def search_panel(results_per_page, pattern, group, status, devel):
 
     # Add form for pattern match and results per page.
 
     print '<form action="/cgi-bin/db/query_projects.py" method="post">'
+
+    # Add hidden input for db instance.
+
+    print '<input type="hidden" id="dev" name="dev" value=%d>' % devel
 
     # Add pattern wildcard input.
 
@@ -221,6 +226,7 @@ def main(qdict):
     pattern = qdict['pattern']
     group = qdict['group']
     status = qdict['status']
+    devel = qdict['dev']
 
     # Open database connection and query projects.
 
@@ -266,7 +272,7 @@ def main(qdict):
 
     # Generate search panel form.
 
-    search_panel(results_per_page, pattern, group, status)
+    search_panel(results_per_page, pattern, group, status, devel)
 
     # Display number of results.
 
@@ -296,17 +302,20 @@ def main(qdict):
         name = prj[1]
         physics_group = prj[2]
         status = prj[3]
-        print '<td align="center">%d</td>' % id
+        color_style = ''
+        if status in colors:
+            color_style = 'style="background-color: %s"' % colors[status]
+        print '<td align="center" %s>%d</td>' % (color_style, id)
 
         # Add link to datasets page with project name.
 
-        print '<td>&nbsp;<a target=_blank rel="noopener noreferer" href=https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
-            (id, dbargs.convert_args(qdict), name)
+        print '<td %s>&nbsp;<a target=_blank rel="noopener noreferer" href=https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
+            (color_style, id, dbargs.convert_args(qdict), name)
 
         # Add physics group and status.
 
-        print '<td align="center">&nbsp;%s&nbsp;</td>' % physics_group
-        print '<td align="center">&nbsp;%s&nbsp;</td>' % status
+        print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, physics_group)
+        print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, status)
 
         # Add XML button/column
 

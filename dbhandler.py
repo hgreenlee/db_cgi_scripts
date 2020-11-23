@@ -26,6 +26,7 @@ def main(argdict):
 
     # Open database connection.
 
+    qdict = dbargs.extract_qdict(argdict)
     cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
 
     # Get table name and id (primary key).
