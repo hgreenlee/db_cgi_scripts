@@ -75,6 +75,12 @@ def get():
             if k not in result:
                 result[k] = kv[1]
 
+    # If there is a 'debug' argument with any value other than '0', post a plain text header.
+
+    if 'debug' in result and result['debug'] != '0':
+        print 'Content-type: text/plain'
+        print
+
     # Done.
 
     return result
