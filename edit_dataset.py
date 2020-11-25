@@ -89,6 +89,11 @@ def main(dataset_id, dataset_name, qdict):
 
     else:
 
+        # Check access.
+
+        if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'datasets', dataset_id):
+            dbutil.restricted_error()
+
         # If dataset name argument is not blank, update database and redirect back to datasets page.
 
         q = 'UPDATE datasets SET name=\'%s\' WHERE id=%d' % (dataset_name, dataset_id)

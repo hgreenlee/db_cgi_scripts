@@ -617,6 +617,11 @@ def export_poms_project(cnx, project_id, ini):
 
 def delete_substage(cnx, substage_id):
 
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'substages', substage_id):
+        restricted_error()
+
     # Delete substage.
 
     c = cnx.cursor()
@@ -632,6 +637,11 @@ def delete_substage(cnx, substage_id):
 # Delete stage.
 
 def delete_stage(cnx, stage_id):
+
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'stages', stage_id):
+        restricted_error()
 
     # Delete substages belonging to this stage.
 
@@ -657,6 +667,11 @@ def delete_stage(cnx, stage_id):
 # Delete project.
 
 def delete_project(cnx, project_id):
+
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'projects', project_id):
+        restricted_error()
 
     # Delete stages belonging to this project.
 
@@ -698,6 +713,11 @@ def clone_substage(cnx, substage_id, stage_id):
     row = rows[0]
     fclname = row[1]
     seqnum = row[3]
+
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'stages', stage_id):
+        restricted_error()
 
     # Increment sequence number, and make sure the new sequence number of free.
 
@@ -753,6 +773,11 @@ def clone_stage(cnx, stage_id, project_id):
     row = rows[0]
     stage_name = row[1]
     seqnum = row[3]
+
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'projects', project_id):
+        restricted_error()
 
     # Increment sequence number, and make sure the new sequence number of free.
 
@@ -837,14 +862,21 @@ def clone_project(cnx, project_id, project_name):
         colname = coltup[0]
         coltype = coltup[2]
         colarray = coltup[3]
+        value = row[n]
+
+        # Reset status of cloned dataset to blank ('').
+
+        if colname == 'status':
+            value = ''
+
         if colarray:
-            q += ',%s=%d' % (colname, row[n])
+            q += ',%s=%d' % (colname, value)
         elif coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, row[n])
+            q += ',%s=%d' % (colname, value)
         elif coltype[:7] == 'VARCHAR':
-            q += ',%s=\'%s\'' % (colname, row[n].replace('&', '&amp;').replace("'", "\\'"))
+            q += ',%s=\'%s\'' % (colname, value.replace('&', '&amp;').replace("'", "\\'"))
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, row[n])
+            q += ',%s=%8.6f' % (colname, value)
     c.execute(q)
 
     # Get id of inserted row.
@@ -1288,6 +1320,11 @@ def add_dataset(cnx, project_id, dataset_type, dataset_name):
 
     result = 0
 
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'projects', project_id):
+        restricted_error()
+
     # Query the maximum sequence number for this stage.
 
     c = cnx.cursor()
@@ -1340,6 +1377,11 @@ def add_dataset(cnx, project_id, dataset_type, dataset_name):
 # Delete dataset.
 
 def delete_dataset(cnx, dataset_id):
+
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'datasets', dataset_id):
+        restricted_error()
 
     # Delete dataset.
 
@@ -1567,6 +1609,11 @@ def free_seqnum_dataset(cnx, project_id, dataset_type, seqnum):
 
 def clone_dataset(cnx, dataset_id):
 
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'datasets', dataset_id):
+        restricted_error()
+
     # Query full dataset row from database.
 
     c = cnx.cursor()
@@ -1620,3 +1667,65 @@ def clone_dataset(cnx, dataset_id):
     return new_dataset_id
 
 
+# Check whether the specified table and row is restricted access.
+# Restricted access depends on the status of the parent project.
+# Any status other that blank ('') or 'Requested' means restricted access.
+
+def restricted_access(cnx, table, id):
+
+    c = cnx.cursor()
+
+    # Default result is that access is restricted.
+
+    result = True
+
+    # Table substages, check parent stage.
+
+    if table == 'substages':
+        q = 'SELECT stage_id FROM substages WHERE id=%d' % id
+        c.execute(q)
+        rows = c.fetchall()
+        if len(rows) > 0:
+            stage_id = rows[0][0]
+            result = restricted_access(cnx, 'stages', stage_id)
+
+    # Tables stages and datasets, check parent project.
+
+    elif table == 'stages' or table == 'datasets':
+        q = 'SELECT project_id FROM %s WHERE id=%d' % (table, id)
+        c.execute(q)
+        rows = c.fetchall()
+        if len(rows) > 0:
+            project_id = rows[0][0]
+            result = restricted_access(cnx, 'projects', project_id)
+
+    # Projects table, check status.
+    
+    elif table == 'projects':
+        q = 'SELECT status FROM projects WHERE id=%d' % id
+        c.execute(q)
+        rows = c.fetchall()
+        if len(rows) > 0:
+            status = rows[0][0]
+            if status == '' or status == 'Requested':
+                result = False
+
+    # Done.
+
+    return result
+
+
+# Function to generate restricted content error page.
+
+def restricted_error():
+    print 'Content-type: text/html'
+    print 'Status: 403 Forbidden'
+    print
+    print '<html>'
+    print '<title>403 Forbidden</title>'
+    print '<body>'
+    print '<h1>403 Forbidden</h1>'
+    print 'You are not authorized to make this update.'
+    print '</body>'
+    print '</html>'
+    sys.exit(0)

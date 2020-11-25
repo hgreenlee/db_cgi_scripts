@@ -26,6 +26,11 @@ def main(substage_id, qdict):
 
     cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
 
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'substages', substage_id):
+        dbutil.restricted_error()
+
     # Query the stage id and sequence number.
 
     c = cnx.cursor()

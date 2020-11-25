@@ -26,6 +26,11 @@ def main(dataset_id, qdict):
 
     cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
 
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'datasets', dataset_id):
+        dbutil.restricted_error()
+
     # Query the project id, dataset type, and sequence number.
 
     c = cnx.cursor()

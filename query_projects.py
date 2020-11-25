@@ -16,7 +16,7 @@
 #==============================================================================
 
 import sys, os, copy
-import dbconfig, dbargs
+import dbconfig, dbargs, dbutil
 from dbdict import pulldowns
 from dbdict import colors
 
@@ -307,6 +307,13 @@ def main(qdict):
             color_style = 'style="background-color: %s"' % colors[status]
         print '<td align="center" %s>%d</td>' % (color_style, id)
 
+        # Construct disabled option for restricted controls.
+
+        disabled = ''
+        if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'projects', id):
+            disabled = 'disabled'
+        
+
         # Add link to datasets page with project name.
 
         print '<td %s>&nbsp;<a target=_blank rel="noopener noreferer" href=https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
@@ -358,7 +365,7 @@ def main(qdict):
         print '<td>'
         print '<form action="/cgi-bin/db/delete_project.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
-        print '<input type="submit" value="Delete">'
+        print '<input type="submit" value="Delete" %s>' % disabled
         print '</form>'
         print '</td>'        
         print '</tr>'

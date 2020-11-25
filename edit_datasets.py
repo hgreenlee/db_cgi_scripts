@@ -31,6 +31,12 @@ def datasets_form(cnx, project_id, qdict):
 
     name = dbutil.get_project_name(cnx, project_id)
 
+    # Construct global disabled option for restricted controls.
+
+    disabled = ''
+    if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'projects', project_id):
+        disabled = 'disabled'
+
     # Generate form.
 
     print '<h2>Datasets for Project %s</h2>' % name
@@ -49,7 +55,7 @@ def datasets_form(cnx, project_id, qdict):
         print '<form action="/cgi-bin/db/add_dataset.py?id=%d&type=%s&%s" method="post">' % \
             (project_id, dataset_type, dbargs.convert_args(qdict))
         print '<label for="submit">Add %s Dataset: </label>' % title_type
-        print '<input type="submit" id="submit" value="Add">'
+        print '<input type="submit" id="submit" value="Add" %s>' % disabled
         print '</form>'
         print '<p>'
 
@@ -87,7 +93,7 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/edit_datasets.py?id=%d&update=%d&%s" method="post">' % \
                 (project_id, dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Update">'
+            print '<input type="submit" value="Update" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -96,7 +102,7 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/edit_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Edit">'
+            print '<input type="submit" value="Edit" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -105,7 +111,7 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/clone_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Clone">'
+            print '<input type="submit" value="Clone" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -114,7 +120,7 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/delete_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Delete">'
+            print '<input type="submit" value="Delete" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -123,7 +129,7 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/up_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Up">'
+            print '<input type="submit" value="Up" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -132,7 +138,7 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/down_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Down">'
+            print '<input type="submit" value="Down" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -202,6 +208,11 @@ def main(project_id, update_id, qdict):
                 update_ok = True
 
         if update_ok:
+
+            # Check access.
+
+            if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'datasets', dataset_id):
+                dbutil.restricted_error()
 
             # Update database.
                     

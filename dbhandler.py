@@ -39,6 +39,22 @@ def main(argdict):
     if argdict.has_key('id'):
         id = int(argdict['id'])
 
+    # Check access restrictions.
+
+    if not dbconfig.restricted_access_allowed():
+
+        # Check whether this table/id is restricted access.
+
+        if dbutil.restricted_access(cnx, table, id):
+            dbutil.restricted_error()
+
+        # If the projects table is being updated to a status which is anything other
+        # than '' or 'Requested', it is an error.
+
+        if table == 'projects' and argdict.has_key('status') and \
+           argdict['status'] != '' and argdict['status'] != 'Requested':
+            dbutil.restricted_error()
+
     # Update database.
 
     c = cnx.cursor()

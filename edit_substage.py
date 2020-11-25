@@ -23,6 +23,12 @@ from dbdict import databaseDict
 
 def substage_form(cnx, id, qdict):
 
+    # Construct global disabled option for restricted controls.
+
+    disabled = ''
+    if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'substages', id):
+        disabled = 'disabled'
+
     # Query substage from database.
 
     c = cnx.cursor()
@@ -82,6 +88,8 @@ def substage_form(cnx, id, qdict):
             readonly = ''
             if colname == 'id' or colname == 'stage_id':
                 readonly = 'readonly'
+            elif disabled != '':
+                readonly = 'readonly'
 
             print '<tr>'
             print '<td>'
@@ -96,11 +104,11 @@ def substage_form(cnx, id, qdict):
                     print '<input type="number" id="%s" name="%s" size=10 value="%d" %s>' % \
                         (colname, colname, row[n], readonly)
                 elif coltype[0:6] == 'DOUBLE':
-                    print '<input type="text" id="%s" name="%s" size=100 value="%8.6f">' % \
-                        (colname, colname, row[n])
+                    print '<input type="text" id="%s" name="%s" size=100 value="%8.6f" %s>' % \
+                        (colname, colname, row[n], readonly)
                 elif coltype[0:7] == 'VARCHAR':
-                    print '<input type="text" id="%s" name="%s" size=100 value="%s">' % \
-                        (colname, colname, row[n])
+                    print '<input type="text" id="%s" name="%s" size=100 value="%s" %s>' % \
+                        (colname, colname, row[n], readonly)
 
             else:
 
@@ -108,8 +116,8 @@ def substage_form(cnx, id, qdict):
                 # Display using multiline <textarea>.
 
                 strs = dbutil.get_strings(cnx, row[n])
-                print '<textarea id="%s" name="%s" rows=%d cols=80>' % \
-                    (colname, colname, max(len(strs), 1))
+                print '<textarea id="%s" name="%s" rows=%d cols=80 %s>' % \
+                    (colname, colname, max(len(strs), 1), readonly)
                 print '\n'.join(strs)
                 print '</textarea>'
 
@@ -122,7 +130,7 @@ def substage_form(cnx, id, qdict):
 
     # Add "Save" and "Back" buttons.
 
-    print '<input type="submit" value="Save">'
+    print '<input type="submit" value="Save" %s>' % disabled
     print '<input type="submit" value="Back" formaction="/cgi-bin/db/edit_stage.py?id=%d&%s">' % \
         (stage_id, dbargs.convert_args(qdict))
     print '</form>'

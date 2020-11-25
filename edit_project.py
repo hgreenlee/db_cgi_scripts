@@ -27,6 +27,18 @@ cgitb.enable()
 
 def project_form(cnx, id, qdict):
 
+    # Construct global disabled option for restricted controls.
+
+    disabled = ''
+    if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'projects', id):
+        disabled = 'disabled'
+
+    # Construct disable option that applies only to status options.
+
+    option_disabled = ''
+    if not dbconfig.restricted_access_allowed():
+        option_disabled = 'disabled'
+
     # Get project name.
 
     name = dbutil.get_project_name(cnx, id)
@@ -40,7 +52,7 @@ def project_form(cnx, id, qdict):
     print '<h2>Stages</h2>'
     print '<form action="/cgi-bin/db/add_stage.py?id=%d&%s" method="post" target="_blank" rel="noopener noreferer">' % \
         (id, dbargs.convert_args(qdict))
-    print '<input type="submit" value="Add Stage">'
+    print '<input type="submit" value="Add Stage" %s>' % disabled
     print '</form>'
     print '<br>'
 
@@ -73,7 +85,7 @@ def project_form(cnx, id, qdict):
             print '<td>'
             print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/clone_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Clone">'
+            print '<input type="submit" value="Clone" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -82,7 +94,7 @@ def project_form(cnx, id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/delete_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Delete">'
+            print '<input type="submit" value="Delete" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -91,7 +103,7 @@ def project_form(cnx, id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/up_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Up">'
+            print '<input type="submit" value="Up" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -100,7 +112,7 @@ def project_form(cnx, id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/down_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Down">'
+            print '<input type="submit" value="Down" %s>' % disabled
             print '</form>'
             print '</td>'        
 
@@ -153,6 +165,8 @@ def project_form(cnx, id, qdict):
             readonly = ''
             if colname == 'id':
                 readonly = 'readonly'
+            elif disabled != '':
+                readonly = 'readonly'
 
             print '<tr>'
             print '<td>'
@@ -167,20 +181,23 @@ def project_form(cnx, id, qdict):
                     print '<input type="number" id="%s" name="%s" size=10 value="%d" %s>' % \
                         (colname, colname, row[n], readonly)
                 elif coltype[0:6] == 'DOUBLE':
-                    print '<input type="text" id="%s" name="%s" size=10 value="%8.6f">' % \
-                        (colname, colname, row[n])
+                    print '<input type="text" id="%s" name="%s" size=10 value="%8.6f" %s>' % \
+                        (colname, colname, row[n], readonly)
                 elif coltype[0:7] == 'VARCHAR':
                     if colname in pulldowns:
-                        print '<select id="%s" name="%s">' % (colname, colname)
+                        print '<select id="%s" name="%s" %s>' % (colname, colname, disabled)
                         for value in pulldowns[colname]:
                             sel = ''
                             if value == row[n]:
                                 sel = 'selected'
-                            print '<option value="%s" %s>%s</option>' % (value, sel, value)
+                            if value == '' or value == 'Requested':
+                                print '<option value="%s" %s>%s</option>' % (value, sel, value)
+                            else:
+                                print '<option value="%s" %s %s>%s</option>' % (value, sel, option_disabled, value)
                         print '</select>'
                     else:
-                        print '<input type="text" id="%s" name="%s" size=100 value="%s">' % \
-                            (colname, colname, row[n])
+                        print '<input type="text" id="%s" name="%s" size=100 value="%s" %s>' % \
+                            (colname, colname, row[n], readonly)
 
             else:
 
@@ -188,8 +205,8 @@ def project_form(cnx, id, qdict):
                 # Display using multiline <textarea>.
 
                 strs = dbutil.get_strings(cnx, row[n])
-                print '<textarea id="%s" name="%s" rows=%d cols=80>' % \
-                    (colname, colname, max(len(strs), 1))
+                print '<textarea id="%s" name="%s" rows=%d cols=80 %s>' % \
+                    (colname, colname, max(len(strs),1), readonly)
                 print '\n'.join(strs)
                 print '</textarea>'
 
@@ -202,7 +219,7 @@ def project_form(cnx, id, qdict):
 
     # Add "Save" and "Back" buttons.
 
-    print '<input type="submit" value="Save">'
+    print '<input type="submit" value="Save" %s>' % disabled
     print '<input type="submit" value="Back" formaction="/cgi-bin/db/query_projects.py?%s">' % \
         dbargs.convert_args(qdict)
     print '</form>'
