@@ -8,7 +8,7 @@
 #
 #==============================================================================
 
-import sys
+import sys, os
 import dbconfig
 from dbdict import databaseDict
 import xml.etree.ElementTree as ET
@@ -857,7 +857,10 @@ def clone_project(cnx, project_id, project_name):
 
     cols = databaseDict['projects']
     q = 'INSERT INTO projects SET name=\'%s\'' % project_name
-    for n in range(2, len(cols)):
+    user = dbconfig.getuser()
+    if user != '':
+        q += ',username=\'%s\'' % user
+    for n in range(3, len(cols)):
         coltup = cols[n]
         colname = coltup[0]
         coltype = coltup[2]
@@ -1210,6 +1213,9 @@ def import_project(cnx, xmlstring):
         q = 'INSERT INTO projects SET'
         if name != '':
             q += ' name=\'%s\'' % name
+        user = dbconfig.getuser()
+        if user != '':
+            q += ',username=\'%s\'' % user
 
         # Loop over dictionary elements for table projects.
 
@@ -1537,11 +1543,14 @@ def insert_blank_project(cnx):
     # Prepare query to insert project row.
 
     q = 'INSERT INTO projects SET name=\'%s\'' % project_name
+    user = dbconfig.getuser()
+    if user != '':
+        q += ',username=\'%s\'' % user
 
     # Loop over remaining fields.
 
     cols = databaseDict['projects']
-    for n in range(2, len(cols)):
+    for n in range(3, len(cols)):
         coltup = cols[n]
         colname = coltup[0]
         coltype = coltup[2]

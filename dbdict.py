@@ -39,6 +39,8 @@ tables = ['projects', 'stages', 'substages', 'strings', 'datasets']
 
 databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Project ID', 0),
                              ('name', '',  'VARCHAR(1000) NOT NULL', 0, 'Project name', ''),
+                             ('username', '', 'VARCHAR(100)', 0, 'Username', ''),
+                             ('description', '', 'VARCHAR(1000)', 0, 'Description', ''),
                              ('poms_campaign', 'poms/campaign', 'VARCHAR(1000)', 0, 'POMS campaign', ''),
                              ('poms_login_setup', 'poms/loginsetup', 'VARCHAR(1000)', 0, 'POMS login/stup', ''),
                              ('poms_job_type', 'poms/jobtype', 'VARCHAR(1000)', 0, 'POMS job type', ''),

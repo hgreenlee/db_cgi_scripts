@@ -34,9 +34,9 @@ def main(argdict):
 
     table = ''
     id = 0
-    if argdict.has_key('table'):
+    if 'table' in argdict:
         table = argdict['table']
-    if argdict.has_key('id'):
+    if 'id' in argdict:
         id = int(argdict['id'])
 
     # Check access restrictions.
@@ -51,7 +51,7 @@ def main(argdict):
         # If the projects table is being updated to a status which is anything other
         # than '' or 'Requested', it is an error.
 
-        if table == 'projects' and argdict.has_key('status') and \
+        if table == 'projects' and 'status' in argdict and \
            argdict['status'] != '' and argdict['status'] != 'Requested':
             dbutil.restricted_error()
 
@@ -117,7 +117,7 @@ def main(argdict):
     # Calculate redirect url.
 
     url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py'
-    if os.environ.has_key('HTTP_REFERER'):
+    if 'HTTP_REFERER' in os.environ:
         url = os.environ['HTTP_REFERER']
 
     # Generate html redirect document.
