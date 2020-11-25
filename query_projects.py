@@ -17,8 +17,8 @@
 
 import sys, os, copy
 import dbconfig, dbargs, dbutil
-from dbdict import pulldowns
-from dbdict import colors
+from dbconfig import pulldowns
+from dbconfig import colors
 
 
 # Return list of projects.

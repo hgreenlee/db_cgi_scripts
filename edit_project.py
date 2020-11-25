@@ -17,7 +17,7 @@
 import sys, os
 import dbconfig, dbutil, dbargs
 from dbdict import databaseDict
-from dbdict import pulldowns
+from dbconfig import pulldowns
 import cgi
 import cgitb
 cgitb.enable()
