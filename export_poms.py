@@ -36,7 +36,7 @@ def main(id, qdict):
     print 'Content-type: text/plain'
     print
 
-    # Generate main parg of html document.
+    # Generate main part of html document.
 
     if id == 0 or name == '':
         print 'No such project.'
@@ -45,7 +45,7 @@ def main(id, qdict):
         # Generate XML.
 
         ini = StringIO.StringIO()
-        dbutil.export_poms_project(cnx, id, ini)
+        dbutil.export_poms_project(cnx, id, qdict['dev'], ini)
         print ini.getvalue()
 
     # Done.

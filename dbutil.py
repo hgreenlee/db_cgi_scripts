@@ -522,7 +522,7 @@ def export_project(cnx, project_id, xml):
 
 # Export poms ini file corresponding to project.
 
-def export_poms_project(cnx, project_id, ini):
+def export_poms_project(cnx, project_id, dev, ini):
 
     # Query information about this project.
 
@@ -597,7 +597,9 @@ def export_poms_project(cnx, project_id, ini):
 
         # Campaign stage section.
 
-        url = '%s/export_project.py?id=%d' % (dbconfig.base_url, project_id)
+        url = '%s/export.py?id=%d' % (dbconfig.cgi_url, project_id)
+        if dev != 0:
+            url += '&dev=%d' % dev
         ini.write('[campaign_stage %s]\n' % poms_stage)
         ini.write('software_version=%s\n' % version)
         ini.write('dataset_or_split_data=\n')
