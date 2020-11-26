@@ -66,9 +66,8 @@ def main(substage_id, qdict):
     # Generate redirect html document header to invoke the substage editor for
     # the newly created document.
 
-    url = ''
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_stage.py?id=%d&%s' % \
-          (stage_id, dbargs.convert_args(qdict))
+    url = '%s/edit_stage.py?id=%d&%s' % \
+          (dbconfig.base_url, stage_id, dbargs.convert_args(qdict))
     print 'Content-type: text/html'
     print
     print '<!DOCTYPE html>'

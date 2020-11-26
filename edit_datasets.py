@@ -222,8 +222,8 @@ def main(project_id, update_id, qdict):
 
         else:
 
-            url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s' % \
-                  (project_id, dbargs.convert_args(qdict))
+            url = '%s/edit_datasets.py?id=%d&%s' % \
+                  (dbconfig.base_url, project_id, dbargs.convert_args(qdict))
             print 'Content-type: text/html'
             print
             print '<!DOCTYPE html>'
@@ -249,8 +249,8 @@ def main(project_id, update_id, qdict):
     print '<title>Project Datasets Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s>Project list</a><br>' % \
-        dbargs.convert_args(qdict)
+    print '<a href=%s/query_projects.py?%s>Project list</a><br>' % \
+        (dbconfig.base_url, dbargs.convert_args(qdict))
 
     # Generate main parg of html document.
 

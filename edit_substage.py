@@ -154,8 +154,8 @@ def main(id, qdict):
     print '<title>Substage Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s>Project list</a><br>' % \
-        dbargs.convert_args(qdict)
+    print '<a href=%s/query_projects.py?%s>Project list</a><br>' % \
+        (dbconfig.base_url, dbargs.convert_args(qdict))
 
     # Generate main parg of html document.
 

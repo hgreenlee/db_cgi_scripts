@@ -83,8 +83,8 @@ def main(id, confirm, qdict):
         # If confirm flag is nonzero, delete substage and redirect to stage editor.
 
         dbutil.delete_substage(cnx, id)
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_stage.py?id=%d&%s' % \
-              (stage_id, dbargs.convert_args(qdict))
+        url = '%s/edit_stage.py?id=%d&%s' % \
+              (dbconfig.base_url, stage_id, dbargs.convert_args(qdict))
 
         # Generate redirect page.
 

@@ -67,9 +67,8 @@ def main(dataset_id, qdict):
     # Generate redirect html document header to invoke the dataset editor for
     # the newly created document.
 
-    url = ''
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s' % \
-          (project_id, dbargs.convert_args(qdict))
+    url = '%s/edit_datasets.py?id=%d&%s' % \
+          (dbconfig.base_url, project_id, dbargs.convert_args(qdict))
     print 'Content-type: text/html'
     print
     print '<!DOCTYPE html>'

@@ -83,8 +83,8 @@ def main(id, confirm, qdict):
         # If confirm flag is nonzero, delete dataset and redirect to datasets editor.
 
         dbutil.delete_dataset(cnx, id)
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s' % \
-              (project_id, dbargs.convert_args(qdict))
+        url = '%s/edit_datasets.py?id=%d&%s' % \
+              (dbconfig.base_url, project_id, dbargs.convert_args(qdict))
 
         # Generate redirect page.
 

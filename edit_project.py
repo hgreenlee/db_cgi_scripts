@@ -77,8 +77,8 @@ def project_form(cnx, id, qdict):
             stage_id = row[0]
             stage_name = row[1]
             print '<td align="center">%d</td>' % stage_id
-            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="https://microboone-exp.fnal.gov/cgi-bin/db/edit_stage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
-                (stage_id, dbargs.convert_args(qdict), stage_name)
+            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="%s/edit_stage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
+                (dbconfig.base_url, stage_id, dbargs.convert_args(qdict), stage_name)
 
             # Add Clone button/column
 
@@ -245,8 +245,8 @@ def main(id, qdict):
     print '<title>Project Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s>Project list</a><br>' % \
-        dbargs.convert_args(qdict)
+    print '<a href=%s/query_projects.py?%s>Project list</a><br>' % \
+        (dbconfig.base_url, dbargs.convert_args(qdict))
 
     # Generate main parg of html document.
 

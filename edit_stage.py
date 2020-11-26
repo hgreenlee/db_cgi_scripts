@@ -76,8 +76,8 @@ def stage_form(cnx, id, qdict):
             substage_id = row[0]
             fclname = row[1]
             print '<td align="center">%d</td>' % substage_id
-            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="https://microboone-exp.fnal.gov/cgi-bin/db/edit_substage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
-                (substage_id, dbargs.convert_args(qdict), fclname)
+            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="%s/edit_substage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
+                (dbconfig.base_url, substage_id, dbargs.convert_args(qdict), fclname)
 
             # Add Clone button/column
 
@@ -239,8 +239,8 @@ def main(id, qdict):
     print '<title>Stage Editor</title>'
     print '</head>'
     print '<body>'
-    print '<a href=https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s>Project list</a><br>' % \
-        dbargs.convert_args(qdict)
+    print '<a href=%s/query_projects.py?%s>Project list</a><br>' % \
+        (dbconfig.base_url, dbargs.convert_args(qdict))
 
     # Generate main parg of html document.
 

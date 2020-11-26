@@ -120,7 +120,7 @@ def page_links(qdict, max_page):
 
     # Base url.
 
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py'
+    url = '%s/query_projects.py' % dbconfig.base_url
 
     # Calculate which pages to display.
     # Display some number of links centered around the current page.
@@ -316,8 +316,8 @@ def main(qdict):
 
         # Add link to datasets page with project name.
 
-        print '<td %s>&nbsp;<a target=_blank rel="noopener noreferer" href=https://microboone-exp.fnal.gov/cgi-bin/db/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
-            (color_style, id, dbargs.convert_args(qdict), name)
+        print '<td %s>&nbsp;<a target=_blank rel="noopener noreferer" href=%s/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
+            (color_style, dbconfig.base_url, id, dbargs.convert_args(qdict), name)
 
         # Add physics group and status.
 

@@ -29,8 +29,8 @@ def main(qdict):
     # Add project and redirect to project editor.
 
     project_id = dbutil.insert_blank_project(cnx)
-    url = 'https://microboone-exp.fnal.gov/cgi-bin/db/edit_project.py?id=%d&%s' % \
-          (project_id, dbargs.convert_args(qdict))
+    url = '%s/edit_project.py?id=%d&%s' % \
+          (dbconfig.base_url, project_id, dbargs.convert_args(qdict))
 
     # Generate redirect page.
 

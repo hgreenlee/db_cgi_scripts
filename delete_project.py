@@ -74,8 +74,8 @@ def main(id, confirm, qdict):
         # If confirm flag is nonzero, delete project and redirect to project list.
 
         dbutil.delete_project(cnx, id)
-        url = 'https://microboone-exp.fnal.gov/cgi-bin/db/query_projects.py?%s' % \
-              dbargs.convert_args(qdict)
+        url = '%s/query_projects.py?%s' % \
+              (dbconfig.base_url, dbargs.convert_args(qdict))
 
         # Generate redirect page.
 
