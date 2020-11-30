@@ -185,7 +185,7 @@ def project_form(cnx, id, qdict):
                         (colname, colname, row[n], readonly)
                 elif coltype[0:7] == 'VARCHAR':
                     if colname in pulldowns:
-                        print '<select id="%s" name="%s" %s>' % (colname, colname, disabled)
+                        print '<select id="%s" name="%s" size=0 %s>' % (colname, colname, disabled)
                         for value in pulldowns[colname]:
                             sel = ''
                             if value == row[n]:
