@@ -9,6 +9,7 @@
 #==============================================================================
 
 import sys, os
+import StringIO, pycurl
 import dbconfig
 from dbdict import databaseDict
 import xml.etree.ElementTree as ET
@@ -370,8 +371,9 @@ def export_substage(cnx, substage_id, xml):
                 if coltup[2][:3] == 'INT':
                     xml.write('      <%s>%d</%s>\n' % (element, row[n], element))
                 elif coltup[2][:7] == 'VARCHAR' and row[n] != '':
-                    xml.write('      <%s>%s</%s>\n' % (element, row[n].replace('&', '&amp;'),
-                                                     element))
+                    if row[n] != None:
+                        xml.write('      <%s>%s</%s>\n' % (element, row[n].replace('&', '&amp;'),
+                                                           element))
                 elif coltup[2][:6] == 'DOUBLE':
                     xml.write('      <%s>%8.6f</%s>\n' % (element, row[n], element))
 
@@ -417,8 +419,9 @@ def export_stage(cnx, stage_id, xml):
                 if coltup[2][:3] == 'INT':
                     xml.write('    <%s>%d</%s>\n' % (element, row[n], element))
                 elif coltup[2][:7] == 'VARCHAR' and row[n] != '':
-                    xml.write('    <%s>%s</%s>\n' % (element, row[n].replace('&', '&amp;'),
-                                                     element))
+                    if row[n] != None:
+                        xml.write('    <%s>%s</%s>\n' % (element, row[n].replace('&', '&amp;'),
+                                                         element))
                 elif coltup[2][:6] == 'DOUBLE':
                     xml.write('    <%s>%8.6f</%s>\n' % (element, row[n], element))
 
@@ -496,8 +499,9 @@ def export_project(cnx, project_id, xml):
                 if coltup[2][:3] == 'INT':
                     xml.write('  %s<%s>%d</%s>\n' % (indent, element, row[n], element))
                 elif coltup[2][:7] == 'VARCHAR' and row[n] != '':
-                    xml.write('  %s<%s>%s</%s>\n' % (indent, element,
-                                                     row[n].replace('&', '&amp;'), element))
+                    if row[n] != None:
+                        xml.write('  %s<%s>%s</%s>\n' % (indent, element,
+                                                         row[n].replace('&', '&amp;'), element))
                 elif coltup[2][:6] == 'DOUBLE':
                     xml.write('  %s<%s>%8.6f</%s>\n' % (indent, element, row[n], element))
 
@@ -742,7 +746,8 @@ def clone_substage(cnx, substage_id, stage_id):
         elif coltype[:3] == 'INT':
             q += ',%s=%d' % (colname, row[n])
         elif coltype[:7] == 'VARCHAR':
-            q += ',%s=\'%s\'' % (colname, row[n].replace('&', '&amp;').replace("'", "\\'"))
+            if row[n] != None:
+                q += ',%s=\'%s\'' % (colname, row[n].replace('&', '&amp;').replace("'", "\\'"))
         elif coltype[:6] == 'DOUBLE':
             q += ',%s=%8.6f' % (colname, row[n])
     c.execute(q)
@@ -802,7 +807,8 @@ def clone_stage(cnx, stage_id, project_id):
         elif coltype[:3] == 'INT':
             q += ',%s=%d' % (colname, row[n])
         elif coltype[:7] == 'VARCHAR':
-            q += ',%s=\'%s\'' % (colname, row[n].replace('&', '&amp;').replace("'", "\\'"))
+            if row[n] != None:
+                q += ',%s=\'%s\'' % (colname, row[n].replace('&', '&amp;').replace("'", "\\'"))
         elif coltype[:6] == 'DOUBLE':
             q += ',%s=%8.6f' % (colname, row[n])
     c.execute(q)
@@ -879,7 +885,8 @@ def clone_project(cnx, project_id, project_name):
         elif coltype[:3] == 'INT':
             q += ',%s=%d' % (colname, value)
         elif coltype[:7] == 'VARCHAR':
-            q += ',%s=\'%s\'' % (colname, value.replace('&', '&amp;').replace("'", "\\'"))
+            if value != None:
+                q += ',%s=\'%s\'' % (colname, value.replace('&', '&amp;').replace("'", "\\'"))
         elif coltype[:6] == 'DOUBLE':
             q += ',%s=%8.6f' % (colname, value)
     c.execute(q)
@@ -890,6 +897,16 @@ def clone_project(cnx, project_id, project_name):
     c.execute(q)
     row = c.fetchone()
     new_project_id = row[0]
+
+    # Clone datasets belonging to this project.
+    # Cloned datasets will have the same names as the original datasets.
+
+    q = 'SELECT id FROM datasets WHERE project_id=%d' % project_id
+    c.execute(q)
+    rows = c.fetchall()
+    for row in rows:
+        dataset_id = row[0]
+        clone_dataset(cnx, dataset_id, new_project_id)
 
     # Clone stages belonging to this project.
     # Cloned stages will have the same names as the original stages.
@@ -1024,7 +1041,8 @@ def import_substage(cnx, substage, stage_id, seqnum):
                     elif coltype[:6] == 'DOUBLE':
                         q += ',%s=%8.6f' % (colname, float(value))
                     elif coltype[:7] == 'VARCHAR':
-                        q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+                        if value != None:
+                            q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
                 else:
                     if coltype[:3] == 'INT':
                         q += ',%s=%d' % (colname, coldefault)
@@ -1110,7 +1128,8 @@ def import_stage(cnx, stage, project_id, seqnum):
                     elif coltype[:6] == 'DOUBLE':
                         q += ',%s=%8.6f' % (colname, float(value))
                     elif coltype[:7] == 'VARCHAR':
-                        q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+                        if value != None:
+                            q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
 
                         # Add datasets.
 
@@ -1246,7 +1265,8 @@ def import_project(cnx, xmlstring):
                         elif coltype[:6] == 'DOUBLE':
                             q += ',%s=%8.6f' % (colname, float(value))
                         elif coltype[:7] == 'VARCHAR':
-                            q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+                            if value != None:
+                                q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
                     else:
                         if coltype[:3] == 'INT':
                             q += ',%s=%d' % (colname, coldefault)
@@ -1618,7 +1638,7 @@ def free_seqnum_dataset(cnx, project_id, dataset_type, seqnum):
 
 # Clone dataset row.
 
-def clone_dataset(cnx, dataset_id):
+def clone_dataset(cnx, dataset_id, project_id):
 
     # Check access.
 
@@ -1635,13 +1655,14 @@ def clone_dataset(cnx, dataset_id):
         raise IOError('Unable to fetch dataset id %d' % dataset_id)
     row = rows[0]
     dataset_name = row[1]
-    project_id = row[2]
+    old_project_id = row[2]
     seqnum = row[3]
     dataset_type = row[4]
 
     # Increment sequence number, and make sure the new sequence number of free.
 
-    seqnum += 1
+    if project_id == old_project_id:
+        seqnum += 1
     free_seqnum_dataset(cnx, project_id, dataset_type, seqnum)
 
     # Construct query to insert a new row into datasets table that is
@@ -1740,3 +1761,87 @@ def restricted_error():
     print '</body>'
     print '</html>'
     sys.exit(0)
+
+
+# Return statistics in form (files, events) of a dataset.
+# Return None on error.
+
+def get_stats( defname ):
+
+    result = None
+
+    # Construct url to query sam.
+
+    url = '%s/definitions/name/%s/files/summary' % (dbconfig.samweb_url, defname)
+    buffer = StringIO.StringIO()
+    pyc = pycurl.Curl()
+    pyc.setopt(pyc.URL, convert_str(url))
+    pyc.setopt(pyc.WRITEFUNCTION, buffer.write)
+    pyc.setopt(pyc.FOLLOWLOCATION, True)
+    pyc.setopt(pyc.TIMEOUT, 3600)
+    pyc.perform()
+    code = pyc.getinfo(pyc.RESPONSE_CODE)
+    pyc.close()
+    if code == 200:
+
+        # Parse result.
+
+        events = 0
+        files = 0
+        result = buffer.getvalue()
+        for line in result.splitlines():
+            words = line.split(':')
+            if len(words) >= 2:
+                word0 = words[0].strip()
+                value = int(words[1].strip())
+                if word0 == 'File Count':
+                    files = value
+                elif word0 == 'Total Event Count':
+                    events = value
+        result = (files, events)
+
+    # Done.
+
+    return result
+
+
+# Return statistics in form (files, events) of parents of a dataset.
+# Return None on error.
+
+def get_parent_stats( defname ):
+
+    result = None
+
+    # Construct url to query sam.
+
+    url = '%s/files/summary?dims=isparentof%%3A(%%20defname%%3A%%20%s%%20)' % (dbconfig.samweb_url, defname)
+    buffer = StringIO.StringIO()
+    pyc = pycurl.Curl()
+    pyc.setopt(pyc.URL, convert_str(url))
+    pyc.setopt(pyc.WRITEFUNCTION, buffer.write)
+    pyc.setopt(pyc.FOLLOWLOCATION, True)
+    pyc.setopt(pyc.TIMEOUT, 3600)
+    pyc.perform()
+    code = pyc.getinfo(pyc.RESPONSE_CODE)
+    pyc.close()
+    if code == 200:
+
+        # Parse result.
+
+        events = 0
+        files = 0
+        result = buffer.getvalue()
+        for line in result.splitlines():
+            words = line.split(':')
+            if len(words) >= 2:
+                word0 = words[0].strip()
+                value = int(words[1].strip())
+                if word0 == 'File Count':
+                    files = value
+                elif word0 == 'Total Event Count':
+                    events = value
+        result = (files, events)
+
+    # Done.
+
+    return result

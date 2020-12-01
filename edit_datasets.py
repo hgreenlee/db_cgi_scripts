@@ -15,7 +15,7 @@
 #==============================================================================
 
 import sys, os
-import StringIO, pycurl
+import pycurl
 import dbconfig, dbutil, dbargs
 from dbdict import databaseDict
 import cgi
@@ -178,34 +178,16 @@ def main(project_id, update_id, qdict):
 
         # Query event count form sam.
 
-        url = '%s/definitions/name/%s/files/summary' % (dbconfig.samweb_url, dataset_name)
-        buffer = StringIO.StringIO()
-        pyc = pycurl.Curl()
-        pyc.setopt(pyc.URL, dbutil.convert_str(url))
-        pyc.setopt(pyc.WRITEFUNCTION, buffer.write)
-        pyc.setopt(pyc.FOLLOWLOCATION, True)
-        pyc.setopt(pyc.TIMEOUT, 3600)
-        pyc.perform()
-        code = pyc.getinfo(pyc.RESPONSE_CODE)
-        pyc.close()
-        if code == 200:
+        files = 0
+        events = 0
+        update_ok = False
+        r = dbutil.get_stats(dataset_name)
+        if r != None:
+            files = r[0]
+            events = r[1]
+            update_ok = True
 
-            # Parse result.
-
-            events = 0
-            files = 0
-            result = buffer.getvalue()
-            for line in result.splitlines():
-                words = line.split(':')
-                if len(words) >= 2:
-                    word0 = words[0].strip()
-                    value = int(words[1].strip())
-                    if word0 == 'File Count':
-                        files = value
-                    elif word0 == 'Total Event Count':
-                        events = value
-            if events > 0 and files > 0:
-                update_ok = True
+        # Do update.
 
         if update_ok:
 

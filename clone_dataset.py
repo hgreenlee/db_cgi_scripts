@@ -40,7 +40,7 @@ def main(dataset_id, qdict):
 
     # Clone the dataset row.
 
-    clone_id = dbutil.clone_dataset(cnx, dataset_id)
+    clone_id = dbutil.clone_dataset(cnx, dataset_id, project_id)
 
     # Generate redirect html document header to invoke the dataset editor for
     # the newly created document.
