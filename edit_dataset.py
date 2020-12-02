@@ -50,7 +50,7 @@ def dataset_form(cnx, id, qdict):
 
     # Query full dataset from database.
 
-    q = 'SELECT * FROM datasets WHERE id=%d' % id
+    q = 'SELECT %s FROM datasets WHERE id=%d' % (dbutil.columns('datasets'), id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:

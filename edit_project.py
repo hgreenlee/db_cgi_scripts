@@ -128,7 +128,7 @@ def project_form(cnx, id, qdict):
 
     # Query full project from database.
 
-    q = 'SELECT * FROM projects WHERE id=%d' % id
+    q = 'SELECT %s FROM projects WHERE id=%d' % (dbutil.columns('projects'), id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:

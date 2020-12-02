@@ -32,7 +32,7 @@ def substage_form(cnx, id, qdict):
     # Query substage from database.
 
     c = cnx.cursor()
-    q = 'SELECT * FROM substages WHERE id=%d' % id
+    q = 'SELECT %s FROM substages WHERE id=%d' % (dbutil.columns('substages'), id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:

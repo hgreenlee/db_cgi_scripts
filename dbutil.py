@@ -81,6 +81,25 @@ def get_tables(cnx):
     return result
 
 
+# Return comma-separated list of columns in a table.
+# Based on dictionary.
+
+def columns(table):
+
+    result = ''
+
+    for coltup in databaseDict[table]:
+        colname = coltup[0]
+        if colname != '':
+            if result != '':
+                result += ','
+            result += colname
+
+    # Done.
+
+    return result
+
+
 # List projects.
 
 def list_projects(cnx):
@@ -215,7 +234,7 @@ def insert_strings(cnx, strings):
 
 
 # Update string array.
-# Check is specified string array already exists.  If so return existing array id.
+# Check if specified string array already exists.  If so return existing array id.
 # Otherwise insert new string array.
 
 def update_strings(cnx, strings):
@@ -342,7 +361,7 @@ def export_substage(cnx, substage_id, xml):
     # Query substage from database.
 
     c = cnx.cursor()
-    q = 'SELECT * FROM substages WHERE id=%d' % substage_id
+    q = 'SELECT %s FROM substages WHERE id=%d' % (columns('substages'), substage_id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
@@ -390,7 +409,7 @@ def export_stage(cnx, stage_id, xml):
     # Query stage from database.
 
     c = cnx.cursor()
-    q = 'SELECT * FROM stages WHERE id=%d' % stage_id
+    q = 'SELECT %s FROM stages WHERE id=%d' % (columns('stages'), stage_id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
@@ -453,7 +472,7 @@ def export_project(cnx, project_id, xml):
     # Query project from database.
 
     c = cnx.cursor()
-    q = 'SELECT * FROM projects WHERE id=%d' % project_id
+    q = 'SELECT %s FROM projects WHERE id=%d' % (columns('projects'), project_id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
@@ -711,7 +730,7 @@ def clone_substage(cnx, substage_id, stage_id):
     # Query substage from database.
 
     c = cnx.cursor()
-    q = 'SELECT * FROM substages WHERE id=%d' % substage_id
+    q = 'SELECT %s FROM substages WHERE id=%d' % (columns('substages'), substage_id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
@@ -772,7 +791,7 @@ def clone_stage(cnx, stage_id, project_id):
     # Query stage from database.
 
     c = cnx.cursor()
-    q = 'SELECT * FROM stages WHERE id=%d' % stage_id
+    q = 'SELECT %s FROM stages WHERE id=%d' % (columns('stages'), stage_id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
@@ -853,7 +872,7 @@ def clone_project(cnx, project_id, project_name):
 
     # Query project from database.
 
-    q = 'SELECT * FROM projects WHERE id=%d' % project_id
+    q = 'SELECT %s FROM projects WHERE id=%d' % (columns('projects'), project_id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
@@ -1648,7 +1667,7 @@ def clone_dataset(cnx, dataset_id, project_id):
     # Query full dataset row from database.
 
     c = cnx.cursor()
-    q = 'SELECT * FROM datasets WHERE id=%d' % dataset_id
+    q = 'SELECT %s FROM datasets WHERE id=%d' % (columns('datasets'), dataset_id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:

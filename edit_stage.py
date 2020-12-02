@@ -127,7 +127,7 @@ def stage_form(cnx, id, qdict):
 
     # Query full stage from database.
 
-    q = 'SELECT * FROM stages WHERE id=%d' % id
+    q = 'SELECT %s FROM stages WHERE id=%d' % (dbutil.columns('stages'), id)
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
