@@ -8,7 +8,6 @@
 # CGI arguments:
 #
 # id      - Dataset id.
-# name    - Dataset name.
 # <qdict> - Standard query_projects.py arguments.
 #
 # Created: 17-Nov-2020  H. Greenlee
@@ -18,111 +17,166 @@
 import sys, os
 import dbconfig, dbutil, dbargs
 from dbdict import databaseDict
+from dbconfig import pulldowns
 
 
 # Main procedure.
 
-def main(dataset_id, dataset_name, qdict):
+def dataset_form(cnx, id, qdict):
 
-    # Open database connection.
+    # Construct global disabled option for restricted controls.
 
-    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
+    disabled = ''
+    if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'datasets', id):
+        disabled = 'disabled'
+
+    # Query project name and id from database.
+
     c = cnx.cursor()
-
-    # Query the current dataset name, and project id.
-
-    current_dataset_name = ''
-    project_id = 0
-    q = 'SELECT name, project_id FROM datasets WHERE id=%d' % dataset_id
+    q = 'SELECT id, name, project_id FROM datasets WHERE id=%d' % id
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
-        raise IOError('Unable to fetch dataset id %d' % dataset_id)
+        raise IOError('Unable to fetch dataset id %d' % id)
     row = rows[0]
-    current_dataset_name = row[0]
-    project_id = row[1]
+    name = row[1]
+    project_id = row[2]
+    project_name = dbutil.get_project_name(cnx, project_id)
 
-    if dataset_name == '':
+    # Generate form.
 
-        # If the argument dataset name is blank, generate a form to edit the name.
+    print '<h2>Project %s</h2>' % project_name
+    print '<h2>Datset %s</h2>' % name
 
-        print 'Content-type: text/html'
-        print
-        print '<!DOCTYPE html>'
-        print '<html>'
-        print '<head>'
-        print '<title>Edit Dataset</title>'
-        print '</head>'
-        print '<body>'
-        
-        # Generate a form with text dialog and two buttons "Save" and "Cancel."
+    # Query full dataset from database.
 
-        print '<h2>Edit Dataset Name</h2>'
-        print '<form action="/cgi-bin/db/edit_dataset.py" method="post">'
+    q = 'SELECT * FROM datasets WHERE id=%d' % id
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) == 0:
+        raise IOError('Unable to fetch dataset id %d' % id)
+    row = rows[0]
 
-        # Add qdict hidden fields.
+    print '<form action="/cgi-bin/db/dbhandler.py" method="post">'
 
-        for key in qdict:
-            print '<input type="hidden" name="%s" value="%s">' % (dbutil.convert_str(key),
-                                                                  dbutil.convert_str(qdict[key]))
+    # Add hidden input field to store table name.
 
-        # Add dataset id hidden field.
+    print '<input type="hidden" id="table" name="table" value="datasets">'
 
-        print '<input type="hidden" name="id" value="%d">' % dataset_id
+    # Add hidden qdict input fields.
 
-        # Add one-line text field for dataset name, pre-filled with current name.
-        # This is the only visible and editable field for this form.
+    for key in qdict:
+        print '<input type="hidden" name="%s" value="%s">' % (dbutil.convert_str(key),
+                                                              dbutil.convert_str(qdict[key]))
+    # Loop over fields of this dataset.
+    # Put fields in a table.
 
-        print '<label for="dataset_name">Dataset Name: </label>'
-        print '<input type="text" id="dataset_name" name="name" value="%s" size=100>' % \
-            current_dataset_name
-        print '<br>'
+    print '<table border=1 style="border-collapse:collapse">'
+    cols = databaseDict['datasets']
+    for n in range(len(cols)):
+        coltup = cols[n]
+        colname = coltup[0]
+        coltype = coltup[2]
+        colarray = coltup[3]
+        coldesc = coltup[4]
 
-        # Add save and cancel buttons.
+        if colname != '':
 
-        print '<input type="submit" value="Save">'
-        print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/edit_datasets.py?id=%d">' % \
-        project_id
-        print '</form>'
-        print '</body>'
-        print '</html>'
+            # Set readonly attribute
 
-    else:
+            readonly = ''
+            if colname == 'id' or colname == 'project_id':
+                readonly = 'readonly'
+            elif disabled != '':
+                readonly = 'readonly'
 
-        # Check access.
+            print '<tr>'
+            print '<td>'
+            print '<label for="%s">%s: </label>' % (colname, coldesc)
+            print '</td>'
+            print '<td>'
+            if colarray == 0:
 
-        if not dbconfig.restricted_access_allowed() and dbutil.restricted_access(cnx, 'datasets', dataset_id):
-            dbutil.restricted_error()
+                # Scalar column.
 
-        # If dataset name argument is not blank, update database and redirect back to datasets page.
+                if coltype[0:3] == 'INT':
+                    print '<input type="number" id="%s" name="%s" size=10 value="%d" %s>' % \
+                        (colname, colname, row[n], readonly)
+                elif coltype[0:6] == 'DOUBLE':
+                    print '<input type="text" id="%s" name="%s" size=100 value="%8.6f" %s>' % \
+                        (colname, colname, row[n], readonly)
+                elif coltype[0:7] == 'VARCHAR':
+                    if colname in pulldowns:
+                        print '<select id="%s" name="%s" size=0 %s>' % (colname, colname, disabled)
+                        for value in pulldowns[colname]:
+                            sel = ''
+                            if value == row[n]:
+                                sel = 'selected'
+                            print '<option value="%s" %s>%s</option>' % (value, sel, value)
+                        print '</select>'
+                    else:
+                        print '<input type="text" id="%s" name="%s" size=100 value="%s" %s>' % \
+                            (colname, colname, row[n], readonly)
 
-        q = 'UPDATE datasets SET name=\'%s\' WHERE id=%d' % (dataset_name, dataset_id)
-        c.execute(q)
-        cnx.commit()
+            else:
 
-        # Redirect to dataset list.
+                # Array columns.
+                # Display using multiline <textarea>.
 
-        url = '%s/edit_datasets.py?id=%d&%s' % \
-              (dbconfig.base_url, project_id, dbargs.convert_args(qdict))
-        print 'Content-type: text/html'
-        print
-        print '<!DOCTYPE html>'
-        print '<html>'
-        print '<head>'
-        print '<meta http-equiv="refresh" content="0; url=%s" />' % url
-        print '</head>'
-        print '<body>'
-        print 'Dataset update successful.'
-        print '<br><br>'
-        print 'If page does not automatically reload click this <a href=%s>link</a>' % url
-        print '</body>'
-        print '</html>'
+                strs = dbutil.get_strings(cnx, row[n])
+                print '<textarea id="%s" name="%s" rows=%d cols=80 %s>' % \
+                    (colname, colname, max(len(strs), 1), readonly)
+                print '\n'.join(strs)
+                print '</textarea>'
 
+            print '</td>'
+            print '</tr>'
 
+    # Finish table.
+
+    print '</table>'
+
+    # Add "Save" and "Back" buttons.
+
+    print '<input type="submit" value="Save" %s>' % disabled
+    print '<input type="submit" value="Back" formaction="/cgi-bin/db/edit_datasets.py?id=%d&%s">' % \
+        (project_id, dbargs.convert_args(qdict))
+    print '</form>'
 
     # Done.
 
     return
+
+# Main procedure.
+
+def main(id, qdict):
+
+    # Open database connection.
+
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
+
+    # Generate html document header.
+
+    print 'Content-type: text/html'
+    print
+    print '<!DOCTYPE html>'
+    print '<html>'
+    print '<head>'
+    print '<title>Dataset Editor</title>'
+    print '</head>'
+    print '<body>'
+    print '<a href=%s/query_projects.py?%s>Project list</a><br>' % \
+        (dbconfig.base_url, dbargs.convert_args(qdict))
+
+    # Generate main parg of html document.
+
+    dataset_form(cnx, id, qdict)
+
+    # Generate html document trailer.
+    
+    print '</body>'
+    print '</html>'
+
 
 # End of definitions.  Executable code starts here.
 
@@ -132,13 +186,10 @@ if __name__ == "__main__":
 
     argdict = dbargs.get()
     qdict = dbargs.extract_qdict(argdict)
-    dataset_id = 0
-    dataset_name = ''
+    id = 0
     if 'id' in argdict:
-        dataset_id = int(argdict['id'])
-    if 'name' in argdict:
-        dataset_name = argdict['name']
+        id = int(argdict['id'])
 
     # Call main procedure.
 
-    main(dataset_id, dataset_name, qdict)
+    main(id, qdict)
