@@ -609,7 +609,7 @@ def export_poms_project(cnx, project_id, dev, ini):
         ini.write('dataset_or_split_data=\n')
         ini.write('cs_split_type=draining\n')
         ini.write('completion_type=located\n')
-        ini.write('param_overrides=[["--xml", "%s"], ["--stage", "%s"]]\n' % (url, stage_name))
+        ini.write('param_overrides=[["--xml", " \'%s\'"], ["--stage", " %s"]]\n' % (url, stage_name))
         ini.write('login_setup=%s\n' % poms_login_setup)
         ini.write('job_type=%s\n' % poms_job_type)
         ini.write('merge_overrides=False\n')
@@ -1814,7 +1814,7 @@ def get_parent_stats( defname ):
 
     # Construct url to query sam.
 
-    url = '%s/files/summary?dims=isparentof%%3A(%%20defname%%3A%%20%s%%20)' % (dbconfig.samweb_url, defname)
+    url = '%s/files/summary?dims=isparentof%%3A(%%20defname%%3A%%20%s%%20)%%20and%%20not%%20file_name%%CRT%%25' % (dbconfig.samweb_url, defname)
     buffer = StringIO.StringIO()
     pyc = pycurl.Curl()
     pyc.setopt(pyc.URL, convert_str(url))
