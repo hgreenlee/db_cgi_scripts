@@ -34,14 +34,19 @@ cgitb.enable()
 
 # Convert argument dictionary to ampersand-separated list of key-value pairs.
 
-def convert_args(argdict):
+def convert_args(argdict, k=None, v=None):
 
     result = ''
 
     for key in argdict:
         if result != '':
             result += '&'
-        result += '%s=%s' % (dbutil.convert_str(key), dbutil.convert_str(argdict[key]))
+        value = None
+        if key == k:
+            value = v
+        else:
+            value = argdict[key]
+        result += '%s=%s' % (dbutil.convert_str(key), dbutil.convert_str(value))
 
     # Done
 
@@ -106,7 +111,7 @@ def extract_qdict(argdict):
 
         # String arguments.
 
-        elif k == 'pattern' or k == 'group' or k == 'status':
+        elif k == 'pattern' or k == 'group' or k == 'status' or k == 'sort':
             result[k] = argdict[k]
 
     # Parse CLI arguments.
@@ -124,7 +129,7 @@ def extract_qdict(argdict):
 
             # String arguments.
 
-            elif k == 'pattern' or k == 'group' or k == 'status':
+            elif k == 'pattern' or k == 'group' or k == 'status' or k == 'sort':
                 if k not in result:
                     result[k] = kv[1]
 
@@ -142,6 +147,8 @@ def extract_qdict(argdict):
         result['group'] = ''
     if not 'status' in result:
         result['status'] = ''
+    if not 'sort' in result:
+        result['sort'] = ''
 
     # Done.
 

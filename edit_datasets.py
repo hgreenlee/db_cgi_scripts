@@ -124,7 +124,9 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/edit_datasets.py?id=%d&update=%d&%s" method="post">' % \
                 (project_id, dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Update" %s>' % disabled
+            print '<div title="Update statistics">'
+            print '<input type="submit" value="+Stats" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -133,7 +135,9 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/edit_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Edit" %s>' % disabled
+            print '<div title="Edit dataset">'
+            print '<input type="submit" value="&#x270e;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -142,7 +146,9 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/clone_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Clone" %s>' % disabled
+            print '<div title="Clone dataset">'
+            print '<input type="submit" value="&#x2398;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -151,7 +157,9 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/delete_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Delete" %s>' % disabled
+            print '<div title="Delete dataset">'
+            print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -160,7 +168,9 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/up_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Up" %s>' % disabled
+            print '<div title="Move up">'
+            print '<input type="submit" value="&#x25b2;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -169,7 +179,9 @@ def datasets_form(cnx, project_id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/down_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Down" %s>' % disabled
+            print '<div title="Move down">'
+            print '<input type="submit" value="&#x25bc;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 

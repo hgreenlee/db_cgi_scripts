@@ -79,12 +79,25 @@ def stage_form(cnx, id, qdict):
             print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="%s/edit_substage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
                 (dbconfig.base_url, substage_id, dbargs.convert_args(qdict), fclname)
 
+            # Add Edit button/column
+
+            print '<td>'
+            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/edit_substage.py?id=%d&%s" method="post">' % \
+                (substage_id, dbargs.convert_args(qdict))
+            print '<div title="Edit substage">'
+            print '<input type="submit" value="&#x270e;">'
+            print '</div>'
+            print '</form>'
+            print '</td>'        
+
             # Add Clone button/column
 
             print '<td>'
             print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/clone_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Clone" %s>' % disabled
+            print '<div title="Clone substage">'
+            print '<input type="submit" value="&#x2398;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -93,7 +106,9 @@ def stage_form(cnx, id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/delete_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Delete" %s>' % disabled
+            print '<div title="Delete substage">'
+            print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -102,7 +117,9 @@ def stage_form(cnx, id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/up_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Up" %s>' % disabled
+            print '<div title="Move up">'
+            print '<input type="submit" value="&#x25b2;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -111,7 +128,9 @@ def stage_form(cnx, id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/down_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Down" %s>' % disabled
+            print '<div title="Move down">'
+            print '<input type="submit" value="&#x25bc;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 

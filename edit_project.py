@@ -80,12 +80,25 @@ def project_form(cnx, id, qdict):
             print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="%s/edit_stage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
                 (dbconfig.base_url, stage_id, dbargs.convert_args(qdict), stage_name)
 
+            # Add Edit button/column
+
+            print '<td>'
+            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/edit_stage.py?id=%d&%s" method="post">' % \
+                (stage_id, dbargs.convert_args(qdict))
+            print '<div title="Edit stage">'
+            print '<input type="submit" value="&#x270e;">'
+            print '</div>'
+            print '</form>'
+            print '</td>'        
+
             # Add Clone button/column
 
             print '<td>'
             print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/clone_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Clone" %s>' % disabled
+            print '<div title="Clone stage">'
+            print '<input type="submit" value="&#x2398;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -94,7 +107,9 @@ def project_form(cnx, id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/delete_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Delete" %s>' % disabled
+            print '<div title="Delete stage">'
+            print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -103,7 +118,9 @@ def project_form(cnx, id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/up_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Up" %s>' % disabled
+            print '<div title="Move up">'
+            print '<input type="submit" value="&#x25b2;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
@@ -112,7 +129,9 @@ def project_form(cnx, id, qdict):
             print '<td>'
             print '<form action="/cgi-bin/db/down_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
-            print '<input type="submit" value="Down" %s>' % disabled
+            print '<div title="Move down">'
+            print '<input type="submit" value="&#x25bc;" %s>' % disabled
+            print '</div>'
             print '</form>'
             print '</td>'        
 
