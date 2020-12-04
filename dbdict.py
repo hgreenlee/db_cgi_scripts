@@ -33,7 +33,7 @@
 
 # Tables in creation order:
 
-tables = ['projects', 'stages', 'substages', 'strings', 'datasets']
+tables = ['projects', 'stages', 'substages', 'strings', 'datasets', 'groups', 'group_project']
 
 # Database dictionary.
 
@@ -157,5 +157,10 @@ databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT
                              ('events', '', 'INT', 0, 'Event count', 0),
                              ('parent_files', '', 'INT', 0, 'Parent file count', 0),
                              ('parent_events', '', 'INT', 0, 'Parent event count', 0),
-                             ('parent_id', '', 'INT', 0, 'Parent dataset ID', 0)]}
+                             ('parent_id', '', 'INT', 0, 'Parent dataset ID', 0)],
+                'groups': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Group ID', 0),
+                           ('name', '', 'VARCHAR(1000) NOT NULL', 0, 'Group name', '')],
+                'group_project': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Group ID', 0),
+                                  ('group_id', '', 'INT NOT NULL', 0, 'Group ID', ''),
+                                  ('project_id', '', 'INT NOT NULL', 0, 'Project ID', '')]}
 

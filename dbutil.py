@@ -182,6 +182,46 @@ def get_project_name(cnx, id):
     return result
 
 
+# Get group id.
+
+def get_group_id(cnx, group_name):
+
+    result = 0
+
+    # Query group id from database.
+
+    c = cnx.cursor()
+    q = 'SELECT id, name FROM groups WHERE name=\'%s\'' % group_name
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) > 0:
+        result = rows[0][0]
+
+    # Done.
+
+    return result
+
+
+# Get group name.
+
+def get_group_name(cnx, id):
+
+    result = ''
+
+    # Query group name from database.
+
+    c = cnx.cursor()
+    q = 'SELECT id, name FROM groups WHERE id=%d' % id
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) > 0:
+        result = rows[0][1]
+
+    # Done.
+
+    return result
+
+
 # Get string array.
 
 def get_strings(cnx, array_id):
@@ -708,6 +748,11 @@ def delete_project(cnx, project_id):
         stage_id = row[0]
         delete_stage(cnx, stage_id)
 
+    # Delete this project from groups.
+
+    q = 'DELETE FROM group_project WHERE project_id=%d' % project_id
+    c.execute(q)
+
     # Delete project.
 
     q = 'DELETE FROM projects WHERE id=%d' % project_id
@@ -716,6 +761,32 @@ def delete_project(cnx, project_id):
     # Delete unreferenced string arrays.
 
     clean_strings(cnx)
+
+    # Done.
+
+    cnx.commit()
+    return
+
+
+# Delete group.
+
+def delete_group(cnx, group_id):
+
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed():
+        restricted_error()
+
+    # Delete group associations for this group.
+
+    c = cnx.cursor()
+    q = 'DELETE FROM group_project WHERE group_id=%d' % group_id
+    c.execute(q)
+
+    # Delete group.
+
+    q = 'DELETE FROM groups WHERE id=%d' % group_id
+    c.execute(q)
 
     # Done.
 
@@ -941,6 +1012,67 @@ def clone_project(cnx, project_id, project_name):
 
     cnx.commit()
     return new_project_id
+
+
+# Clone group.
+# Return newly created group id.
+
+def clone_group(cnx, group_id, group_name):
+
+    # See if the new group already exists.
+
+    c = cnx.cursor()
+    q = 'SELECT COUNT(*) FROM groups WHERE name=\'%s\'' % group_name
+    c.execute(q)
+    row = c.fetchone()
+    n = row[0]
+    if n > 0:
+        print 'Group %s already exists.' % group_name
+        return
+
+    # Query group from database.
+
+    q = 'SELECT %s FROM groups WHERE id=%d' % (columns('groups'), group_id)
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) == 0:
+        raise IOError('Unable to fetch group id %d' % group_id)
+    row = rows[0]
+
+    # Construct query to insert a new row into groups table that is
+    # a copy of the row that we just read.
+
+    cols = databaseDict['groups']
+    q = 'INSERT INTO groups SET name=\'%s\'' % group_name
+    for n in range(2, len(cols)):
+        coltup = cols[n]
+        colname = coltup[0]
+        coltype = coltup[2]
+        colarray = coltup[3]
+        value = row[n]
+
+        if colarray:
+            q += ',%s=%d' % (colname, value)
+        elif coltype[:3] == 'INT':
+            q += ',%s=%d' % (colname, value)
+        elif coltype[:7] == 'VARCHAR':
+            if value != None:
+                q += ',%s=\'%s\'' % (colname, value.replace('&', '&amp;').replace("'", "\\'"))
+        elif coltype[:6] == 'DOUBLE':
+            q += ',%s=%8.6f' % (colname, value)
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    new_group_id = row[0]
+
+    # Done.
+
+    cnx.commit()
+    return new_group_id
 
 
 # Make sure the specified substage sequence number is not used.
@@ -1616,6 +1748,55 @@ def insert_blank_project(cnx):
 
     cnx.commit()
     return new_project_id
+
+
+# Insert blank project groupinto database.
+# Fields are filled with default values.
+# Project id of newly added project is returned.
+
+def insert_blank_group(cnx):
+
+    c = cnx.cursor()
+
+    # Generate unique group name.
+
+    n = 1
+    done = False
+    group_name = ''
+    while not done:
+
+        if n == 1:
+            group_name = 'blank'
+        else:
+            group_name = 'blank%d' % n
+
+        # See if this candidate name already exists.
+
+        q = 'SELECT COUNT(*) FROM groups WHERE name=\'%s\'' % group_name
+        c.execute(q)
+        row = c.fetchone()
+        count = row[0]
+        if count == 0:
+            done = True
+        else:
+            n += 1
+
+    # Prepare query to insert group row.
+
+    q = 'INSERT INTO groups SET name=\'%s\'' % group_name
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    new_group_id = row[0]
+
+    # Done.
+
+    cnx.commit()
+    return new_group_id
 
 
 # Make sure the specified dataset sequence number is not used.

@@ -23,14 +23,16 @@ from dbconfig import colors
 
 # Return list of projects.
 
-def list_projects(cnx, pattern, group, status, sort):
+def list_projects(cnx, pattern, group, status, gid, sort):
 
     result = []
 
     # Query projects from database.
 
     c = cnx.cursor()
-    q = 'SELECT id, name, physics_group, status FROM projects'
+    q = 'SELECT projects.id, name, physics_group, status FROM projects'
+    if gid != 0:
+        q += ',group_project'
     con = 'WHERE'
     if pattern != '':
         q += ' %s name LIKE \'%%%s%%\'' % (con, pattern)
@@ -41,6 +43,8 @@ def list_projects(cnx, pattern, group, status, sort):
     if status != '':
         q += ' %s status=\'%s\'' % (con, status)
         con = 'AND'
+    if gid != 0:
+        q += ' %s group_id=%d and project_id=projects.id' % (con, gid)
     if sort == '' or sort == 'id_u':
         q += ' ORDER BY id'
     elif sort == 'id_d':
@@ -73,7 +77,7 @@ def list_projects(cnx, pattern, group, status, sort):
 
 # Generate search panel.
 
-def search_panel(results_per_page, pattern, group, status, devel):
+def search_panel(results_per_page, pattern, group, status, gid, devel):
 
     # Add form for pattern match and results per page.
 
@@ -87,6 +91,11 @@ def search_panel(results_per_page, pattern, group, status, devel):
 
     print '<label for="pattern">Match: </label>'
     print '<input type="text" id="pattern" name="pattern" size=30 value="%s">' % pattern
+
+    # Add group id input.
+
+    print '<label for="gid">Group ID: </label>'
+    print '<input type="text" id="gid" name="gid" size=6 value=%d>' % gid
 
     # Add physics group drop down.
 
@@ -242,6 +251,7 @@ def main(qdict):
     group = qdict['group']
     status = qdict['status']
     devel = qdict['dev']
+    gid = qdict['gid']
     sort = qdict['sort']
 
     # Open database connection and query projects.
@@ -250,7 +260,7 @@ def main(qdict):
 
     # Get list of projects.
 
-    prjs = list_projects(cnx, pattern, group, status, sort)
+    prjs = list_projects(cnx, pattern, group, status, gid, sort)
     max_page = (len(prjs) + results_per_page - 1) / results_per_page
 
     # Generate html document header.
@@ -274,6 +284,11 @@ def main(qdict):
     print '  background-color:white;'
     print '}'
     print '</style>'
+
+    # Add link to project group list.
+
+    print '<a href=%s/query_groups.py?%s>Group list</a><br>' % \
+        (dbconfig.base_url, dbargs.convert_args(qdict))
 
     # Generate main part of html document.
 
@@ -299,7 +314,7 @@ def main(qdict):
 
     # Generate search panel form.
 
-    search_panel(results_per_page, pattern, group, status, devel)
+    search_panel(results_per_page, pattern, group, status, gid, devel)
 
     # Display number of results.
 
@@ -313,7 +328,7 @@ def main(qdict):
 
     print '<table border=1 style="border-collapse:collapse">'
     print '<tr>'
-    print '<th>'
+    print '<th nowrap>'
     print '&nbsp;Project ID&nbsp;'
 
     # Add sort buttons.
@@ -336,7 +351,7 @@ def main(qdict):
     print '</div>'
     print '</th>'
 
-    print '<th>'
+    print '<th nowrap>'
     print '&nbsp;Project Name (Datasets)&nbsp;'
 
     # Add sort buttons.
@@ -359,8 +374,8 @@ def main(qdict):
     print '</div>'
     print '</th>'
 
-    print '<th>'
-    print '&nbsp;Physics Group&nbsp;'
+    print '<th nowrap>'
+    print '&nbsp;Physics&nbsp;'
 
     # Add sort buttons.
 
@@ -382,7 +397,7 @@ def main(qdict):
     print '</div>'
     print '</th>'
 
-    print '<th>'
+    print '<th nowrap>'
     print '&nbsp;Status&nbsp;'
 
     # Add sort buttons.

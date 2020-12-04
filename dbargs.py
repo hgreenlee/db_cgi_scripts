@@ -106,7 +106,7 @@ def extract_qdict(argdict):
 
         # Integer arguments.
 
-        if k == 'results_per_page' or k == 'page' or k == 'dev':
+        if k == 'results_per_page' or k == 'page' or k == 'dev' or k == 'gid':
             result[k] = int(argdict[k])
 
         # String arguments.
@@ -123,7 +123,7 @@ def extract_qdict(argdict):
 
             # Integer arguments (convert to integer).
 
-            if k == 'results_per_page' or k == 'page' or k == 'dev':
+            if k == 'results_per_page' or k == 'page' or k == 'dev' or k == 'gid':
                 if k not in result:
                     result[k] = int(kv[1])
 
@@ -149,6 +149,8 @@ def extract_qdict(argdict):
         result['status'] = ''
     if not 'sort' in result:
         result['sort'] = ''
+    if not 'gid' in result:
+        result['gid'] = 0
 
     # Done.
 
