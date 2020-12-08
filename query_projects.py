@@ -23,14 +23,14 @@ from dbconfig import colors
 
 # Return list of projects.
 
-def list_projects(cnx, pattern, group, status, gid, sort):
+def list_projects(cnx, pattern, group, status, gid, file_type, campaign, sort):
 
     result = []
 
     # Query projects from database.
 
     c = cnx.cursor()
-    q = 'SELECT projects.id, name, physics_group, status FROM projects'
+    q = 'SELECT projects.id, name, file_type, campaign, physics_group, status FROM projects'
     if gid != 0:
         q += ',group_project'
     con = 'WHERE'
@@ -45,6 +45,12 @@ def list_projects(cnx, pattern, group, status, gid, sort):
         con = 'AND'
     if gid != 0:
         q += ' %s group_id=%d and project_id=projects.id' % (con, gid)
+    if file_type != '':
+        q += ' %s file_type=\'%s\'' % (con, file_type)
+        con = 'AND'
+    if campaign != '':
+        q += ' %s campaign=\'%s\'' % (con, campaign)
+        con = 'AND'
     if sort == '' or sort == 'id_u':
         q += ' ORDER BY id'
     elif sort == 'id_d':
@@ -53,6 +59,14 @@ def list_projects(cnx, pattern, group, status, gid, sort):
         q += ' ORDER BY name'
     elif sort == 'name_d':
         q += ' ORDER BY name DESC'
+    elif sort == 'file_type_u':
+        q += ' ORDER BY file_type'
+    elif sort == 'file_type_d':
+        q += ' ORDER BY file_type DESC'
+    elif sort == 'campaign_u':
+        q += ' ORDER BY campaign'
+    elif sort == 'campaign_d':
+        q += ' ORDER BY campaign DESC'
     elif sort == 'group_u':
         q += ' ORDER BY physics_group'
     elif sort == 'group_d':
@@ -66,9 +80,11 @@ def list_projects(cnx, pattern, group, status, gid, sort):
     for row in rows:
         id = row[0]
         name = row[1]
-        physics_group = row[2]
-        status = row[3]
-        result.append((id, name, physics_group, status))
+        file_type = row[2]
+        campaign = row[3]
+        physics_group = row[4]
+        status = row[5]
+        result.append((id, name, file_type, campaign, physics_group, status))
 
     # Done.
 
@@ -77,7 +93,7 @@ def list_projects(cnx, pattern, group, status, gid, sort):
 
 # Generate search panel.
 
-def search_panel(results_per_page, pattern, group, status, gid, devel):
+def search_panel(results_per_page, pattern, group, status, gid, file_type, campaign, devel):
 
     # Add form for pattern match and results per page.
 
@@ -96,6 +112,28 @@ def search_panel(results_per_page, pattern, group, status, gid, devel):
 
     print '<label for="gid">Group ID: </label>'
     print '<input type="text" id="gid" name="gid" size=6 value=%d>' % gid
+
+    # Add file type drop down.
+
+    print '<label for="file_type">File Type: </label>'
+    print '<select id="file_type" name="file_type">'
+    for value in pulldowns['file_type']:
+        sel = ''
+        if value == file_type:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (value, sel, value)
+    print '</select>'
+
+    # Add campaign drop down.
+
+    print '<label for="campaign">Campaign: </label>'
+    print '<select id="campaign" name="campaign">'
+    for value in pulldowns['campaign']:
+        sel = ''
+        if value == campaign:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (value, sel, value)
+    print '</select>'
 
     # Add physics group drop down.
 
@@ -202,7 +240,6 @@ def page_links(qdict, max_page):
         else:
             print '<th align="center" style="width:25px;">%d</th>' % page
 
-
     # Link to next page.
 
     disabled = ''
@@ -252,6 +289,8 @@ def main(qdict):
     status = qdict['status']
     devel = qdict['dev']
     gid = qdict['gid']
+    file_type = qdict['file_type']
+    campaign = qdict['campaign']
     sort = qdict['sort']
 
     # Open database connection and query projects.
@@ -260,7 +299,7 @@ def main(qdict):
 
     # Get list of projects.
 
-    prjs = list_projects(cnx, pattern, group, status, gid, sort)
+    prjs = list_projects(cnx, pattern, group, status, gid, file_type, campaign, sort)
     max_page = (len(prjs) + results_per_page - 1) / results_per_page
 
     # Generate html document header.
@@ -314,7 +353,7 @@ def main(qdict):
 
     # Generate search panel form.
 
-    search_panel(results_per_page, pattern, group, status, gid, devel)
+    search_panel(results_per_page, pattern, group, status, gid, file_type, campaign, devel)
 
     # Display number of results.
 
@@ -328,6 +367,9 @@ def main(qdict):
 
     print '<table border=1 style="border-collapse:collapse">'
     print '<tr>'
+
+    # Project ID column.
+
     print '<th nowrap>'
     print '&nbsp;Project ID&nbsp;'
 
@@ -350,6 +392,8 @@ def main(qdict):
     print '</form>'
     print '</div>'
     print '</th>'
+
+    # Project name column.
 
     print '<th nowrap>'
     print '&nbsp;Project Name (Datasets)&nbsp;'
@@ -374,6 +418,58 @@ def main(qdict):
     print '</div>'
     print '</th>'
 
+    # File type column.
+
+    print '<th nowrap>'
+    print '&nbsp;File Type&nbsp;'
+
+    # Add sort buttons.
+
+    print '<div style="display:inline-block">'
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
+        (dbargs.convert_args(qdict, 'sort', 'file_type_u'))
+    if sort == 'file_type_u':
+        print '<input class="small-btn" type="submit" value="&#x25b2;">'
+    else:
+        print '<input class="small-btn" type="submit" value="&#x25b3;">'
+    print '</form>'
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
+        (dbargs.convert_args(qdict, 'sort', 'file_type_d'))
+    if sort == 'file_type_d':
+        print '<input class="small-btn" type="submit" value="&#x25bc;">'
+    else:
+        print '<input class="small-btn" type="submit" value="&#x25bd;">'
+    print '</form>'
+    print '</div>'
+    print '</th>'
+
+    # Campaign column.
+
+    print '<th nowrap>'
+    print '&nbsp;Campaign&nbsp;'
+
+    # Add sort buttons.
+
+    print '<div style="display:inline-block">'
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
+        (dbargs.convert_args(qdict, 'sort', 'campaign_u'))
+    if sort == 'campaign_u':
+        print '<input class="small-btn" type="submit" value="&#x25b2;">'
+    else:
+        print '<input class="small-btn" type="submit" value="&#x25b3;">'
+    print '</form>'
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
+        (dbargs.convert_args(qdict, 'sort', 'campaign_d'))
+    if sort == 'campaign_d':
+        print '<input class="small-btn" type="submit" value="&#x25bc;">'
+    else:
+        print '<input class="small-btn" type="submit" value="&#x25bd;">'
+    print '</form>'
+    print '</div>'
+    print '</th>'
+
+    # Physics group column.
+
     print '<th nowrap>'
     print '&nbsp;Physics&nbsp;'
 
@@ -396,6 +492,8 @@ def main(qdict):
     print '</form>'
     print '</div>'
     print '</th>'
+
+    # Status column.
 
     print '<th nowrap>'
     print '&nbsp;Status&nbsp;'
@@ -429,8 +527,10 @@ def main(qdict):
         print '<tr>'
         id = prj[0]
         name = prj[1]
-        physics_group = prj[2]
-        status = prj[3]
+        file_type = prj[2]
+        campaign = prj[3]
+        physics_group = prj[4]
+        status = prj[5]
         color_style = ''
         if status in colors:
             color_style = 'style="background-color: %s"' % colors[status]
@@ -448,8 +548,10 @@ def main(qdict):
         print '<td %s>&nbsp;<a target=_blank rel="noopener noreferer" href=%s/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
             (color_style, dbconfig.base_url, id, dbargs.convert_args(qdict), name)
 
-        # Add physics group and status.
+        # Add middle columns
 
+        print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, file_type)
+        print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, campaign)
         print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, physics_group)
         print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, status)
 
