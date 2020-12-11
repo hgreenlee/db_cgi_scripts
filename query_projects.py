@@ -23,14 +23,14 @@ from dbconfig import colors
 
 # Return list of projects.
 
-def list_projects(cnx, pattern, group, status, gid, file_type, campaign, sort):
+def list_projects(cnx, pattern, group, status, gid, experiment, file_type, campaign, sort):
 
     result = []
 
     # Query projects from database.
 
     c = cnx.cursor()
-    q = 'SELECT projects.id, name, file_type, campaign, physics_group, status FROM projects'
+    q = 'SELECT projects.id, name, file_type, experiment, campaign, physics_group, status FROM projects'
     if gid != 0:
         q += ',group_project'
     con = 'WHERE'
@@ -48,6 +48,9 @@ def list_projects(cnx, pattern, group, status, gid, file_type, campaign, sort):
     if file_type != '':
         q += ' %s file_type=\'%s\'' % (con, file_type)
         con = 'AND'
+    if experiment != '':
+        q += ' %s experiment=\'%s\'' % (con, experiment)
+        con = 'AND'
     if campaign != '':
         q += ' %s campaign=\'%s\'' % (con, campaign)
         con = 'AND'
@@ -63,6 +66,10 @@ def list_projects(cnx, pattern, group, status, gid, file_type, campaign, sort):
         q += ' ORDER BY file_type'
     elif sort == 'file_type_d':
         q += ' ORDER BY file_type DESC'
+    elif sort == 'experiment_u':
+        q += ' ORDER BY experiment'
+    elif sort == 'experiment_d':
+        q += ' ORDER BY experiment DESC'
     elif sort == 'campaign_u':
         q += ' ORDER BY campaign'
     elif sort == 'campaign_d':
@@ -81,10 +88,11 @@ def list_projects(cnx, pattern, group, status, gid, file_type, campaign, sort):
         id = row[0]
         name = row[1]
         file_type = row[2]
-        campaign = row[3]
-        physics_group = row[4]
-        status = row[5]
-        result.append((id, name, file_type, campaign, physics_group, status))
+        experiment = row[3]
+        campaign = row[4]
+        physics_group = row[5]
+        status = row[6]
+        result.append((id, name, file_type, experiment, campaign, physics_group, status))
 
     # Done.
 
@@ -93,7 +101,7 @@ def list_projects(cnx, pattern, group, status, gid, file_type, campaign, sort):
 
 # Generate search panel.
 
-def search_panel(results_per_page, pattern, group, status, gid, file_type, campaign, devel):
+def search_panel(results_per_page, pattern, group, status, gid, experiment, file_type, campaign, devel):
 
     # Add form for pattern match and results per page.
 
@@ -112,6 +120,17 @@ def search_panel(results_per_page, pattern, group, status, gid, file_type, campa
 
     print '<label for="gid">Group ID: </label>'
     print '<input type="text" id="gid" name="gid" size=6 value=%d>' % gid
+
+    # Add experiment drop down.
+
+    print '<label for="experiment">Experiment: </label>'
+    print '<select id="experiment" name="experiment">'
+    for value in pulldowns['experiment']:
+        sel = ''
+        if value == experiment:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (value, sel, value)
+    print '</select>'
 
     # Add file type drop down.
 
@@ -292,6 +311,7 @@ def main(qdict):
     file_type = qdict['file_type']
     campaign = qdict['campaign']
     sort = qdict['sort']
+    experiment = qdict['experiment']
 
     # Open database connection and query projects.
 
@@ -299,7 +319,7 @@ def main(qdict):
 
     # Get list of projects.
 
-    prjs = list_projects(cnx, pattern, group, status, gid, file_type, campaign, sort)
+    prjs = list_projects(cnx, pattern, group, status, gid, experiment, file_type, campaign, sort)
     max_page = (len(prjs) + results_per_page - 1) / results_per_page
 
     # Generate html document header.
@@ -353,7 +373,7 @@ def main(qdict):
 
     # Generate search panel form.
 
-    search_panel(results_per_page, pattern, group, status, gid, file_type, campaign, devel)
+    search_panel(results_per_page, pattern, group, status, gid, experiment, file_type, campaign, devel)
 
     # Display number of results.
 
@@ -411,6 +431,31 @@ def main(qdict):
     print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
         (dbargs.convert_args(qdict, 'sort', 'name_d'))
     if sort == 'name_d':
+        print '<input class="small-btn" type="submit" value="&#x25bc;">'
+    else:
+        print '<input class="small-btn" type="submit" value="&#x25bd;">'
+    print '</form>'
+    print '</div>'
+    print '</th>'
+
+    # Experiment column.
+
+    print '<th nowrap>'
+    print '&nbsp;Experiment&nbsp;'
+
+    # Add sort buttons.
+
+    print '<div style="display:inline-block">'
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
+        (dbargs.convert_args(qdict, 'sort', 'experiment_u'))
+    if sort == 'experiment_u':
+        print '<input class="small-btn" type="submit" value="&#x25b2;">'
+    else:
+        print '<input class="small-btn" type="submit" value="&#x25b3;">'
+    print '</form>'
+    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
+        (dbargs.convert_args(qdict, 'sort', 'experiment_d'))
+    if sort == 'experiment_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25bd;">'
@@ -528,9 +573,10 @@ def main(qdict):
         id = prj[0]
         name = prj[1]
         file_type = prj[2]
-        campaign = prj[3]
-        physics_group = prj[4]
-        status = prj[5]
+        experiment = prj[3]
+        campaign = prj[4]
+        physics_group = prj[5]
+        status = prj[6]
         color_style = ''
         if status in colors:
             color_style = 'style="background-color: %s"' % colors[status]
@@ -550,6 +596,7 @@ def main(qdict):
 
         # Add middle columns
 
+        print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, experiment)
         print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, file_type)
         print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, campaign)
         print '<td align="center" %s>&nbsp;%s&nbsp;</td>' % (color_style, physics_group)

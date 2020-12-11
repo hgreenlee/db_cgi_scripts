@@ -590,16 +590,19 @@ def export_poms_project(cnx, project_id, dev, ini):
     # Query information about this project.
 
     c = cnx.cursor()
-    q = '''SELECT name, release_tag, poms_campaign, poms_login_setup, poms_job_type 
+    q = '''SELECT name, release_tag, experiment,
+           poms_campaign, poms_login_setup, poms_job_type, poms_role 
            FROM projects WHERE id=%d''' % project_id
     c.execute(q)
     rows = c.fetchall()
     row = rows[0]
     name = row[0]
     version = row[1]
-    poms_campaign = row[2]
-    poms_login_setup = row[3]
-    poms_job_type = row[4]
+    experiment = row[2]
+    poms_campaign = row[3]
+    poms_login_setup = row[4]
+    poms_job_type = row[5]
+    poms_role = row[6]
     if poms_campaign == '':
         poms_campaign = name
 
@@ -617,8 +620,8 @@ def export_poms_project(cnx, project_id, dev, ini):
     # Campaign section.
 
     ini.write('[campaign]\n')
-    ini.write('experiment=%s\n' % dbconfig.experiment)
-    ini.write('poms_role=production\n')
+    ini.write('experiment=%s\n' % experiment)
+    ini.write('poms_role=%s\n' % poms_role)
     ini.write('name=%s\n' % poms_campaign)
     ini.write('stage=Active\n')
     ini.write('campaign_keywords={}\n')
@@ -1966,13 +1969,13 @@ def restricted_error():
 # Return statistics in form (files, events) of a dataset.
 # Return None on error.
 
-def get_stats( defname ):
+def get_stats(samweb_url, defname):
 
     result = None
 
     # Construct url to query sam.
 
-    url = '%s/definitions/name/%s/files/summary' % (dbconfig.samweb_url, defname)
+    url = '%s/definitions/name/%s/files/summary' % (samweb_url, defname)
     buffer = StringIO.StringIO()
     pyc = pycurl.Curl()
     pyc.setopt(pyc.URL, convert_str(url))
@@ -2008,13 +2011,13 @@ def get_stats( defname ):
 # Return statistics in form (files, events) of parents of a dataset.
 # Return None on error.
 
-def get_parent_stats( defname ):
+def get_parent_stats(samweb_url, defname):
 
     result = None
 
     # Construct url to query sam.
 
-    url = '%s/files/summary?dims=isparentof%%3A(%%20defname%%3A%%20%s%%20)%%20and%%20not%%20file_name%%CRT%%25' % (dbconfig.samweb_url, defname)
+    url = '%s/files/summary?dims=isparentof%%3A(%%20defname%%3A%%20%s%%20)%%20and%%20not%%20file_name%%CRT%%25' % (samweb_url, defname)
     buffer = StringIO.StringIO()
     pyc = pycurl.Curl()
     pyc.setopt(pyc.URL, convert_str(url))

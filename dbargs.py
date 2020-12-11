@@ -111,7 +111,7 @@ def extract_qdict(argdict):
 
         # String arguments.
 
-        elif k == 'pattern' or k == 'group' or k == 'status' or k == 'sort' or k == 'campaign' or k == 'file_type':
+        elif k == 'pattern' or k == 'group' or k == 'status' or k == 'sort' or k == 'campaign' or k == 'file_type' or k == 'experiment':
             result[k] = argdict[k]
 
     # Parse CLI arguments.
@@ -129,7 +129,7 @@ def extract_qdict(argdict):
 
             # String arguments.
 
-            elif k == 'pattern' or k == 'group' or k == 'status' or k == 'sort' or k == 'campaign' or k == 'file_type':
+            elif k == 'pattern' or k == 'group' or k == 'status' or k == 'sort' or k == 'campaign' or k == 'file_type' or k == 'experiment':
                 if k not in result:
                     result[k] = kv[1]
 
@@ -155,6 +155,8 @@ def extract_qdict(argdict):
         result['campaign'] = ''
     if not 'file_type' in result:
         result['file_type'] = ''
+    if not 'experiment' in result:
+        result['experiment'] = ''
 
     # Done.
 

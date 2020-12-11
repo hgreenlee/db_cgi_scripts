@@ -27,9 +27,17 @@ cgitb.enable()
 
 def datasets_form(cnx, project_id, qdict):
 
-    # Get project name.
+    # Query project name and experiment.
 
-    name = dbutil.get_project_name(cnx, project_id)
+    c = cnx.cursor()
+    q = 'SELECT name, experiment FROM projects WHERE id=%d' % project_id
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) == 0:
+        raise IOError('Unable to fetch project id %d' % project_id)
+    row = rows[0]
+    name = row[0]
+    experiment = row[1]
 
     # Construct global disabled option for restricted controls.
 
@@ -40,8 +48,6 @@ def datasets_form(cnx, project_id, qdict):
     # Generate form.
 
     print '<h2>Datasets for Project %s</h2>' % name
-
-    c = cnx.cursor()
 
     for dataset_type in ('input', 'output'):
         title_type = dataset_type[0].upper() + dataset_type[1:]
@@ -111,7 +117,7 @@ def datasets_form(cnx, project_id, qdict):
                 
             print '<td align="center">%d</td>' % dataset_id
             print '<td>&nbsp;<a href=%s/definitions/name/%s>%s</a>&nbsp;</td>' % \
-                (dbconfig.samweb_url, dataset_name, dataset_name)
+                (dbconfig.samweb_url[experiment], dataset_name, dataset_name)
             print '<td align="right">&nbsp;%d&nbsp;</td>' % nfile
             print '<td align="right">&nbsp;%d&nbsp;</td>' % nev
             if dataset_type == 'output':
@@ -219,6 +225,16 @@ def main(project_id, update_id, qdict):
             raise IOError('Unable to fetch dataset id %d' % update_id)
         dataset_name = rows[0][0]
 
+        # Query experiment name.
+
+        q = 'SELECT experiment FROM projects WHERE id=%d' % project_id
+        c.execute(q)
+        rows = c.fetchall()
+        if len(rows) == 0:
+            raise IOError('Unable to fetch project id %d' % project_id)
+        row = rows[0]
+        experiment = row[0]
+
         # Query event count form sam.
 
         files = 0
@@ -226,13 +242,13 @@ def main(project_id, update_id, qdict):
         parent_files = 0
         parent_events = 0
         update_ok = True
-        r = dbutil.get_stats(dataset_name)
+        r = dbutil.get_stats(dbconfig.samweb_url[experiment], dataset_name)
         if r == None:
             update_ok = False
         else:
             files = r[0]
             events = r[1]
-            r = dbutil.get_parent_stats(dataset_name)
+            r = dbutil.get_parent_stats(dbconfig.samweb_url[experiment], dataset_name)
             if r == None:
                 update_ok = False
             else:

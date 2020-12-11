@@ -42,7 +42,7 @@ def main(id, qdict):
         print 'No such project.'
     else:
 
-        # Generate XML.
+        # Generate POMS ini file.
 
         ini = StringIO.StringIO()
         dbutil.export_poms_project(cnx, id, qdict['dev'], ini)
