@@ -139,7 +139,7 @@ def datasets_form(cnx, project_id, qdict):
             # Add Edit button/column
 
             print '<td>'
-            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/edit_dataset.py?id=%d&%s" method="post">' % \
+            print '<form target="_self" action="/cgi-bin/db/edit_dataset.py?id=%d&%s" method="post">' % \
                 (dataset_id, dbargs.convert_args(qdict))
             print '<div title="Edit dataset">'
             print '<input type="submit" value="&#x270e;" %s>' % disabled

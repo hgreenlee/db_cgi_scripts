@@ -50,7 +50,7 @@ def stage_form(cnx, id, qdict):
     # Add button to insert another substage.
 
     print '<h2>Substages</h2>'
-    print '<form action="/cgi-bin/db/add_substage.py?id=%d&%s" method="post" target="_blank" rel="noopener noreferer">' % \
+    print '<form action="/cgi-bin/db/add_substage.py?id=%d&%s" method="post" target="_self">' % \
         (id, dbargs.convert_args(qdict))
     print '<input type="submit" value="Add Substage" %s>' % disabled
     print '</form>'
@@ -76,13 +76,13 @@ def stage_form(cnx, id, qdict):
             substage_id = row[0]
             fclname = row[1]
             print '<td align="center">%d</td>' % substage_id
-            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="%s/edit_substage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
+            print '<td>&nbsp;<a target="_self" href="%s/edit_substage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
                 (dbconfig.base_url, substage_id, dbargs.convert_args(qdict), fclname)
 
             # Add Edit button/column
 
             print '<td>'
-            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/edit_substage.py?id=%d&%s" method="post">' % \
+            print '<form target="_self" action="/cgi-bin/db/edit_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
             print '<div title="Edit substage">'
             print '<input type="submit" value="&#x270e;">'
@@ -93,7 +93,7 @@ def stage_form(cnx, id, qdict):
             # Add Clone button/column
 
             print '<td>'
-            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/clone_substage.py?id=%d&%s" method="post">' % \
+            print '<form target="_self" action="/cgi-bin/db/clone_substage.py?id=%d&%s" method="post">' % \
                 (substage_id, dbargs.convert_args(qdict))
             print '<div title="Clone substage">'
             print '<input type="submit" value="&#x2398;" %s>' % disabled

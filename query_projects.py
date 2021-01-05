@@ -355,7 +355,7 @@ def main(qdict):
 
     # Add button to create new project.
 
-    print '<form action="/cgi-bin/db/add_project.py?%s" method="post" target="_blank" rel="noopener noreferer">' % \
+    print '<form action="/cgi-bin/db/add_project.py?%s" method="post" target="_self">' % \
         dbargs.convert_args(qdict)
     print '<label for="submit">Generate a new empty project: </label>'
     print '<input type="submit" id="submit" value="New Project">'
@@ -364,7 +364,7 @@ def main(qdict):
 
     # Add button to import a project from local xml file.
 
-    print '<form action="/cgi-bin/db/import_project.py?%s" method="post" target="_blank" rel="noopener noreferer">' % \
+    print '<form action="/cgi-bin/db/import_project.py?%s" method="post" target="_self">' % \
         dbargs.convert_args(qdict)
     print '<label for="submit">Import project from local XML file: </label>'
     print '<input type="submit" id="submit" value="Import Project">'
@@ -591,7 +591,7 @@ def main(qdict):
 
         # Add link to datasets page with project name.
 
-        print '<td %s>&nbsp;<a target=_blank rel="noopener noreferer" href=%s/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
+        print '<td %s>&nbsp;<a target=_self href=%s/edit_datasets.py?id=%d&%s>%s</a>&nbsp;</td>' % \
             (color_style, dbconfig.base_url, id, dbargs.convert_args(qdict), name)
 
         # Add middle columns
@@ -605,7 +605,7 @@ def main(qdict):
         # Add XML button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/export_project.py?id=%d&%s" method="post">' % \
+        print '<form target="_self" action="/cgi-bin/db/export_project.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<div title="Generate XML">'
         print '<input type="submit" value="XML">'
@@ -616,7 +616,7 @@ def main(qdict):
         # Add POMS button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/export_poms.py?id=%d&%s" method="post">' % \
+        print '<form target="_self" action="/cgi-bin/db/export_poms.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<div title="Generate POMS .ini file">'
         print '<input type="submit" value="POMS">'
@@ -626,7 +626,7 @@ def main(qdict):
         # Add Edit button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/edit_project.py?id=%d&%s" method="post">' % \
+        print '<form target="_self" action="/cgi-bin/db/edit_project.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<div title="Edit project">'
         print '<input type="submit" value="&#x270e;">'
@@ -637,7 +637,7 @@ def main(qdict):
         # Add Clone button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/clone_project.py?id=%d&%s" method="post">' % \
+        print '<form target="_self" action="/cgi-bin/db/clone_project.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<div title="Clone project">'
         print '<input type="submit" value="&#x2398;">'

@@ -50,7 +50,7 @@ def project_form(cnx, id, qdict):
     # Add button to insert another stage.
 
     print '<h2>Stages</h2>'
-    print '<form action="/cgi-bin/db/add_stage.py?id=%d&%s" method="post" target="_blank" rel="noopener noreferer">' % \
+    print '<form action="/cgi-bin/db/add_stage.py?id=%d&%s" method="post" target="_self">' % \
         (id, dbargs.convert_args(qdict))
     print '<input type="submit" value="Add Stage" %s>' % disabled
     print '</form>'
@@ -77,13 +77,13 @@ def project_form(cnx, id, qdict):
             stage_id = row[0]
             stage_name = row[1]
             print '<td align="center">%d</td>' % stage_id
-            print '<td>&nbsp;<a target="_blank" rel="noopener noreferer" href="%s/edit_stage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
+            print '<td>&nbsp;<a target="_self" href="%s/edit_stage.py?id=%d&%s">%s</a>&nbsp;</td>' % \
                 (dbconfig.base_url, stage_id, dbargs.convert_args(qdict), stage_name)
 
             # Add Edit button/column
 
             print '<td>'
-            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/edit_stage.py?id=%d&%s" method="post">' % \
+            print '<form target="_self" action="/cgi-bin/db/edit_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
             print '<div title="Edit stage">'
             print '<input type="submit" value="&#x270e;">'
@@ -94,7 +94,7 @@ def project_form(cnx, id, qdict):
             # Add Clone button/column
 
             print '<td>'
-            print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/clone_stage.py?id=%d&%s" method="post">' % \
+            print '<form target="_self" action="/cgi-bin/db/clone_stage.py?id=%d&%s" method="post">' % \
                 (stage_id, dbargs.convert_args(qdict))
             print '<div title="Clone stage">'
             print '<input type="submit" value="&#x2398;" %s>' % disabled

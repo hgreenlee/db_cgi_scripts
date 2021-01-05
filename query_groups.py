@@ -246,7 +246,7 @@ def main(qdict):
 
     # Add button to create new group.
 
-    print '<form action="/cgi-bin/db/add_group.py?%s" method="post" target="_blank" rel="noopener noreferer">' % \
+    print '<form action="/cgi-bin/db/add_group.py?%s" method="post" target="_self">' % \
         dbargs.convert_args(qdict)
     print '<label for="submit">Generate a new empty project group: </label>'
     print '<input type="submit" id="submit" value="New Group">'
@@ -343,7 +343,7 @@ def main(qdict):
         # Add Edit button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/edit_group.py?id=%d&%s" method="post">' % \
+        print '<form target="_self" action="/cgi-bin/db/edit_group.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<div title="Edit group">'
         print '<input type="submit" value="&#x270e;">'
@@ -354,7 +354,7 @@ def main(qdict):
         # Add Clone button/column
 
         print '<td>'
-        print '<form target="_blank" rel="noopener noreferer" action="/cgi-bin/db/clone_group.py?id=%d&%s" method="post">' % \
+        print '<form target="_self" action="/cgi-bin/db/clone_group.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<div title="Clone group">'
         print '<input type="submit" value="&#x2398;">'
