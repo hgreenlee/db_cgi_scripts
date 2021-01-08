@@ -68,6 +68,14 @@ def get():
         arg = args[k]
         if type(arg) == type([]):
             result[k] = arg[-1].value   # Give priority to last element of list.
+            n = 0
+
+            # Add repeated arguments.
+
+            for a in arg[:-1]:
+                n += 1
+                key = '%s_%d' % (str(k), n)
+                result[key] = a.value
         else:
             result[k] = arg.value
 

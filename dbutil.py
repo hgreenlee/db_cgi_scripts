@@ -1968,6 +1968,11 @@ def restricted_access(cnx, table, id):
             if status == '' or status == 'Requested':
                 result = False
 
+    # Groups table, never restricted.
+
+    elif table == 'groups':
+        result = False
+
     # Done.
 
     return result

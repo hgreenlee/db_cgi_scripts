@@ -133,6 +133,69 @@ def group_form(cnx, id, qdict):
 
     print '</table>'
 
+    # Projects section.
+
+    print '<h3>Projects</h3>'
+
+    # Query all projects.
+
+    project_ids = []
+    q = 'SELECT id,name FROM projects ORDER BY name'
+    c.execute(q)
+    rows = c.fetchall()
+    for row in rows:
+        project_id = row[0]
+        project_ids.append(project_id)
+
+    # Query all projects in this group.
+
+    project_group_ids = set()
+    q = 'SELECT project_id FROM group_project WHERE group_id=%d' % id
+    c.execute(q)
+    rows = c.fetchall()
+    for row in rows:
+        project_id = row[0]
+        project_group_ids.add(project_id)
+
+    # Projects table.
+
+    print '<table border=1 style="border-collapse:collapse">'
+    print '<tr>'
+    print '<th>Group Projects</th>'
+    print '<th>Available Projects</th>'
+    print '</tr>'
+
+    # Generate project lists.
+
+    print '<td>'
+
+    # Generate selection list for projects in group.
+    # Loop over project ids in name order.
+
+    print '<select id="ingroup" name="remove" size=20 multiple>'
+    for project_id in project_ids:
+        if project_id in project_group_ids:
+            project_name = dbutil.get_project_name(cnx, project_id)
+            print '<option value="%d">%s</option>' % (project_id, project_name)
+    print '</select>'
+    print '</td>'
+    print '<td>'
+
+    # Generate selection list for projects not in group.
+    # Loop over project ids in name order.
+
+    print '<select id="available" name="add" size=20 multiple>'
+    for project_id in project_ids:
+        if not project_id in project_group_ids:
+            project_name = dbutil.get_project_name(cnx, project_id)
+            print '<option value="%d">%s</option>' % (project_id, project_name)
+    print '</select>'
+    print '</td>'
+
+    # Finish datasets table.
+
+    print '</table>'
+
     # Add "Save" and "Back" buttons.
 
     print '<input type="submit" value="Save" %s>' % disabled

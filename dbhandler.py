@@ -112,6 +112,39 @@ def main(argdict):
     # Run query.
 
     c.execute(q)
+
+    # Special handling for table groups.
+
+    if table == 'groups':
+
+        # Loop over arguments to find projects to add to this group.
+
+        project_ids = []
+        for k in argdict:
+            if k.startswith('add'):
+                project_ids.append(int(argdict[k]))
+
+        # Loop over projects.
+
+        for project_id in project_ids:
+            q = 'INSERT INTO group_project SET group_id=%d,project_id=%d' % (id, project_id)
+            c.execute(q)
+
+        # Loop over arguments to find projects to remove from this group.
+
+        project_ids = []
+        for k in argdict:
+            if k.startswith('remove'):
+                project_ids.append(int(argdict[k]))
+
+        # Loop over projects.
+
+        for project_id in project_ids:
+            q = 'DELETE FROM group_project WHERE group_id=%d AND project_id=%d' % (id, project_id)
+            c.execute(q)
+
+    # Commit updates.
+
     cnx.commit()
 
     # Calculate redirect url.
