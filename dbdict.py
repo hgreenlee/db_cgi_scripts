@@ -33,7 +33,7 @@
 
 # Tables in creation order:
 
-tables = ['projects', 'stages', 'substages', 'strings', 'datasets', 'groups', 'group_project']
+tables = ['projects', 'stages', 'substages', 'strings', 'datasets', 'groups', 'group_project', 'overrides']
 
 # Database dictionary.
 
@@ -164,6 +164,10 @@ databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT
                 'groups': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Group ID', 0),
                            ('name', '', 'VARCHAR(1000) NOT NULL', 0, 'Group name', '')],
                 'group_project': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Group ID', 0),
-                                  ('group_id', '', 'INT NOT NULL', 0, 'Group ID', ''),
-                                  ('project_id', '', 'INT NOT NULL', 0, 'Project ID', '')]}
+                                  ('group_id', '', 'INT NOT NULL', 0, 'Group ID', 0),
+                                  ('project_id', '', 'INT NOT NULL', 0, 'Project ID', 0)],
+                'overrides': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Override ID', 0),
+                              ('stage_id', '', 'INT NOT NULL', 0, 'Stage ID', 0),
+                              ('name', '', 'VARCHAR(100) NOT NULL', 0, 'Override name', ''),
+                              ('value', '', 'VARCHAR(1000) NOT NULL', 0, 'Override value', '')]}
 

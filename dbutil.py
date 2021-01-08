@@ -1914,10 +1914,10 @@ def restricted_access(cnx, table, id):
 
     result = True
 
-    # Table substages, check parent stage.
+    # Table substages and overrides, check parent stage.
 
-    if table == 'substages':
-        q = 'SELECT stage_id FROM substages WHERE id=%d' % id
+    if table == 'substages' or table == 'overrides':
+        q = 'SELECT stage_id FROM %s WHERE id=%d' % (table, id)
         c.execute(q)
         rows = c.fetchall()
         if len(rows) > 0:
@@ -2048,3 +2048,99 @@ def get_parent_stats(samweb_url, defname):
     # Done.
 
     return result
+
+
+# Add override.
+
+def add_override(cnx, stage_id, name, value):
+
+    result = 0
+
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'stages', stage_id):
+        restricted_error()
+
+    # Construct a query to insert dataset.
+
+    c = cnx.cursor()
+    q = 'INSERT INTO overrides SET stage_id=%d,name=\'%s\',value=\'%s\'' % \
+        (stage_id, name, value)
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    result = row[0]
+
+    # Done.
+
+    cnx.commit()
+    return result
+
+
+# Delete override.
+
+def delete_override(cnx, override_id):
+
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'overrides', override_id):
+        restricted_error()
+
+    # Delete substage.
+
+    c = cnx.cursor()
+    q = 'DELETE FROM overrides WHERE id=%d' % override_id
+    c.execute(q)
+
+    # Done.
+
+    cnx.commit()
+    return
+
+
+# Clone override.
+
+def clone_override(cnx, override_id):
+
+    # Query overrode from database.
+
+    c = cnx.cursor()
+    q = 'SELECT stage_id,name,value FROM overrides WHERE id=%d' % override_id
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) == 0:
+        raise IOError('Unable to fetch override id %d' % override_id)
+    row = rows[0]
+    stage_id = row[0]
+    name = row[1]
+    value = row[2]
+
+    # Check access.
+
+    if not dbconfig.restricted_access_allowed() and restricted_access(cnx, 'stages', stage_id):
+        restricted_error()
+
+    # Construct query to insert a new row into overrides table that is
+    # a copy of the row that we just read.
+
+    q = 'INSERT INTO overrides SET stage_id=%d,name=\'%s\',value=\'%s\'' % \
+        (stage_id, name, value)
+    c.execute(q)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    new_override_id = row[0]
+
+    # Done.
+
+    cnx.commit()
+    return new_override_id
+
+

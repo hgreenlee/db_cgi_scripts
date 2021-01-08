@@ -47,9 +47,12 @@ def stage_form(cnx, id, qdict):
     print '<h2>Project %s</h2>' % project_name
     print '<h2>Stage %s</h2>' % name
 
-    # Add button to insert another substage.
+    # Substages section.
 
     print '<h2>Substages</h2>'
+
+    # Add a button to add a new substage.
+
     print '<form action="/cgi-bin/db/add_substage.py?id=%d&%s" method="post" target="_self">' % \
         (id, dbargs.convert_args(qdict))
     print '<input type="submit" value="Add Substage" %s>' % disabled
@@ -130,6 +133,102 @@ def stage_form(cnx, id, qdict):
                 (substage_id, dbargs.convert_args(qdict))
             print '<div title="Move down">'
             print '<input type="submit" value="&#x25bc;" %s>' % disabled
+            print '</div>'
+            print '</form>'
+            print '</td>'        
+
+            # Finish row.
+
+            print '</tr>'
+
+        # Finish table.
+
+        print '</table>'
+
+    # Overrides section.
+
+    print '<h2>Overrides</h2>'
+
+    # Add a button to add a new override.
+
+    print '<form action="/cgi-bin/db/add_override.py?id=%d&%s" method="post" target="_self">' % \
+        (id, dbargs.convert_args(qdict))
+    print '<table>'
+    print '<tr>'
+    print '<td>'
+    print '<label for="name">Name:</label>'
+    print '</td>'
+    print '<td>'
+    print '<input type="text" id="name" name="name" value="">'
+    print '</td>'
+    print '</tr>'
+    print '<tr>'
+    print '<td>'
+    print '<label for="value">Value:</label>'
+    print '</td>'
+    print '<td>'
+    print '<input type="text" id="value" name="value" value="">'
+    print '</td>'
+    print '</tr>'
+    print '</table>'
+    print '<input type="submit" value="Add Override" %s>' % disabled
+    print '</form>'
+    print '<br>'
+
+    # Query override ids belonging to this stage.
+
+    q = 'SELECT id, name, value FROM overrides WHERE stage_id=%d' % id
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) > 0:
+
+        # Add links to edit project stages.
+
+        print '<table border=1 style="border-collapse:collapse">'
+        print '<tr>'
+        print '<th>&nbsp;ID&nbsp;</th>'
+        print '<th>&nbsp;Name&nbsp;</th>'
+        print '<th>&nbsp;Value&nbsp;</th>'
+        print '</tr>'
+
+        for row in rows:
+            print '<tr>'
+            override_id = row[0]
+            name = row[1]
+            value = row[2]
+            print '<td align="center">%d</td>' % override_id
+            print '<td align="left">&nbsp;%s&nbsp;</td>' % name
+            print '<td align="value" >&nbsp;%s&nbsp;</td>' % value
+
+            # Add Edit button/column
+
+            print '<td>'
+            print '<form target="_self" action="/cgi-bin/db/edit_override.py?id=%d&%s" method="post">' % \
+                (override_id, dbargs.convert_args(qdict))
+            print '<div title="Edit override">'
+            print '<input type="submit" value="&#x270e;">'
+            print '</div>'
+            print '</form>'
+            print '</td>'        
+
+            # Add Clone button/column
+
+            print '<td>'
+            print '<form target="_self" action="/cgi-bin/db/clone_override.py?id=%d&%s" method="post">' % \
+                (override_id, dbargs.convert_args(qdict))
+            print '<div title="Clone override">'
+            print '<input type="submit" value="&#x2398;" %s>' % disabled
+            print '</div>'
+            print '</form>'
+            print '</td>'        
+
+            # Add Delete button/column
+
+            print '<td>'
+            print '<form action="/cgi-bin/db/delete_override.py?id=%d&%s" method="post">' % \
+                (override_id, dbargs.convert_args(qdict))
+            print '<div title="Delete override">'
+            print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
             print '</div>'
             print '</form>'
             print '</td>'        
