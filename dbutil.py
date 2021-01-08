@@ -671,7 +671,27 @@ def export_poms_project(cnx, project_id, dev, ini):
         ini.write('dataset_or_split_data=\n')
         ini.write('cs_split_type=draining\n')
         ini.write('completion_type=located\n')
-        ini.write('param_overrides=[["--xml", " \'%s\'"], ["--stage", " %s"]]\n' % (url, stage_name))
+
+        # Generate parameter overrides.
+
+        overrides = []
+        overrides.append('["--xml", " \'%s\'"]' % url)
+        overrides.append('["--stage", " %s"]' % stage_name)
+
+        # Query extra overrides.
+
+        q = 'SELECT name, value FROM overrides WHERE stage_id=%d' % stage_id
+        c.execute(q)
+        rows = c.fetchall()
+        for row in rows:
+            name = row[0]
+            value = row[1]
+            overrides.append('["-O%s=", "%s"]' % (name, value))
+
+        ini.write('param_overrides=[%s]\n' % ','.join(overrides))
+
+        # Finish stage.
+
         ini.write('login_setup=%s\n' % poms_login_setup)
         ini.write('job_type=%s\n' % poms_job_type)
         ini.write('merge_overrides=False\n')
