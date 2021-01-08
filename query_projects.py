@@ -604,11 +604,14 @@ def main(qdict):
 
         # Add XML button/column
 
+        xml_disabled = ''
+        if dbutil.xml_disabled(cnx, id):
+            xml_disabled = 'disabled'
         print '<td>'
         print '<form target="_self" action="/cgi-bin/db/export_project.py?id=%d&%s" method="post">' % \
             (id, dbargs.convert_args(qdict))
         print '<div title="Generate XML">'
-        print '<input type="submit" value="XML">'
+        print '<input type="submit" value="XML" %s>' % xml_disabled
         print '</div>'
         print '</form>'
         print '</td>'        

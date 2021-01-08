@@ -661,21 +661,20 @@ def export_poms_project(cnx, project_id, dev, ini):
         if poms_stage == '':
             poms_stage = stage_name
 
-        # Campaign stage section.
+        # Generate xml parameter.
+        # If the number of substages is zero, this is a fife_launch campaign.
 
-        url = '%s/export.py?id=%d' % (dbconfig.cgi_url, project_id)
-        if dev != 0:
-            url += '&dev=%d' % dev
-        ini.write('[campaign_stage %s]\n' % poms_stage)
-        ini.write('software_version=%s\n' % version)
-        ini.write('dataset_or_split_data=\n')
-        ini.write('cs_split_type=draining\n')
-        ini.write('completion_type=located\n')
+        url = ''
+        if not xml_disabled(cnx, project_id):
+            url = '%s/export.py?id=%d' % (dbconfig.cgi_url, project_id)
+            if dev != 0:
+                url += '&dev=%d' % dev
 
         # Generate parameter overrides.
 
         overrides = []
-        overrides.append('["--xml", " \'%s\'"]' % url)
+        if url != '':
+            overrides.append('["--xml", " \'%s\'"]' % url)
         overrides.append('["--stage", " %s"]' % stage_name)
 
         # Query extra overrides.
@@ -688,18 +687,22 @@ def export_poms_project(cnx, project_id, dev, ini):
             value = row[1]
             overrides.append('["-O%s=", "%s"]' % (name, value))
 
+        ini.write('[campaign_stage %s]\n' % poms_stage)
+        ini.write('software_version=%s\n' % version)
+        ini.write('dataset_or_split_data=\n')
+        ini.write('cs_split_type=draining\n')
+        ini.write('completion_type=located\n')
         ini.write('param_overrides=[%s]\n' % ','.join(overrides))
-
-        # Finish stage.
-
         ini.write('login_setup=%s\n' % poms_login_setup)
         ini.write('job_type=%s\n' % poms_job_type)
         ini.write('merge_overrides=False\n')
         ini.write('stage_type=regular\n')
         ini.write('\n')
 
-        
-        
+    # Done.
+
+    return
+
 
 # Delete substage.
 
@@ -2162,5 +2165,39 @@ def clone_override(cnx, override_id):
 
     cnx.commit()
     return new_override_id
+
+
+# Check whether xml generation should be disabled for a project.
+# XML generation will be disabled if all stages have zero substages,
+# indicating that this is a fife_launch project/campaign.
+
+def xml_disabled(cnx, project_id):
+
+    # Default result.
+
+    result = True
+
+    # Query stages of this project.
+
+    c = cnx.cursor()
+    q = 'SELECT id FROM stages WHERE project_id=%d' % project_id
+    c.execute(q)
+    rows = c.fetchall()
+    for row in rows:
+        stage_id = row[0]
+
+        # Count substages for this stage.
+
+        q = 'SELECT COUNT(*) FROM substages WHERE stage_id=%d' % stage_id
+        c.execute(q)
+        row = c.fetchone()
+        num_substages = row[0]
+        if num_substages > 0:
+            result = False
+            break
+
+    # Done.
+
+    return result
 
 
