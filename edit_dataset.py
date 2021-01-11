@@ -63,6 +63,11 @@ def dataset_form(cnx, id, qdict):
 
     print '<input type="hidden" id="table" name="table" value="datasets">'
 
+    # Add hidden input field to store save url (parent of this page).
+
+    print '<input type="hidden" id="saveurl" name="saveurl" value="%s/edit_datasets.py?id=%d&%s">' % \
+        (dbconfig.base_url, project_id, dbargs.convert_args(qdict))
+
     # Add hidden qdict input fields.
 
     for key in qdict:
@@ -138,9 +143,9 @@ def dataset_form(cnx, id, qdict):
 
     # Add "Save" and "Back" buttons.
 
-    print '<input type="submit" value="Save" %s>' % disabled
-    print '<input type="submit" value="Back" formaction="/cgi-bin/db/edit_datasets.py?id=%d&%s">' % \
-        (project_id, dbargs.convert_args(qdict))
+    print '<input type="submit" name="submit" value="Save" %s>' % disabled
+    print '<input type="submit" name="submit" value="Update" %s>' % disabled
+    print '<input type="submit" name="submit" value="Back">'
     print '</form>'
 
     # Done.

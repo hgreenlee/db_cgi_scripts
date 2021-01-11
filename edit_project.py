@@ -160,6 +160,11 @@ def project_form(cnx, id, qdict):
 
     print '<input type="hidden" id="table" name="table" value="projects">'
 
+    # Add hidden input field to store save url (parent of this page).
+
+    print '<input type="hidden" id="saveurl" name="saveurl" value="%s/query_projects.py?%s">' % \
+        (dbconfig.base_url, dbargs.convert_args(qdict))
+
     # Add hidden qdict input fields.
 
     for key in qdict:
@@ -238,9 +243,9 @@ def project_form(cnx, id, qdict):
 
     # Add "Save" and "Back" buttons.
 
-    print '<input type="submit" value="Save" %s>' % disabled
-    print '<input type="submit" value="Back" formaction="/cgi-bin/db/query_projects.py?%s">' % \
-        dbargs.convert_args(qdict)
+    print '<input type="submit" name="submit" value="Save" %s>' % disabled
+    print '<input type="submit" name="submit" value="Update" %s>' % disabled
+    print '<input type="submit" name="submit" value="Back">'
     print '</form>'
 
 

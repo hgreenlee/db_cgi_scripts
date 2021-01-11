@@ -34,10 +34,18 @@ def main(argdict):
 
     table = ''
     id = 0
+    saveurl = ''
+    update_db = False
     if 'table' in argdict:
         table = argdict['table']
     if 'id' in argdict:
         id = int(argdict['id'])
+    if 'saveurl' in argdict and 'submit' in argdict and \
+       (argdict['submit'] == 'Save' or argdict['submit'] == 'Back'):
+        saveurl = argdict['saveurl']
+    if 'submit' in argdict and (argdict['submit'] == 'Save' or argdict['submit'] == 'Update'):
+        update_db = True
+    
 
     # Check access restrictions.
 
@@ -55,102 +63,106 @@ def main(argdict):
            argdict['status'] != '' and argdict['status'] != 'Requested':
             dbutil.restricted_error()
 
-    # Update database.
+    if update_db:
 
-    c = cnx.cursor()
-    q = 'UPDATE %s SET ' % table
+        # Update database.
 
-    # Loop over columns of this table.
+        c = cnx.cursor()
+        q = 'UPDATE %s SET ' % table
 
-    cols = databaseDict[table]
-    first = True
-    for n in range(len(cols)):
-        coltup = cols[n]
-        colname = coltup[0]
-        coltype = coltup[2]
-        colarray = coltup[3]
-        coldesc = coltup[4]
+        # Loop over columns of this table.
 
-        if colname != '' and colname != 'id':
+        cols = databaseDict[table]
+        first = True
+        for n in range(len(cols)):
+            coltup = cols[n]
+            colname = coltup[0]
+            coltype = coltup[2]
+            colarray = coltup[3]
+            coldesc = coltup[4]
 
-            # Did form supply a value for this column?
+            if colname != '' and colname != 'id':
 
-            if colname in argdict:
+                # Did form supply a value for this column?
 
-                # Maybe add separator.
+                if colname in argdict:
 
-                if first:
-                    first = False
-                else:
-                    q += ', '
+                    # Maybe add separator.
 
-                # Add value.
+                    if first:
+                        first = False
+                    else:
+                        q += ', '
 
-                if colarray == 0:
+                    # Add value.
 
-                    # Scalar column.
+                    if colarray == 0:
 
-                    if coltype[0:3] == 'INT':
-                        q += '%s=%d' % (colname, int(argdict[colname]))
-                    elif coltype[0:6] == 'DOUBLE':
-                        q += '%s=%8.6f' % (colname, float(argdict[colname]))
-                    elif coltype[0:7] == 'VARCHAR':
-                        q += '%s=\'%s\'' % (colname, argdict[colname].replace("'", "\\'"))
+                        # Scalar column.
 
-                else:
+                        if coltype[0:3] == 'INT':
+                            q += '%s=%d' % (colname, int(argdict[colname]))
+                        elif coltype[0:6] == 'DOUBLE':
+                            q += '%s=%8.6f' % (colname, float(argdict[colname]))
+                        elif coltype[0:7] == 'VARCHAR':
+                            q += '%s=\'%s\'' % (colname, argdict[colname].replace("'", "\\'"))
 
-                    # String array.
+                    else:
 
-                    strs = argdict[colname].split()
-                    strid = dbutil.update_strings(cnx, strs)
-                    q += '%s=%d' % (colname, strid)
+                        # String array.
 
-    # Add where clause.
+                        strs = argdict[colname].split()
+                        strid = dbutil.update_strings(cnx, strs)
+                        q += '%s=%d' % (colname, strid)
 
-    q += ' WHERE id=%d' % id
+        # Add where clause.
 
-    # Run query.
+        q += ' WHERE id=%d' % id
 
-    c.execute(q)
+        # Run query.
 
-    # Special handling for table groups.
+        c.execute(q)
 
-    if table == 'groups':
+        # Special handling for table groups.
 
-        # Loop over arguments to find projects to add to this group.
+        if table == 'groups':
 
-        project_ids = []
-        for k in argdict:
-            if k.startswith('add'):
-                project_ids.append(int(argdict[k]))
+            # Loop over arguments to find projects to add to this group.
 
-        # Loop over projects.
+            project_ids = []
+            for k in argdict:
+                if k.startswith('add'):
+                    project_ids.append(int(argdict[k]))
 
-        for project_id in project_ids:
-            q = 'INSERT INTO group_project SET group_id=%d,project_id=%d' % (id, project_id)
-            c.execute(q)
+            # Loop over projects.
 
-        # Loop over arguments to find projects to remove from this group.
+            for project_id in project_ids:
+                q = 'INSERT INTO group_project SET group_id=%d,project_id=%d' % (id, project_id)
+                c.execute(q)
 
-        project_ids = []
-        for k in argdict:
-            if k.startswith('remove'):
-                project_ids.append(int(argdict[k]))
+            # Loop over arguments to find projects to remove from this group.
 
-        # Loop over projects.
+            project_ids = []
+            for k in argdict:
+                if k.startswith('remove'):
+                    project_ids.append(int(argdict[k]))
 
-        for project_id in project_ids:
-            q = 'DELETE FROM group_project WHERE group_id=%d AND project_id=%d' % (id, project_id)
-            c.execute(q)
+            # Loop over projects.
 
-    # Commit updates.
+            for project_id in project_ids:
+                q = 'DELETE FROM group_project WHERE group_id=%d AND project_id=%d' % (id, project_id)
+                c.execute(q)
 
-    cnx.commit()
+        # Commit updates.
+
+        cnx.commit()
 
     # Calculate redirect url.
 
     url = '%s/query_projects.py' % dbconfig.base_url
-    if 'HTTP_REFERER' in os.environ:
+    if saveurl != '':
+        url = saveurl
+    elif 'HTTP_REFERER' in os.environ:
         url = os.environ['HTTP_REFERER']
 
     # Generate html redirect document.
