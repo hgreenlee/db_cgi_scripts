@@ -95,12 +95,11 @@ def main(project_id, dataset_name, dataset_type, qdict):
             url = '%s/edit_datasets.py?id=%d&%s' % \
                   (dbconfig.base_url, project_id, dbargs.convert_args(qdict))
             print 'Content-type: text/html'
+            print 'Status: 303 See Other'
+            print 'Location: %s' % url
             print
             print '<!DOCTYPE html>'
             print '<html>'
-            print '<head>'
-            print '<meta http-equiv="refresh" content="0; url=%s" />' % url
-            print '</head>'
             print '<body>'
             print 'Dataset addition successful.'
             print '<br><br>'

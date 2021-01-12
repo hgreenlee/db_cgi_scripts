@@ -168,12 +168,11 @@ def main(argdict):
     # Generate html redirect document.
 
     print 'Content-type: text/html'
+    print 'Status: 303 See Other'
+    print 'Location: %s' % url
     print
     print '<!DOCTYPE html>'
     print '<html>'
-    print '<head>'
-    print '<meta http-equiv="refresh" content="0; url=%s" />' % url
-    print '</head>'
     print '<body>'
     if table != '':
         print 'Database table "%s" updated.' % table

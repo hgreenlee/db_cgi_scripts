@@ -38,12 +38,11 @@ def main(stage_id, name, value, qdict):
     # Generate redirect page.
 
     print 'Content-type: text/html'
+    print 'Status: 303 See Other'
+    print 'Location: %s' % url
     print
     print '<!DOCTYPE html>'
     print '<html>'
-    print '<head>'
-    print '<meta http-equiv="refresh" content="0; url=%s" />' % url
-    print '</head>'
     print '<body>'
     print 'Add override.'
     print '<br><br>'

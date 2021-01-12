@@ -70,12 +70,11 @@ def main(substage_id, qdict):
     url = '%s/edit_stage.py?id=%d&%s' % \
           (dbconfig.base_url, stage_id, dbargs.convert_args(qdict))
     print 'Content-type: text/html'
+    print 'Status: 303 See Other'
+    print 'Location: %s' % url
     print
     print '<!DOCTYPE html>'
     print '<html>'
-    print '<head>'
-    print '<meta http-equiv="refresh" content="0; url=%s" />' % url
-    print '</head>'
     print '<body>'
     print 'If page does not automatically reload click this <a href=%s>link</a>' % url
     print '</body>'
