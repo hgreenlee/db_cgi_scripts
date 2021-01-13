@@ -643,7 +643,7 @@ def export_poms_project(cnx, project_id, dev, ini):
     ini.write('experiment=%s\n' % experiment)
     ini.write('poms_role=%s\n' % poms_role)
     ini.write('name=%s\n' % poms_campaign)
-    ini.write('stage=Active\n')
+    ini.write('state=Active\n')
     ini.write('campaign_keywords={}\n')
     ini.write('campaign_stage_list=%s\n' % ','.join(stage_names))
     ini.write('\n')
