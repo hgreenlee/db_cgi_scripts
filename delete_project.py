@@ -59,11 +59,11 @@ def main(id, confirm, qdict):
             # Generate a form with two buttons "Delete" and "Cancel."
 
             print '<br>'
-            print '<form action="/cgi-bin/db/delete_project.py?id=%d&confirm=1&%s" method="post">' % \
-                (id, dbargs.convert_args(qdict))
+            print '<form action="%s/delete_project.py?id=%d&confirm=1&%s" method="post">' % \
+                (dbconfig.rel_url, id, dbargs.convert_args(qdict))
             print '<input type="submit" value="Delete">'
-            print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/query_projects.py?%s">' % \
-                dbargs.convert_args(qdict)
+            print '<input type="submit" value="Cancel" formaction="%s/query_projects.py?%s">' % \
+                (dbconfig.rel_url, dbargs.convert_args(qdict))
             print '</form>'
 
         print '</body>'

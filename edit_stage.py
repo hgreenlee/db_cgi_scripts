@@ -53,8 +53,8 @@ def stage_form(cnx, id, qdict):
 
     # Add a button to add a new substage.
 
-    print '<form action="/cgi-bin/db/add_substage.py?id=%d&%s" method="post" target="_self">' % \
-        (id, dbargs.convert_args(qdict))
+    print '<form action="%s/add_substage.py?id=%d&%s" method="post" target="_self">' % \
+        (dbconfig.rel_url, id, dbargs.convert_args(qdict))
     print '<input type="submit" value="Add Substage" %s>' % disabled
     print '</form>'
     print '<br>'
@@ -85,8 +85,8 @@ def stage_form(cnx, id, qdict):
             # Add Edit button/column
 
             print '<td>'
-            print '<form target="_self" action="/cgi-bin/db/edit_substage.py?id=%d&%s" method="post">' % \
-                (substage_id, dbargs.convert_args(qdict))
+            print '<form target="_self" action="%s/edit_substage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, substage_id, dbargs.convert_args(qdict))
             print '<div title="Edit substage">'
             print '<input type="submit" value="&#x270e;">'
             print '</div>'
@@ -96,8 +96,8 @@ def stage_form(cnx, id, qdict):
             # Add Clone button/column
 
             print '<td>'
-            print '<form target="_self" action="/cgi-bin/db/clone_substage.py?id=%d&%s" method="post">' % \
-                (substage_id, dbargs.convert_args(qdict))
+            print '<form target="_self" action="%s/clone_substage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, substage_id, dbargs.convert_args(qdict))
             print '<div title="Clone substage">'
             print '<input type="submit" value="&#x2398;" %s>' % disabled
             print '</div>'
@@ -107,8 +107,8 @@ def stage_form(cnx, id, qdict):
             # Add Delete button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/delete_substage.py?id=%d&%s" method="post">' % \
-                (substage_id, dbargs.convert_args(qdict))
+            print '<form action="%s/delete_substage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, substage_id, dbargs.convert_args(qdict))
             print '<div title="Delete substage">'
             print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
             print '</div>'
@@ -118,8 +118,8 @@ def stage_form(cnx, id, qdict):
             # Add Up button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/up_substage.py?id=%d&%s" method="post">' % \
-                (substage_id, dbargs.convert_args(qdict))
+            print '<form action="%s/up_substage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, substage_id, dbargs.convert_args(qdict))
             print '<div title="Move up">'
             print '<input type="submit" value="&#x25b2;" %s>' % disabled
             print '</div>'
@@ -129,8 +129,8 @@ def stage_form(cnx, id, qdict):
             # Add Down button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/down_substage.py?id=%d&%s" method="post">' % \
-                (substage_id, dbargs.convert_args(qdict))
+            print '<form action="%s/down_substage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, substage_id, dbargs.convert_args(qdict))
             print '<div title="Move down">'
             print '<input type="submit" value="&#x25bc;" %s>' % disabled
             print '</div>'
@@ -151,8 +151,8 @@ def stage_form(cnx, id, qdict):
 
     # Add a button to add a new override.
 
-    print '<form action="/cgi-bin/db/add_override.py?id=%d&%s" method="post" target="_self">' % \
-        (id, dbargs.convert_args(qdict))
+    print '<form action="%s/add_override.py?id=%d&%s" method="post" target="_self">' % \
+        (dbconfig.rel_url, id, dbargs.convert_args(qdict))
     print '<table>'
     print '<tr>'
     print '<td>'
@@ -203,8 +203,8 @@ def stage_form(cnx, id, qdict):
             # Add Edit button/column
 
             print '<td>'
-            print '<form target="_self" action="/cgi-bin/db/edit_override.py?id=%d&%s" method="post">' % \
-                (override_id, dbargs.convert_args(qdict))
+            print '<form target="_self" action="%s/edit_override.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, override_id, dbargs.convert_args(qdict))
             print '<div title="Edit override">'
             print '<input type="submit" value="&#x270e;">'
             print '</div>'
@@ -214,8 +214,8 @@ def stage_form(cnx, id, qdict):
             # Add Clone button/column
 
             print '<td>'
-            print '<form target="_self" action="/cgi-bin/db/clone_override.py?id=%d&%s" method="post">' % \
-                (override_id, dbargs.convert_args(qdict))
+            print '<form target="_self" action="%s/clone_override.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, override_id, dbargs.convert_args(qdict))
             print '<div title="Clone override">'
             print '<input type="submit" value="&#x2398;" %s>' % disabled
             print '</div>'
@@ -225,8 +225,8 @@ def stage_form(cnx, id, qdict):
             # Add Delete button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/delete_override.py?id=%d&%s" method="post">' % \
-                (override_id, dbargs.convert_args(qdict))
+            print '<form action="%s/delete_override.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, override_id, dbargs.convert_args(qdict))
             print '<div title="Delete override">'
             print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
             print '</div>'
@@ -252,7 +252,7 @@ def stage_form(cnx, id, qdict):
         raise IOError('Unable to fetch stage id %d' % id)
     row = rows[0]
 
-    print '<form action="/cgi-bin/db/dbhandler.py" method="post">'
+    print '<form action="%s/dbhandler.py" method="post">' % dbconfig.rel_url
 
     # Add hidden input field to store table name.
 

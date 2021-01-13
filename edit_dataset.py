@@ -57,7 +57,7 @@ def dataset_form(cnx, id, qdict):
         raise IOError('Unable to fetch dataset id %d' % id)
     row = rows[0]
 
-    print '<form action="/cgi-bin/db/dbhandler.py" method="post">'
+    print '<form action="%s/dbhandler.py" method="post">' % dbconfig.rel_url
 
     # Add hidden input field to store table name.
 

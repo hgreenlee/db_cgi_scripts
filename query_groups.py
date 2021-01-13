@@ -61,7 +61,7 @@ def search_panel(results_per_page, pattern, devel):
 
     # Add form for pattern match and results per page.
 
-    print '<form action="/cgi-bin/db/query_groups.py" method="post">'
+    print '<form action="%s/query_groups.py" method="post">' % dbconfig.rel_url
 
     # Add hidden input for db instance.
 
@@ -126,8 +126,8 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = 1
-    print '<form action="/cgi-bin/db/query_groups.py?%s" method="post">' % \
-        dbargs.convert_args(new_qdict)
+    print '<form action="%s/query_groups.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(new_qdict))
     print '<input type="submit" value="&#x25c4;&#x25c4;" %s>' % disabled
     print '</form>'
     print '</td>'
@@ -138,8 +138,8 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = prev_page
-    print '<form action="/cgi-bin/db/query_groups.py?%s" method="post">' % \
-        dbargs.convert_args(new_qdict)
+    print '<form action="%s/query_groups.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(new_qdict))
     print '<input type="submit" value="&#x25c4;" %s>' % disabled
     print '</form>'
     print '</td>'
@@ -165,8 +165,8 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = next_page
-    print '<form action="/cgi-bin/db/query_groups.py?%s" method="post">' % \
-        dbargs.convert_args(new_qdict)
+    print '<form action="%s/query_groups.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(new_qdict))
     print '<input type="submit" value="&#x25ba;" %s>' % disabled
     print '</form>'
     print '</td>'
@@ -176,8 +176,8 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = max_page
-    print '<form action="/cgi-bin/db/query_groups.py?%s" method="post">' % \
-        dbargs.convert_args(new_qdict)
+    print '<form action="%s/query_groups.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(new_qdict))
     print '<input type="submit" value="&#x25ba;&#x25ba;" %s >' % disabled
     print '</form>'
     print '</td>'
@@ -246,8 +246,8 @@ def main(qdict):
 
     # Add button to create new group.
 
-    print '<form action="/cgi-bin/db/add_group.py?%s" method="post" target="_self">' % \
-        dbargs.convert_args(qdict)
+    print '<form action="%s/add_group.py?%s" method="post" target="_self">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict))
     print '<label for="submit">Generate a new empty project group: </label>'
     print '<input type="submit" id="submit" value="New Group">'
     print '</form>'
@@ -275,15 +275,15 @@ def main(qdict):
     # Add sort buttons.
 
     print '<div style="display:inline-block">'
-    print '<form action="/cgi-bin/db/query_groups.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'id_u'))
+    print '<form action="%s/query_groups.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'id_u'))
     if sort == 'id_u':
         print '<input class="small-btn" type="submit" value="&#x25b2;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25b3;">'
     print '</form>'
-    print '<form action="/cgi-bin/db/query_groups.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'id_d'))
+    print '<form action="%s/query_groups.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'id_d'))
     if sort == 'id_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
@@ -298,15 +298,15 @@ def main(qdict):
     # Add sort buttons.
 
     print '<div style="display:inline-block">'
-    print '<form action="/cgi-bin/db/query_groups.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'name_u'))
+    print '<form action="%s/query_groups.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'name_u'))
     if sort == 'name_u':
         print '<input class="small-btn" type="submit" value="&#x25b2;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25b3;">'
     print '</form>'
-    print '<form action="/cgi-bin/db/query_groups.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'name_d'))
+    print '<form action="%s/query_groups.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'name_d'))
     if sort == 'name_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
@@ -343,8 +343,8 @@ def main(qdict):
         # Add Edit button/column
 
         print '<td>'
-        print '<form target="_self" action="/cgi-bin/db/edit_group.py?id=%d&%s" method="post">' % \
-            (id, dbargs.convert_args(qdict))
+        print '<form target="_self" action="%s/edit_group.py?id=%d&%s" method="post">' % \
+            (dbconfig.rel_url, id, dbargs.convert_args(qdict))
         print '<div title="Edit group">'
         print '<input type="submit" value="&#x270e;">'
         print '</div>'
@@ -354,8 +354,8 @@ def main(qdict):
         # Add Clone button/column
 
         print '<td>'
-        print '<form target="_self" action="/cgi-bin/db/clone_group.py?id=%d&%s" method="post">' % \
-            (id, dbargs.convert_args(qdict))
+        print '<form target="_self" action="%s/clone_group.py?id=%d&%s" method="post">' % \
+            (dbconfig.rel_url, id, dbargs.convert_args(qdict))
         print '<div title="Clone group">'
         print '<input type="submit" value="&#x2398;">'
         print '</div>'
@@ -365,8 +365,8 @@ def main(qdict):
         # Add Delete button/column
 
         print '<td>'
-        print '<form action="/cgi-bin/db/delete_group.py?id=%d&%s" method="post">' % \
-            (id, dbargs.convert_args(qdict))
+        print '<form action="%s/delete_group.py?id=%d&%s" method="post">' % \
+            (dbconfig.rel_url, id, dbargs.convert_args(qdict))
         print '<div title="Delete group">'
         print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
         print '</div>'

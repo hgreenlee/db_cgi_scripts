@@ -105,7 +105,7 @@ def search_panel(results_per_page, pattern, group, status, gid, experiment, file
 
     # Add form for pattern match and results per page.
 
-    print '<form action="/cgi-bin/db/query_projects.py" method="post">'
+    print '<form action="%s/query_projects.py" method="post">' % dbconfig.rel_url
 
     # Add hidden input for db instance.
 
@@ -230,8 +230,8 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = 1
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        dbargs.convert_args(new_qdict)
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(new_qdict))
     print '<input type="submit" value="&#x25c4;&#x25c4;" %s>' % disabled
     print '</form>'
     print '</td>'
@@ -242,8 +242,8 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = prev_page
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        dbargs.convert_args(new_qdict)
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(new_qdict))
     print '<input type="submit" value="&#x25c4;" %s>' % disabled
     print '</form>'
     print '</td>'
@@ -268,8 +268,8 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = next_page
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        dbargs.convert_args(new_qdict)
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(new_qdict))
     print '<input type="submit" value="&#x25ba;" %s>' % disabled
     print '</form>'
     print '</td>'
@@ -279,8 +279,8 @@ def page_links(qdict, max_page):
     print '<td>'
     new_qdict = copy.deepcopy(qdict)
     new_qdict['page'] = max_page
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        dbargs.convert_args(new_qdict)
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(new_qdict))
     print '<input type="submit" value="&#x25ba;&#x25ba;" %s >' % disabled
     print '</form>'
     print '</td>'
@@ -355,8 +355,8 @@ def main(qdict):
 
     # Add button to create new project.
 
-    print '<form action="/cgi-bin/db/add_project.py?%s" method="post" target="_self">' % \
-        dbargs.convert_args(qdict)
+    print '<form action="%s/add_project.py?%s" method="post" target="_self">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict))
     print '<label for="submit">Generate a new empty project: </label>'
     print '<input type="submit" id="submit" value="New Project">'
     print '</form>'
@@ -364,8 +364,8 @@ def main(qdict):
 
     # Add button to import a project from local xml file.
 
-    print '<form action="/cgi-bin/db/import_project.py?%s" method="post" target="_self">' % \
-        dbargs.convert_args(qdict)
+    print '<form action="%s/import_project.py?%s" method="post" target="_self">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict))
     print '<label for="submit">Import project from local XML file: </label>'
     print '<input type="submit" id="submit" value="Import Project">'
     print '</form>'
@@ -396,15 +396,15 @@ def main(qdict):
     # Add sort buttons.
 
     print '<div style="display:inline-block">'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'id_u'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'id_u'))
     if sort == 'id_u':
         print '<input class="small-btn" type="submit" value="&#x25b2;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25b3;">'
     print '</form>'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'id_d'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'id_d'))
     if sort == 'id_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
@@ -421,15 +421,15 @@ def main(qdict):
     # Add sort buttons.
 
     print '<div style="display:inline-block">'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'name_u'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'name_u'))
     if sort == 'name_u':
         print '<input class="small-btn" type="submit" value="&#x25b2;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25b3;">'
     print '</form>'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'name_d'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'name_d'))
     if sort == 'name_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
@@ -446,15 +446,15 @@ def main(qdict):
     # Add sort buttons.
 
     print '<div style="display:inline-block">'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'experiment_u'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'experiment_u'))
     if sort == 'experiment_u':
         print '<input class="small-btn" type="submit" value="&#x25b2;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25b3;">'
     print '</form>'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'experiment_d'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'experiment_d'))
     if sort == 'experiment_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
@@ -471,15 +471,15 @@ def main(qdict):
     # Add sort buttons.
 
     print '<div style="display:inline-block">'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'file_type_u'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'file_type_u'))
     if sort == 'file_type_u':
         print '<input class="small-btn" type="submit" value="&#x25b2;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25b3;">'
     print '</form>'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'file_type_d'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'file_type_d'))
     if sort == 'file_type_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
@@ -496,15 +496,15 @@ def main(qdict):
     # Add sort buttons.
 
     print '<div style="display:inline-block">'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'campaign_u'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'campaign_u'))
     if sort == 'campaign_u':
         print '<input class="small-btn" type="submit" value="&#x25b2;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25b3;">'
     print '</form>'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'campaign_d'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'campaign_d'))
     if sort == 'campaign_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
@@ -521,15 +521,15 @@ def main(qdict):
     # Add sort buttons.
 
     print '<div style="display:inline-block">'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'group_u'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'group_u'))
     if sort == 'group_u':
         print '<input class="small-btn" type="submit" value="&#x25b2;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25b3;">'
     print '</form>'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'group_d'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'group_d'))
     if sort == 'group_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
@@ -546,15 +546,15 @@ def main(qdict):
     # Add sort buttons.
 
     print '<div style="display:inline-block">'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'status_u'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'status_u'))
     if sort == 'status_u':
         print '<input class="small-btn" type="submit" value="&#x25b2;">'
     else:
         print '<input class="small-btn" type="submit" value="&#x25b3;">'
     print '</form>'
-    print '<form action="/cgi-bin/db/query_projects.py?%s" method="post">' % \
-        (dbargs.convert_args(qdict, 'sort', 'status_d'))
+    print '<form action="%s/query_projects.py?%s" method="post">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict, 'sort', 'status_d'))
     if sort == 'status_d':
         print '<input class="small-btn" type="submit" value="&#x25bc;">'
     else:
@@ -608,8 +608,8 @@ def main(qdict):
         if dbutil.xml_disabled(cnx, id):
             xml_disabled = 'disabled'
         print '<td>'
-        print '<form target="_self" action="/cgi-bin/db/export_project.py?id=%d&%s" method="post">' % \
-            (id, dbargs.convert_args(qdict))
+        print '<form target="_self" action="%s/export_project.py?id=%d&%s" method="post">' % \
+            (dbconfig.rel_url, id, dbargs.convert_args(qdict))
         print '<div title="Generate XML">'
         print '<input type="submit" value="XML" %s>' % xml_disabled
         print '</div>'
@@ -619,8 +619,8 @@ def main(qdict):
         # Add POMS button/column
 
         print '<td>'
-        print '<form target="_self" action="/cgi-bin/db/export_poms.py?id=%d&%s" method="post">' % \
-            (id, dbargs.convert_args(qdict))
+        print '<form target="_self" action="%s/export_poms.py?id=%d&%s" method="post">' % \
+            (dbconfig.rel_url, id, dbargs.convert_args(qdict))
         print '<div title="Generate POMS .ini file">'
         print '<input type="submit" value="POMS">'
         print '</form>'
@@ -629,8 +629,8 @@ def main(qdict):
         # Add Edit button/column
 
         print '<td>'
-        print '<form target="_self" action="/cgi-bin/db/edit_project.py?id=%d&%s" method="post">' % \
-            (id, dbargs.convert_args(qdict))
+        print '<form target="_self" action="%s/edit_project.py?id=%d&%s" method="post">' % \
+            (dbconfig.rel_url, id, dbargs.convert_args(qdict))
         print '<div title="Edit project">'
         print '<input type="submit" value="&#x270e;">'
         print '</div>'
@@ -640,8 +640,8 @@ def main(qdict):
         # Add Clone button/column
 
         print '<td>'
-        print '<form target="_self" action="/cgi-bin/db/clone_project.py?id=%d&%s" method="post">' % \
-            (id, dbargs.convert_args(qdict))
+        print '<form target="_self" action="%s/clone_project.py?id=%d&%s" method="post">' % \
+            (dbconfig.rel_url, id, dbargs.convert_args(qdict))
         print '<div title="Clone project">'
         print '<input type="submit" value="&#x2398;">'
         print '</div>'
@@ -651,8 +651,8 @@ def main(qdict):
         # Add Delete button/column
 
         print '<td>'
-        print '<form action="/cgi-bin/db/delete_project.py?id=%d&%s" method="post">' % \
-            (id, dbargs.convert_args(qdict))
+        print '<form action="%s/delete_project.py?id=%d&%s" method="post">' % \
+            (dbconfig.rel_url, id, dbargs.convert_args(qdict))
         print '<div title="Delete project">'
         print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
         print '</div>'
