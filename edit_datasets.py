@@ -58,8 +58,8 @@ def datasets_form(cnx, project_id, qdict):
 
         # Add button to add dataset.
 
-        print '<form action="/cgi-bin/db/add_dataset.py?id=%d&type=%s&%s" method="post">' % \
-            (project_id, dataset_type, dbargs.convert_args(qdict))
+        print '<form action="%s/add_dataset.py?id=%d&type=%s&%s" method="post">' % \
+            (dbconfig.rel_url, project_id, dataset_type, dbargs.convert_args(qdict))
         print '<label for="submit">Add %s Dataset: </label>' % title_type
         print '<input type="submit" id="submit" value="Add" %s>' % disabled
         print '</form>'
@@ -128,8 +128,8 @@ def datasets_form(cnx, project_id, qdict):
             # Add Update button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/edit_datasets.py?id=%d&update=%d&%s" method="post">' % \
-                (project_id, dataset_id, dbargs.convert_args(qdict))
+            print '<form action="%s/edit_datasets.py?id=%d&update=%d&%s" method="post">' % \
+                (dbconfig.rel_url, project_id, dataset_id, dbargs.convert_args(qdict))
             print '<div title="Update statistics">'
             print '<input type="submit" value="+Stats" %s>' % disabled
             print '</div>'
@@ -139,8 +139,8 @@ def datasets_form(cnx, project_id, qdict):
             # Add Edit button/column
 
             print '<td>'
-            print '<form target="_self" action="/cgi-bin/db/edit_dataset.py?id=%d&%s" method="post">' % \
-                (dataset_id, dbargs.convert_args(qdict))
+            print '<form target="_self" action="%s/edit_dataset.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, dataset_id, dbargs.convert_args(qdict))
             print '<div title="Edit dataset">'
             print '<input type="submit" value="&#x270e;" %s>' % disabled
             print '</div>'
@@ -150,8 +150,8 @@ def datasets_form(cnx, project_id, qdict):
             # Add Clone button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/clone_dataset.py?id=%d&%s" method="post">' % \
-                (dataset_id, dbargs.convert_args(qdict))
+            print '<form action="%s/clone_dataset.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, dataset_id, dbargs.convert_args(qdict))
             print '<div title="Clone dataset">'
             print '<input type="submit" value="&#x2398;" %s>' % disabled
             print '</div>'
@@ -161,8 +161,8 @@ def datasets_form(cnx, project_id, qdict):
             # Add Delete button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/delete_dataset.py?id=%d&%s" method="post">' % \
-                (dataset_id, dbargs.convert_args(qdict))
+            print '<form action="%s/delete_dataset.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, dataset_id, dbargs.convert_args(qdict))
             print '<div title="Delete dataset">'
             print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
             print '</div>'
@@ -172,8 +172,8 @@ def datasets_form(cnx, project_id, qdict):
             # Add Up button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/up_dataset.py?id=%d&%s" method="post">' % \
-                (dataset_id, dbargs.convert_args(qdict))
+            print '<form action="%s/up_dataset.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, dataset_id, dbargs.convert_args(qdict))
             print '<div title="Move up">'
             print '<input type="submit" value="&#x25b2;" %s>' % disabled
             print '</div>'
@@ -183,8 +183,8 @@ def datasets_form(cnx, project_id, qdict):
             # Add Down button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/down_dataset.py?id=%d&%s" method="post">' % \
-                (dataset_id, dbargs.convert_args(qdict))
+            print '<form action="%s/down_dataset.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, dataset_id, dbargs.convert_args(qdict))
             print '<div title="Move down">'
             print '<input type="submit" value="&#x25bc;" %s>' % disabled
             print '</div>'

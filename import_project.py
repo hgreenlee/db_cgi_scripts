@@ -42,7 +42,7 @@ def main(xmldata, qdict):
         
         # Generate a form with file dialog and two buttons "Import" and "Cancel."
 
-        print '<form action="/cgi-bin/db/import_project.py" method="post" enctype="multipart/form-data">'
+        print '<form action="%s/import_project.py" method="post" enctype="multipart/form-data">' % dbconfig.rel_url
         for key in qdict:
             print '<input type="hidden" name="%s" value="%s">' % (dbutil.convert_str(key),
                                                                   dbutil.convert_str(qdict[key]))
@@ -50,8 +50,8 @@ def main(xmldata, qdict):
         print '<input type="file" id="xmldata" name="data" accept=".xml">'
         print '<br>'
         print '<input type="submit" value="Import">'
-        print '<input type="submit" value="Cancel" formaction="/cgi-bin/db/query_projects.py?%s">' % \
-            dbargs.convert_args(qdict)
+        print '<input type="submit" value="Cancel" formaction="%s/query_projects.py?%s">' % \
+            (dbconfig.rel_url, dbargs.convert_args(qdict))
         print '</body>'
         print '</html>'
 

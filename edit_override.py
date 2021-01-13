@@ -59,7 +59,7 @@ def override_form(cnx, id, qdict):
     print '<h2>Project %s</h2>' % project_name
     print '<h2>Stage %s</h2>' % stage_name
     print '<h2>Override %s</h2>' % name
-    print '<form action="/cgi-bin/db/dbhandler.py" method="post">'
+    print '<form action="%s/dbhandler.py" method="post">' % dbconfig.rel_url
 
     # Add hidden input field to store table name.
 

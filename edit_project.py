@@ -54,8 +54,8 @@ def project_form(cnx, id, qdict):
     # Add button to insert another stage.
 
     print '<h2>Stages</h2>'
-    print '<form action="/cgi-bin/db/add_stage.py?id=%d&%s" method="post" target="_self">' % \
-        (id, dbargs.convert_args(qdict))
+    print '<form action="%s/add_stage.py?id=%d&%s" method="post" target="_self">' % \
+        (dbconfig.rel_url, id, dbargs.convert_args(qdict))
     print '<input type="submit" value="Add Stage" %s>' % disabled
     print '</form>'
     print '<br>'
@@ -87,8 +87,8 @@ def project_form(cnx, id, qdict):
             # Add Edit button/column
 
             print '<td>'
-            print '<form target="_self" action="/cgi-bin/db/edit_stage.py?id=%d&%s" method="post">' % \
-                (stage_id, dbargs.convert_args(qdict))
+            print '<form target="_self" action="%s/edit_stage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, stage_id, dbargs.convert_args(qdict))
             print '<div title="Edit stage">'
             print '<input type="submit" value="&#x270e;">'
             print '</div>'
@@ -98,8 +98,8 @@ def project_form(cnx, id, qdict):
             # Add Clone button/column
 
             print '<td>'
-            print '<form target="_self" action="/cgi-bin/db/clone_stage.py?id=%d&%s" method="post">' % \
-                (stage_id, dbargs.convert_args(qdict))
+            print '<form target="_self" action="%s/clone_stage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, stage_id, dbargs.convert_args(qdict))
             print '<div title="Clone stage">'
             print '<input type="submit" value="&#x2398;" %s>' % disabled
             print '</div>'
@@ -109,8 +109,8 @@ def project_form(cnx, id, qdict):
             # Add Delete button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/delete_stage.py?id=%d&%s" method="post">' % \
-                (stage_id, dbargs.convert_args(qdict))
+            print '<form action="%s/delete_stage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, stage_id, dbargs.convert_args(qdict))
             print '<div title="Delete stage">'
             print '<input type="submit" value="&#x1f5d1;" %s>' % disabled
             print '</div>'
@@ -120,8 +120,8 @@ def project_form(cnx, id, qdict):
             # Add Up button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/up_stage.py?id=%d&%s" method="post">' % \
-                (stage_id, dbargs.convert_args(qdict))
+            print '<form action="%s/up_stage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, stage_id, dbargs.convert_args(qdict))
             print '<div title="Move up">'
             print '<input type="submit" value="&#x25b2;" %s>' % disabled
             print '</div>'
@@ -131,8 +131,8 @@ def project_form(cnx, id, qdict):
             # Add Down button/column
 
             print '<td>'
-            print '<form action="/cgi-bin/db/down_stage.py?id=%d&%s" method="post">' % \
-                (stage_id, dbargs.convert_args(qdict))
+            print '<form action="%s/down_stage.py?id=%d&%s" method="post">' % \
+                (dbconfig.rel_url, stage_id, dbargs.convert_args(qdict))
             print '<div title="Move down">'
             print '<input type="submit" value="&#x25bc;" %s>' % disabled
             print '</div>'
@@ -158,7 +158,7 @@ def project_form(cnx, id, qdict):
         raise IOError('Unable to fetch project id %d' % id)
     row = rows[0]
 
-    print '<form action="/cgi-bin/db/dbhandler.py" method="post">'
+    print '<form action="%s/dbhandler.py" method="post">' % dbconfig.rel_url
 
     # Add hidden input field to store table name.
 
