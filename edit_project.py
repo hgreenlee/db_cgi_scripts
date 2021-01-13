@@ -216,7 +216,10 @@ def project_form(cnx, id, qdict):
                         print '<select id="%s" name="%s" size=0 %s>' % (colname, colname, disabled)
                         pulldown_list = pulldowns[colname]
                         if type(pulldown_list) == type({}):
-                            pulldown_list = pulldowns[colname][experiment]
+                            if experiment in pulldown_list:
+                                pulldown_list = pulldowns[colname][experiment]
+                            else:
+                                pulldown_list = ['']
                         for value in pulldown_list:
                             sel = ''
                             if value == row[n]:
