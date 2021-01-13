@@ -43,6 +43,10 @@ def project_form(cnx, id, qdict):
 
     name = dbutil.get_project_name(cnx, id)
 
+    # Get experiment.
+
+    experiment = dbutil.get_project_experiment(cnx, id)
+
     # Generate form.
 
     print '<h2>Project %s</h2>' % name
@@ -210,7 +214,10 @@ def project_form(cnx, id, qdict):
                 elif coltype[0:7] == 'VARCHAR':
                     if colname in pulldowns:
                         print '<select id="%s" name="%s" size=0 %s>' % (colname, colname, disabled)
-                        for value in pulldowns[colname]:
+                        pulldown_list = pulldowns[colname]
+                        if type(pulldown_list) == type({}):
+                            pulldown_list = pulldowns[colname][experiment]
+                        for value in pulldown_list:
                             sel = ''
                             if value == row[n]:
                                 sel = 'selected'

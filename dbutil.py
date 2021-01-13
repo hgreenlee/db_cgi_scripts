@@ -182,6 +182,26 @@ def get_project_name(cnx, id):
     return result
 
 
+# Get project experiment.
+
+def get_project_experiment(cnx, id):
+
+    result = ''
+
+    # Query project experiment from database.
+
+    c = cnx.cursor()
+    q = 'SELECT id, experiment FROM projects WHERE id=%d' % id
+    c.execute(q)
+    rows = c.fetchall()
+    if len(rows) > 0:
+        result = rows[0][1]
+
+    # Done.
+
+    return result
+
+
 # Get group id.
 
 def get_group_id(cnx, group_name):

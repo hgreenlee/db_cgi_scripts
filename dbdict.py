@@ -43,7 +43,7 @@ databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT
                              ('description', '', 'VARCHAR(1000)', 0, 'Description', ''),
                              ('experiment', '', 'VARCHAR(100)', 0, 'Experiment', 'uboone'),
                              ('poms_campaign', 'poms/campaign', 'VARCHAR(1000)', 0, 'POMS campaign', ''),
-                             ('poms_login_setup', 'poms/loginsetup', 'VARCHAR(1000)', 0, 'POMS login/stup', ''),
+                             ('poms_login_setup', 'poms/loginsetup', 'VARCHAR(1000)', 0, 'POMS login/setup', ''),
                              ('poms_job_type', 'poms/jobtype', 'VARCHAR(1000)', 0, 'POMS job type', ''),
                              ('poms_role', '', 'VARCHAR(100)', 0, 'POMS Role', 'production'),
                              ('physics_group', 'physicsgroup', 'VARCHAR(100)', 0, 'Physics Group', ''),
