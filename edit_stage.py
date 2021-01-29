@@ -196,7 +196,7 @@ def stage_form(cnx, id, qdict):
 
     # Query override ids belonging to this stage.
 
-    q = 'SELECT id, name, override_type, value FROM overrides WHERE stage_id=%d' % id
+    q = 'SELECT id, name, override_type, value FROM overrides WHERE stage_id=%d ORDER BY override_type' % id
     c.execute(q)
     rows = c.fetchall()
     if len(rows) > 0:

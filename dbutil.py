@@ -711,7 +711,7 @@ def export_poms_project(cnx, project_id, dev, ini):
             if dev != 0:
                 url += '&dev=%d' % dev
 
-        # Generate parameter overrides.
+        # Generate regular parameter overrides.
 
         overrides = []
         if url != '':
@@ -720,7 +720,7 @@ def export_poms_project(cnx, project_id, dev, ini):
 
         # Query extra overrides.
 
-        q = 'SELECT name, value FROM overrides WHERE stage_id=%d' % stage_id
+        q = 'SELECT name, value, override_type FROM overrides WHERE stage_id=%d AND override_type=\'regular\'' % stage_id
         c.execute(q)
         rows = c.fetchall()
         for row in rows:
@@ -728,12 +728,27 @@ def export_poms_project(cnx, project_id, dev, ini):
             value = row[1]
             overrides.append('["-O%s=", "%s"]' % (name, value))
 
+        # Generate test parameter overrides.
+
+        test_overrides = []
+
+        # Query test overrides.
+
+        q = 'SELECT name, value, override_type FROM overrides WHERE stage_id=%d AND override_type=\'test\'' % stage_id
+        c.execute(q)
+        rows = c.fetchall()
+        for row in rows:
+            name = row[0]
+            value = row[1]
+            test_overrides.append('["-O%s=", "%s"]' % (name, value))
+
         ini.write('[campaign_stage %s]\n' % poms_stage)
         ini.write('software_version=%s\n' % version)
         ini.write('dataset_or_split_data=\n')
         ini.write('cs_split_type=draining\n')
         ini.write('completion_type=located\n')
         ini.write('param_overrides=[%s]\n' % ','.join(overrides))
+        ini.write('test_param_overrides=[%s]\n' % ','.join(test_overrides))
         ini.write('login_setup=%s\n' % poms_login_setup)
         ini.write('job_type=%s\n' % poms_job_type)
         ini.write('merge_overrides=False\n')
