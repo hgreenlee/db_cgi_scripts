@@ -17,6 +17,7 @@
 import sys, os
 import dbconfig, dbutil, dbargs
 from dbdict import databaseDict
+from dbconfig import pulldowns
 
 
 # Override edit form.
@@ -32,7 +33,7 @@ def override_form(cnx, id, qdict):
     # Query override from database.
 
     c = cnx.cursor()
-    q = 'SELECT stage_id,name,value FROM overrides WHERE id=%d' % id
+    q = 'SELECT stage_id,name,override_type,value FROM overrides WHERE id=%d' % id
     c.execute(q)
     rows = c.fetchall()
     if len(rows) == 0:
@@ -40,7 +41,8 @@ def override_form(cnx, id, qdict):
     row = rows[0]
     stage_id = row[0]
     name = row[1]
-    value = row[2]
+    override_type = row[2]
+    value = row[3]
 
     # Query stage name and project id.
 
@@ -78,6 +80,7 @@ def override_form(cnx, id, qdict):
     # Add form fields in a table.
 
     print '<table border=1 style="border-collapse:collapse">'
+
     print '<tr>'
     print '<td>'
     print '<label for="id">ID:</label>'
@@ -86,6 +89,7 @@ def override_form(cnx, id, qdict):
     print '<input type="number" id="id" name="id" value="%d" readonly>' % id
     print '</td>'
     print '</tr>'
+
     print '<tr>'
     print '<td>'
     print '<label for="stage_id">Stage ID:</label>'
@@ -94,6 +98,7 @@ def override_form(cnx, id, qdict):
     print '<input type="number" id="stage_id" name="stage_id" value="%d" readonly>' % stage_id
     print '</td>'
     print '</tr>'
+
     print '<tr>'
     print '<td>'
     print '<label for="name">Name:</label>'
@@ -102,6 +107,23 @@ def override_form(cnx, id, qdict):
     print '<input type="text" id="name" name="name" value="%s">' % name
     print '</td>'
     print '</tr>'
+
+    print '<tr>'
+    print '<td>'
+    print '<label for="override_type">Type:</label>'
+    print '</td>'
+    print '<td>'
+    print '<select id="override_type" name="override_type" size=0>'
+    pulldown_list = pulldowns['override_type']
+    for override_value in pulldown_list:
+        sel = ''
+        if override_value == override_type:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (override_value, sel, override_value)
+    print '</select>'
+    print '</td>'
+    print '</tr>'
+
     print '<tr>'
     print '<td>'
     print '<label for="value">Value:</label>'

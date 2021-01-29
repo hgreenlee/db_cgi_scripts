@@ -23,7 +23,7 @@ from dbdict import databaseDict
 
 # Main procedure.
 
-def main(stage_id, name, value, qdict):
+def main(stage_id, name, override_type, value, qdict):
 
     # Open database connection.
 
@@ -31,7 +31,7 @@ def main(stage_id, name, value, qdict):
 
     # Add override and redirect to stage editor.
 
-    override_id = dbutil.add_override(cnx, stage_id, name, value)
+    override_id = dbutil.add_override(cnx, stage_id, name, override_type, value)
     url = '%s/edit_stage.py?id=%d&%s' % \
           (dbconfig.base_url, stage_id, dbargs.convert_args(qdict))
 
@@ -69,9 +69,11 @@ if __name__ == "__main__":
         stage_id = int(argdict['id'])
     if 'name' in argdict:
         name = argdict['name']
+    if 'override_type' in argdict:
+        override_type = argdict['override_type']
     if 'value' in argdict:
         value = argdict['value']
 
     # Call main procedure.
 
-    main(stage_id, name, value, qdict)
+    main(stage_id, name, override_type, value, qdict)
