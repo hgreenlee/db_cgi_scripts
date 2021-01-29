@@ -81,6 +81,27 @@ def get_tables(cnx):
     return result
 
 
+# Get list of defined columns for a table.
+
+def get_columns(cnx, table):
+
+    result = []
+
+    # Query column names.
+
+    c = cnx.cursor()
+    q = 'DESCRIBE %s' % table
+    c.execute(q)
+    rows = c.fetchall()
+    for row in rows:
+        column_name = convert_str(row[0])
+        result.append(column_name)
+
+    # Done.
+
+    return result
+
+
 # Return comma-separated list of columns in a table.
 # Based on dictionary.
 
@@ -652,7 +673,7 @@ def export_poms_project(cnx, project_id, dev, ini):
 
     ini.write('[campaign_defaults]\n')
     ini.write('vo_role=Production\n')
-    ini.write('software_version=v1_0\n')
+    ini.write('software_version=%s\n' % version)
     ini.write('dataset_or_split_data=\n')
     ini.write('cs_split_type=\n')
     ini.write('completion_type=located\n')
@@ -660,8 +681,8 @@ def export_poms_project(cnx, project_id, dev, ini):
     ini.write('param_overrides=[]\n')
     ini.write('test_param_overrides=[]\n')
     ini.write('merge_overrides=\n')
-    ini.write('login_setup=generic\n')
-    ini.write('job_type=generic\n')
+    ini.write('login_setup=%s\n' % poms_login_setup)
+    ini.write('job_type=%s\n' % poms_job_type)
     ini.write('stage_type=regular\n')
     ini.write('output_ancestor_depth=1\n')
     ini.write('\n')
@@ -2100,7 +2121,7 @@ def get_parent_stats(samweb_url, defname):
 
 # Add override.
 
-def add_override(cnx, stage_id, name, value):
+def add_override(cnx, stage_id, name, override_type, value):
 
     result = 0
 
@@ -2112,8 +2133,8 @@ def add_override(cnx, stage_id, name, value):
     # Construct a query to insert dataset.
 
     c = cnx.cursor()
-    q = 'INSERT INTO overrides SET stage_id=%d,name=\'%s\',value=\'%s\'' % \
-        (stage_id, name, value)
+    q = 'INSERT INTO overrides SET stage_id=%d,name=\'%s\',override_type=\'%s\',value=\'%s\'' % \
+        (stage_id, name, override_type, value)
     c.execute(q)
 
     # Get id of inserted row.

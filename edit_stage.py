@@ -17,6 +17,7 @@
 import sys, os
 import dbconfig, dbutil, dbargs
 from dbdict import databaseDict
+from dbconfig import pulldowns
 
 
 # Stage edit form.
@@ -154,6 +155,7 @@ def stage_form(cnx, id, qdict):
     print '<form action="%s/add_override.py?id=%d&%s" method="post" target="_self">' % \
         (dbconfig.rel_url, id, dbargs.convert_args(qdict))
     print '<table>'
+
     print '<tr>'
     print '<td>'
     print '<label for="name">Name:</label>'
@@ -162,6 +164,22 @@ def stage_form(cnx, id, qdict):
     print '<input type="text" id="name" name="name" value="">'
     print '</td>'
     print '</tr>'
+
+    print '<tr>'
+    print '<td>'
+    print '<label for="override_type">Type:</label>'
+    print '</td>'
+    print '<td>'
+    print '<select id="override_type" name="override_type" size=0>'
+    pulldown_list = pulldowns['override_type']
+    sel = 'selected'
+    for value in pulldown_list:
+        print '<option value="%s" %s>%s</option>' % (value, sel, value)
+        sel = ''
+    print '</select>'
+    print '</td>'
+    print '</tr>'
+
     print '<tr>'
     print '<td>'
     print '<label for="value">Value:</label>'
@@ -170,6 +188,7 @@ def stage_form(cnx, id, qdict):
     print '<input type="text" id="value" name="value" value="">'
     print '</td>'
     print '</tr>'
+
     print '</table>'
     print '<input type="submit" value="Add Override" %s>' % disabled
     print '</form>'
@@ -177,7 +196,7 @@ def stage_form(cnx, id, qdict):
 
     # Query override ids belonging to this stage.
 
-    q = 'SELECT id, name, value FROM overrides WHERE stage_id=%d' % id
+    q = 'SELECT id, name, override_type, value FROM overrides WHERE stage_id=%d' % id
     c.execute(q)
     rows = c.fetchall()
     if len(rows) > 0:
@@ -188,6 +207,7 @@ def stage_form(cnx, id, qdict):
         print '<tr>'
         print '<th>&nbsp;ID&nbsp;</th>'
         print '<th>&nbsp;Name&nbsp;</th>'
+        print '<th>&nbsp;Type&nbsp;</th>'
         print '<th>&nbsp;Value&nbsp;</th>'
         print '</tr>'
 
@@ -195,9 +215,11 @@ def stage_form(cnx, id, qdict):
             print '<tr>'
             override_id = row[0]
             name = row[1]
-            value = row[2]
+            override_type = row[2]
+            value = row[3]
             print '<td align="center">%d</td>' % override_id
             print '<td align="left">&nbsp;%s&nbsp;</td>' % name
+            print '<td align="left">&nbsp;%s&nbsp;</td>' % override_type
             print '<td align="value" >&nbsp;%s&nbsp;</td>' % value
 
             # Add Edit button/column
@@ -306,8 +328,23 @@ def stage_form(cnx, id, qdict):
                     print '<input type="text" id="%s" name="%s" size=100 value="%8.6f" %s>' % \
                         (colname, colname, row[n], readonly)
                 elif coltype[0:7] == 'VARCHAR':
-                    print '<input type="text" id="%s" name="%s" size=100 value="%s" %s>' % \
-                        (colname, colname, row[n], readonly)
+                    if colname in pulldowns:
+                        print '<select id="%s" name="%s" size=0 %s>' % (colname, colname, disabled)
+                        pulldown_list = pulldowns[colname]
+                        if type(pulldown_list) == type({}):
+                            if experiment in pulldown_list:
+                                pulldown_list = pulldowns[colname][experiment]
+                            else:
+                                pulldown_list = ['']
+                        for value in pulldown_list:
+                            sel = ''
+                            if value == row[n]:
+                                sel = 'selected'
+                            print '<option value="%s" %s>%s</option>' % (value, sel, value)
+                        print '</select>'
+                    else:
+                        print '<input type="text" id="%s" name="%s" size=100 value="%s" %s>' % \
+                            (colname, colname, row[n], readonly)
 
                     # Add datasets.
 

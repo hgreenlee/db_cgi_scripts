@@ -84,6 +84,9 @@ databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT
                            ('seqnum', '', 'INT', 0, 'Sequence number', 0),
                            ('batchname', 'batchname', 'VARCHAR(1000)', 0, 'Batch job name', ''),
                            ('poms_stage', 'pomsstage', 'VARCHAR(1000)', 0, 'POMS stage', ''),
+                           ('poms_split_type', '', 'VARCHAR(1000)', 0, 'POMS split type', 'draining'),
+                           ('poms_completion_type', '', 'VARCHAR(1000)', 0, 'POMS completion type', 'located'),
+                           ('poms_completion_pct', '', 'DOUBLE', 0, 'POMS completion percentage', 95.),
                            ('outdir', 'outdir', 'VARCHAR(1000)', 0, 'Output directory', ''),
                            ('logdir', 'logdir', 'VARCHAR(1000)', 0, 'Log file directory', ''),
                            ('workdir', 'workdir', 'VARCHAR(1000)', 0, 'Work directory', ''),
@@ -169,5 +172,6 @@ databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT
                 'overrides': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT', 0, 'Override ID', 0),
                               ('stage_id', '', 'INT NOT NULL', 0, 'Stage ID', 0),
                               ('name', '', 'VARCHAR(100) NOT NULL', 0, 'Override name', ''),
+                              ('override_type', '', 'VARCHAR(100) NOT NULL', 0, 'Override type', 'regular'),
                               ('value', '', 'VARCHAR(1000) NOT NULL', 0, 'Override value', '')]}
 
