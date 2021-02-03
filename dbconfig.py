@@ -12,6 +12,7 @@
 # Import mysql api.
 
 import sys, os, getpass
+sys.path.append('/web/sites/m/microboone-exp.fnal.gov/cgi-bin/lib/python2.7/site-packages')
 import mysql.connector
 from dbpasswd import *
 
