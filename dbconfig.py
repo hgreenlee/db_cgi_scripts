@@ -55,7 +55,7 @@ writer_user = 'sbnpro_writer'
 # Authentication files.
 
 auth1 = '%s/sbn.txt' % auth_dir
-auth2 = '%s/sbn_.txt' % auth_dir
+auth2 = '%s/sbn_dm.txt' % auth_dir
 
 # Pull downs.
 
