@@ -15,11 +15,14 @@
 #
 #==============================================================================
 
-import sys
+import sys, os
 
-# This is the directory where most python scripts and modules are located.
+# Calculate the directory where most python scripts and modules are located.
 
-dir = '/web/sites/m/microboone-exp.fnal.gov/cgi-bin/db'
+dir = os.path.abspath(__file__)
+while dir != '/' and not dir.endswith('fnal.gov'):
+    dir = os.path.dirname(dir)
+dir = '%s/cgi-bin/db' % dir
 sys.path.append(dir)
 
 # Import modules.

@@ -353,6 +353,15 @@ def main(qdict):
 
     print '<h1>Projects</h1>'
 
+    # Add button to request a new sample.
+
+    print '<form action="%s/request.py?%s" method="post" target="_self">' % \
+        (dbconfig.rel_url, dbargs.convert_args(qdict))
+    print '<label for="submit">Request a sample: </label>'
+    print '<input type="submit" id="submit" value="Request">'
+    print '</form>'
+    print '<p>'
+
     # Add button to create new project.
 
     print '<form action="%s/add_project.py?%s" method="post" target="_self">' % \
