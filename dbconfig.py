@@ -14,11 +14,19 @@
 import sys, os, getpass
 from dbpasswd import *
 
+# E-mail recipients (comma-separated list).
+
+#email = 'greenlee@fnal.gov'
+email = ''
+
 # Directories.
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 cgi_dir = os.path.dirname(base_dir)
 top_dir = os.path.dirname(cgi_dir)
+data_dir = '%s/data' % top_dir
+auth_dir = '%s/auth' % data_dir
+request_dir = '%s/requests' % data_dir
 
 # Import mysql
 
@@ -45,8 +53,8 @@ writer_user = 'ubprod_writer'
 
 # Authentication files.
 
-auth1 = '%s/data/auth/uboone.txt' % top_dir
-auth2 = '%s/data/auth/dm.txt' % top_dir
+auth1 = '%s/uboone.txt' % auth_dir
+auth2 = '%s/dm.txt' % auth_dir
 
 # Pull downs.
 
