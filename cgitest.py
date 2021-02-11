@@ -9,7 +9,6 @@ import dbargs
 import cgi
 import cgitb
 cgitb.enable()
-#os.environ['PYTHONUSERBASE'] = '/web/sites/m/microboone-exp.fnal.gov/data/python'
 
 #
 #  Signal this will be an HTML page.
