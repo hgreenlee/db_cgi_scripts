@@ -53,7 +53,14 @@ def gentext(argdict):
             buf.write('%s\n' % sline)
     buf.write('\n')
 
-    # Sample name.
+    # Version.
+
+    version = ''
+    if 'version' in argdict:
+        version = argdict['version']
+    buf.write('Version: %s\n' % version)
+
+    # Input dataset.
 
     input = ''
     if 'input' in argdict:
@@ -353,6 +360,16 @@ def request_form(cnx, qdict, argdict):
     print '<td><textarea id="description" name="description" rows=2 cols=80>'
     print desc,
     print '</textarea></td>'
+    print '</tr>'
+
+    # Version field.
+
+    version = ''
+    if 'version' in argdict:
+        version = argdict['version']
+    print '<tr>'
+    print '<td><label for="version">Release Version: </label></td>'
+    print '<td><input type="text" id="version" name="version" size=80 value="%s"></td>' % version
     print '</tr>'
 
     # Input dataset field.
