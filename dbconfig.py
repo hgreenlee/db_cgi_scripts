@@ -12,16 +12,26 @@
 # Import mysql api.
 
 import sys, os, getpass
-sys.path.append('/web/sites/m/microboone-exp.fnal.gov/cgi-bin/lib/python2.7/site-packages')
-import mysql.connector
 from dbpasswd import *
 
-# Experiment.
+# Directories.
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+cgi_dir = os.path.dirname(base_dir)
+top_dir = os.path.dirname(cgi_dir)
+
+# Import mysql
+
+sys.path.append('%s/lib/python2.7/site-packages' % cgi_dir)
+import mysql.connector
+
+# Urls.
 
 samweb_url = {'uboone': 'https://samweb.fnal.gov:8483/sam/uboone/api'}
-cgi_url = 'https://microboone-exp.fnal.gov/cgi-bin'
-base_url = 'https://microboone-exp.fnal.gov/cgi-bin/db'
-rel_url = '/cgi-bin/db'
+top_url = 'https://%s' % os.path.basename(top_dir)
+cgi_url = '%s/%s' % (top_url, os.path.basename(cgi_dir))
+base_url = '%s/%s' % (cgi_url, os.path.basename(base_dir))
+rel_url = '/%s/%s' % (os.path.basename(cgi_dir), os.path.basename(base_dir))
 
 # Connection parameters.
 
@@ -35,8 +45,8 @@ writer_user = 'ubprod_writer'
 
 # Authentication files.
 
-auth1 = '/web/sites/m/microboone-exp.fnal.gov/data/auth/uboone.txt'
-auth2 = '/web/sites/m/microboone-exp.fnal.gov/data/auth/dm.txt'
+auth1 = '%s/data/auth/uboone.txt' % top_dir
+auth2 = '%s/data/auth/dm.txt' % top_dir
 
 # Pull downs.
 
