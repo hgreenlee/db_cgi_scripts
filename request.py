@@ -17,6 +17,7 @@ import sys, os
 import dbconfig, dbargs, dbutil
 import StringIO
 import subprocess
+import datetime
 
 
 # Convert arguments to text string.
@@ -215,7 +216,15 @@ def view(qdict, argdict):
 def submit(qdict, argdict):
 
     # This function is currently implemented to generate a text document containing
-    # summary of the form data.
+    # summary of the form data.  The text document may be saved on the web server, or
+    # emailed.
+
+    # Generate a request name.
+    # The request name is generated based on the time stamp.
+    # The request name is used to generate the name of the saved file, and
+    # the subject of the email.
+
+    request_name = 'request_%s' % datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 
     # Generate html document header.
 
@@ -231,18 +240,9 @@ def submit(qdict, argdict):
         if not os.path.isdir(dbconfig.request_dir):
             os.makedirs(dbconfig.request_dir)
 
-        # Scan files to determine new request id.
-
-        reqid = 0
-        for fn in os.listdir(dbconfig.request_dir):
-            if fn.startswith('request_') and fn.endswith('.txt'):
-                r = int(fn[8:-4])
-                if reqid <= r:
-                    reqid = r + 1
-
         # Make new request file.
 
-        rfn = '%s/request_%d.txt' % (dbconfig.request_dir, reqid)
+        rfn = '%s/%s.txt' % (dbconfig.request_dir, request_name)
         f = open(rfn, 'w')
         f.write(gentext(argdict))
         f.close()
@@ -250,8 +250,9 @@ def submit(qdict, argdict):
     # Maybe send email.
 
     if dbconfig.email != '':
-        p = subprocess.Popen(['mail', '-s', 'Sample request', dbconfig.email], stdin=subprocess.PIPE)
-        p.communicate(input=gentext(argdict))
+        p = subprocess.Popen(['sendmail', dbconfig.email], stdin=subprocess.PIPE)
+        message = 'Subject:Sample request %s\n%s' % (request_name, gentext(argdict))
+        p.communicate(input=message)
         p.wait()
 
     # Generate message.
@@ -368,7 +369,7 @@ def request_form(cnx, qdict, argdict):
     if 'version' in argdict:
         version = argdict['version']
     print '<tr>'
-    print '<td><label for="version">Release Version: </label></td>'
+    print '<td><label for="version">Release version: </label></td>'
     print '<td><input type="text" id="version" name="version" size=80 value="%s"></td>' % version
     print '</tr>'
 
