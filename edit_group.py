@@ -44,8 +44,8 @@ def group_form(cnx, id, qdict):
     # Query full group from database.
 
     c = cnx.cursor()
-    q = 'SELECT %s FROM groups WHERE id=%d' % (dbutil.columns('groups'), id)
-    c.execute(q)
+    q = 'SELECT %s FROM groups WHERE id=%%s' % dbutil.columns('groups')
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch group id %d' % id)
@@ -146,7 +146,7 @@ def group_form(cnx, id, qdict):
 
     project_ids = []
     q = 'SELECT id,name FROM projects ORDER BY name'
-    c.execute(q)
+    c.execute(q, ())
     rows = c.fetchall()
     for row in rows:
         project_id = row[0]
@@ -155,8 +155,8 @@ def group_form(cnx, id, qdict):
     # Query all projects in this group.
 
     project_group_ids = set()
-    q = 'SELECT project_id FROM group_project WHERE group_id=%d' % id
-    c.execute(q)
+    q = 'SELECT project_id FROM group_project WHERE group_id=%s'
+    c.execute(q, (id,))
     rows = c.fetchall()
     for row in rows:
         project_id = row[0]

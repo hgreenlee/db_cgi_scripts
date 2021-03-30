@@ -34,8 +34,8 @@ def main(dataset_id, qdict):
     # Query the project id, dataset type, and sequence number.
 
     c = cnx.cursor()
-    q = 'SELECT id,project_id,type,seqnum FROM datasets WHERE id=%d' % dataset_id
-    c.execute(q)
+    q = 'SELECT id,project_id,type,seqnum FROM datasets WHERE id=%s'
+    c.execute(q, (dataset_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch dataset id %d' % dataset_id)
@@ -46,10 +46,9 @@ def main(dataset_id, qdict):
 
     # Query the preceding sequence number
 
-    q = 'SELECT id, project_id, type, seqnum FROM datasets WHERE project_id=%d AND type=\'%s\' AND seqnum<%d ORDER BY seqnum DESC' % \
-        (project_id, dataset_type, seqnum)
+    q = 'SELECT id, project_id, type, seqnum FROM datasets WHERE project_id=%s AND type=%s AND seqnum<%s ORDER BY seqnum DESC'
         
-    c.execute(q)
+    c.execute(q, (project_id, dataset_type, seqnum))
     rows = c.fetchall()
     if len(rows) > 0:
         row = rows[0]
@@ -58,10 +57,10 @@ def main(dataset_id, qdict):
 
         # Swap sequence numbers.
 
-        q = 'UPDATE datasets SET seqnum=%d WHERE id=%d' % (prev_seqnum, dataset_id)
-        c.execute(q)
-        q = 'UPDATE datasets SET seqnum=%d WHERE id=%d' % (seqnum, prev_dataset_id)
-        c.execute(q)
+        q = 'UPDATE datasets SET seqnum=%s WHERE id=%s'
+        c.execute(q, (prev_seqnum, dataset_id))
+        q = 'UPDATE datasets SET seqnum=%s WHERE id=%s'
+        c.execute(q, (seqnum, prev_dataset_id))
         cnx.commit()
 
     # Generate redirect html document header to invoke the dataset editor for

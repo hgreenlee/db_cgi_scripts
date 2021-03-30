@@ -69,6 +69,7 @@ def main(argdict):
 
         c = cnx.cursor()
         q = 'UPDATE %s SET ' % table
+        params = []
 
         # Loop over columns of this table.
 
@@ -101,11 +102,14 @@ def main(argdict):
                         # Scalar column.
 
                         if coltype[0:3] == 'INT':
-                            q += '%s=%d' % (colname, int(argdict[colname]))
+                            q += '%s=%%s' % colname
+                            params.append(int(argdict[colname]))
                         elif coltype[0:6] == 'DOUBLE':
-                            q += '%s=%8.6f' % (colname, float(argdict[colname]))
+                            q += '%s=%%s' % colname
+                            params.append(float(argdict[colname]))
                         elif coltype[0:7] == 'VARCHAR':
-                            q += '%s=\'%s\'' % (colname, argdict[colname].replace("'", "\\'"))
+                            q += '%s=%%s' % colname
+                            params.append(argdict[colname])
 
                     else:
 
@@ -113,15 +117,17 @@ def main(argdict):
 
                         strs = argdict[colname].split()
                         strid = dbutil.update_strings(cnx, strs)
-                        q += '%s=%d' % (colname, strid)
+                        q += '%s=%%s' % colname
+                        params.append(strid)
 
         # Add where clause.
 
-        q += ' WHERE id=%d' % id
+        q += ' WHERE id=%s'
+        params.append(id)
 
         # Run query.
 
-        c.execute(q)
+        c.execute(q, params)
 
         # Special handling for table groups.
 
@@ -137,8 +143,8 @@ def main(argdict):
             # Loop over projects.
 
             for project_id in project_ids:
-                q = 'INSERT INTO group_project SET group_id=%d,project_id=%d' % (id, project_id)
-                c.execute(q)
+                q = 'INSERT INTO group_project SET group_id=%s,project_id=%s'
+                c.execute(q, (id, project_id))
 
             # Loop over arguments to find projects to remove from this group.
 
@@ -150,8 +156,8 @@ def main(argdict):
             # Loop over projects.
 
             for project_id in project_ids:
-                q = 'DELETE FROM group_project WHERE group_id=%d AND project_id=%d' % (id, project_id)
-                c.execute(q)
+                q = 'DELETE FROM group_project WHERE group_id=%s AND project_id=%s'
+                c.execute(q, (id, project_id))
 
         # Commit updates.
 

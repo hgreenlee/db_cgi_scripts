@@ -33,8 +33,8 @@ def main(id, confirm, qdict):
     # Query the fclname and stage id.
 
     c = cnx.cursor()
-    q = 'SELECT id,fclname,stage_id FROM substages WHERE id=%d' % id
-    c.execute(q)
+    q = 'SELECT id,fclname,stage_id FROM substages WHERE id=%s'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch substage id %d' % id)

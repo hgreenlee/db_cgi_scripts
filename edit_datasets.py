@@ -30,8 +30,8 @@ def datasets_form(cnx, project_id, qdict):
     # Query project name and experiment.
 
     c = cnx.cursor()
-    q = 'SELECT name, experiment FROM projects WHERE id=%d' % project_id
-    c.execute(q)
+    q = 'SELECT name, experiment FROM projects WHERE id=%s'
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch project id %d' % project_id)
@@ -67,9 +67,8 @@ def datasets_form(cnx, project_id, qdict):
 
         # Query datasets belonging to this project and type.
 
-        q = 'SELECT id, name, files, events, parent_files, parent_events, parent_id FROM datasets WHERE project_id=%d AND type=\'%s\' ORDER BY seqnum' % \
-            (project_id, dataset_type)
-        c.execute(q)
+        q = 'SELECT id, name, files, events, parent_files, parent_events, parent_id FROM datasets WHERE project_id=%s AND type=%s ORDER BY seqnum'
+        c.execute(q, (project_id, dataset_type))
         rows = c.fetchall()
 
         # Make dataset table.
@@ -101,8 +100,8 @@ def datasets_form(cnx, project_id, qdict):
             pfile2 = 0
             pev2 = 0
             if parent_id != 0:
-                q2 = 'SELECT files, events FROM datasets WHERE id=%d' % parent_id
-                c.execute(q2)
+                q2 = 'SELECT files, events FROM datasets WHERE id=%s'
+                c.execute(q2, (parent_id,))
                 rows2 = c.fetchall()
                 if len(rows2) > 0:
                     row2 = rows2[0]
@@ -218,8 +217,8 @@ def main(project_id, update_id, qdict):
         # Query dataset name.
 
         c = cnx.cursor()
-        q = 'SELECT name FROM datasets WHERE id=%d' % update_id
-        c.execute(q)
+        q = 'SELECT name FROM datasets WHERE id=%s'
+        c.execute(q, (update_id,))
         rows = c.fetchall()
         if len(rows) == 0:
             raise IOError('Unable to fetch dataset id %d' % update_id)
@@ -227,8 +226,8 @@ def main(project_id, update_id, qdict):
 
         # Query experiment name.
 
-        q = 'SELECT experiment FROM projects WHERE id=%d' % project_id
-        c.execute(q)
+        q = 'SELECT experiment FROM projects WHERE id=%s'
+        c.execute(q, (project_id,))
         rows = c.fetchall()
         if len(rows) == 0:
             raise IOError('Unable to fetch project id %d' % project_id)
@@ -266,8 +265,8 @@ def main(project_id, update_id, qdict):
 
             # Update database.
                     
-            q = 'UPDATE datasets SET events=%d, files=%d, parent_events=%d, parent_files=%d WHERE id=%d' % (events, files, parent_events, parent_files, update_id)
-            c.execute(q)
+            q = 'UPDATE datasets SET events=%s, files=%s, parent_events=%s, parent_files=%s WHERE id=%s'
+            c.execute(q, (events, files, parent_events, parent_files, update_id))
             cnx.commit()
 
         else:

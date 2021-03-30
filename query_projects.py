@@ -31,28 +31,36 @@ def list_projects(cnx, pattern, group, status, gid, experiment, file_type, campa
 
     c = cnx.cursor()
     q = 'SELECT projects.id, name, file_type, experiment, campaign, physics_group, status FROM projects'
+    params = []
     if gid != 0:
         q += ',group_project'
     con = 'WHERE'
     if pattern != '':
-        q += ' %s name LIKE \'%%%s%%\'' % (con, pattern)
+        q += ' %s name LIKE %%s' % con
+        params.append('%%%s%%' % pattern)
         con = 'AND'
     if group != '':
-        q += ' %s physics_group=\'%s\'' % (con, group)
+        q += ' %s physics_group=%%s' % con
+        params.append(group)
         con = 'AND'
     if status != '':
-        q += ' %s status=\'%s\'' % (con, status)
+        q += ' %s status=%%s' % con
+        params.append(status)
         con = 'AND'
     if gid != 0:
-        q += ' %s group_id=%d and project_id=projects.id' % (con, gid)
+        q += ' %s group_id=%%s and project_id=projects.id' % con
+        params.append(gid)
     if file_type != '':
-        q += ' %s file_type=\'%s\'' % (con, file_type)
+        q += ' %s file_type=%%s' % con
+        params.append(file_type)
         con = 'AND'
     if experiment != '':
-        q += ' %s experiment=\'%s\'' % (con, experiment)
+        q += ' %s experiment=%%s' % con
+        params.append(experiment)
         con = 'AND'
     if campaign != '':
-        q += ' %s campaign=\'%s\'' % (con, campaign)
+        q += ' %s campaign=%%s' % con
+        params.append(campaign)
         con = 'AND'
     if sort == '' or sort == 'id_u':
         q += ' ORDER BY id'
@@ -82,7 +90,7 @@ def list_projects(cnx, pattern, group, status, gid, experiment, file_type, campa
         q += ' ORDER BY status'
     elif sort == 'status_d':
         q += ' ORDER BY status DESC'
-    c.execute(q)
+    c.execute(q, params)
     rows = c.fetchall()
     for row in rows:
         id = row[0]

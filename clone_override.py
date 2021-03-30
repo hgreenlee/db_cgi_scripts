@@ -29,8 +29,8 @@ def main(override_id, qdict):
     # Query the stage id.
 
     c = cnx.cursor()
-    q = 'SELECT id,stage_id FROM overrides WHERE id=%d' % override_id
-    c.execute(q)
+    q = 'SELECT id,stage_id FROM overrides WHERE id=%s'
+    c.execute(q, (override_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch override id %d' % override_id)

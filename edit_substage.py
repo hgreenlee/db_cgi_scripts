@@ -32,8 +32,8 @@ def substage_form(cnx, id, qdict):
     # Query substage from database.
 
     c = cnx.cursor()
-    q = 'SELECT %s FROM substages WHERE id=%d' % (dbutil.columns('substages'), id)
-    c.execute(q)
+    q = 'SELECT %s FROM substages WHERE id=%%s' % dbutil.columns('substages')
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch substage id %d' % id)
@@ -43,8 +43,8 @@ def substage_form(cnx, id, qdict):
 
     # Query stage name and project id.
 
-    q = 'SELECT id, name, project_id FROM stages WHERE id=%d' % stage_id
-    c.execute(q)
+    q = 'SELECT id, name, project_id FROM stages WHERE id=%s'
+    c.execute(q, (stage_id,))
     stage_rows = c.fetchall()
     if len(stage_rows) == 0:
         raise IOError('Unable to fetch stage id %d' % stage_id)

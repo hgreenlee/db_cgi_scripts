@@ -34,8 +34,8 @@ def main(stage_id, qdict):
     # Query the project id and sequence number.
 
     c = cnx.cursor()
-    q = 'SELECT id,project_id,seqnum FROM stages WHERE id=%d' % stage_id
-    c.execute(q)
+    q = 'SELECT id,project_id,seqnum FROM stages WHERE id=%s'
+    c.execute(q, (stage_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch stage id %d' % stage_id)
@@ -45,10 +45,9 @@ def main(stage_id, qdict):
 
     # Query the preceding sequence number
 
-    q = 'SELECT id, project_id, seqnum FROM stages WHERE project_id=%d AND seqnum<%d ORDER BY seqnum DESC' % \
-        (project_id, seqnum)
+    q = 'SELECT id, project_id, seqnum FROM stages WHERE project_id=%s AND seqnum<%s ORDER BY seqnum DESC'
         
-    c.execute(q)
+    c.execute(q, (project_id, seqnum))
     rows = c.fetchall()
     if len(rows) > 0:
         row = rows[0]
@@ -57,10 +56,10 @@ def main(stage_id, qdict):
 
         # Swap sequence numbers.
 
-        q = 'UPDATE stages SET seqnum=%d WHERE id=%d' % (prev_seqnum, stage_id)
-        c.execute(q)
-        q = 'UPDATE stages SET seqnum=%d WHERE id=%d' % (seqnum, prev_stage_id)
-        c.execute(q)
+        q = 'UPDATE stages SET seqnum=%s WHERE id=%s'
+        c.execute(q, (prev_seqnum, stage_id))
+        q = 'UPDATE stages SET seqnum=%s WHERE id=%s'
+        c.execute(q, (seqnum, prev_stage_id))
         cnx.commit()
 
     # Generate redirect html document header to invoke the stage editor for
