@@ -33,8 +33,8 @@ def override_form(cnx, id, qdict):
     # Query override from database.
 
     c = cnx.cursor()
-    q = 'SELECT stage_id,name,override_type,value FROM overrides WHERE id=%d' % id
-    c.execute(q)
+    q = 'SELECT stage_id,name,override_type,value FROM overrides WHERE id=%s'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch override id %d' % id)
@@ -46,8 +46,8 @@ def override_form(cnx, id, qdict):
 
     # Query stage name and project id.
 
-    q = 'SELECT id, name, project_id FROM stages WHERE id=%d' % stage_id
-    c.execute(q)
+    q = 'SELECT id, name, project_id FROM stages WHERE id=%s'
+    c.execute(q, (stage_id,))
     stage_rows = c.fetchall()
     if len(stage_rows) == 0:
         raise IOError('Unable to fetch stage id %d' % stage_id)

@@ -29,8 +29,8 @@ def main(substage_id, qdict):
     # Query the stage id.
 
     c = cnx.cursor()
-    q = 'SELECT id,fclname,stage_id FROM substages WHERE id=%d' % substage_id
-    c.execute(q)
+    q = 'SELECT id,fclname,stage_id FROM substages WHERE id=%s'
+    c.execute(q, (substage_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch substage id %d' % substage_id)

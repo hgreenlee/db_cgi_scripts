@@ -30,8 +30,8 @@ def main(dataset_id, qdict):
     # This is only needed for the redirect page.
 
     c = cnx.cursor()
-    q = 'SELECT id,project_id FROM datasets WHERE id=%d' % dataset_id
-    c.execute(q)
+    q = 'SELECT id,project_id FROM datasets WHERE id=%s'
+    c.execute(q, (dataset_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch dataset id %d' % dataset_id)

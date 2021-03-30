@@ -31,9 +31,11 @@ def list_groups(cnx, pattern, sort):
 
     c = cnx.cursor()
     q = 'SELECT id, name FROM groups'
+    params = []
     con = 'WHERE'
     if pattern != '':
-        q += ' %s name LIKE \'%%%s%%\'' % (con, pattern)
+        q += ' %s name LIKE %%s' % con
+        params.append('%%%s%%' % pattern)
         con = 'AND'
     if sort == '' or sort == 'id_u':
         q += ' ORDER BY id'
@@ -43,7 +45,7 @@ def list_groups(cnx, pattern, sort):
         q += ' ORDER BY name'
     elif sort == 'name_d':
         q += ' ORDER BY name DESC'
-    c.execute(q)
+    c.execute(q, params)
     rows = c.fetchall()
     for row in rows:
         id = row[0]

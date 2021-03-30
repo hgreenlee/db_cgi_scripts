@@ -33,8 +33,8 @@ def stage_form(cnx, id, qdict):
     # Query project name and id from database.
 
     c = cnx.cursor()
-    q = 'SELECT id, name, project_id FROM stages WHERE id=%d' % id
-    c.execute(q)
+    q = 'SELECT id, name, project_id FROM stages WHERE id=%s'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch stage id %d' % id)
@@ -62,8 +62,8 @@ def stage_form(cnx, id, qdict):
 
     # Query substage ids belonging to this stage.
 
-    q = 'SELECT id, fclname FROM substages WHERE stage_id=%d ORDER BY seqnum' % id
-    c.execute(q)
+    q = 'SELECT id, fclname FROM substages WHERE stage_id=%s ORDER BY seqnum'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) > 0:
 
@@ -196,8 +196,8 @@ def stage_form(cnx, id, qdict):
 
     # Query override ids belonging to this stage.
 
-    q = 'SELECT id, name, override_type, value FROM overrides WHERE stage_id=%d ORDER BY override_type' % id
-    c.execute(q)
+    q = 'SELECT id, name, override_type, value FROM overrides WHERE stage_id=%s ORDER BY override_type'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) > 0:
 
@@ -267,8 +267,8 @@ def stage_form(cnx, id, qdict):
 
     # Query full stage from database.
 
-    q = 'SELECT %s FROM stages WHERE id=%d' % (dbutil.columns('stages'), id)
-    c.execute(q)
+    q = 'SELECT %s FROM stages WHERE id=%%s' % dbutil.columns('stages')
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch stage id %d' % id)
@@ -325,8 +325,11 @@ def stage_form(cnx, id, qdict):
                     print '<input type="number" id="%s" name="%s" size=10 value="%d" %s>' % \
                         (colname, colname, row[n], readonly)
                 elif coltype[0:6] == 'DOUBLE':
+                    value = row[n]
+                    if value == None:
+                        value = 0.
                     print '<input type="text" id="%s" name="%s" size=100 value="%8.6f" %s>' % \
-                        (colname, colname, row[n], readonly)
+                        (colname, colname, value, readonly)
                 elif coltype[0:7] == 'VARCHAR':
                     if colname in pulldowns:
                         print '<select id="%s" name="%s" size=0 %s>' % (colname, colname, disabled)

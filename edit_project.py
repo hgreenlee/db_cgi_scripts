@@ -63,8 +63,8 @@ def project_form(cnx, id, qdict):
     # Query stage ids belonging to this project.
 
     c = cnx.cursor()
-    q = 'SELECT id, name FROM stages WHERE project_id=%d ORDER BY seqnum' % id
-    c.execute(q)
+    q = 'SELECT id, name FROM stages WHERE project_id=%s ORDER BY seqnum'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) > 0:
 
@@ -151,8 +151,8 @@ def project_form(cnx, id, qdict):
 
     # Query full project from database.
 
-    q = 'SELECT %s FROM projects WHERE id=%d' % (dbutil.columns('projects'), id)
-    c.execute(q)
+    q = 'SELECT %s FROM projects WHERE id=%%s' % dbutil.columns('projects')
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch project id %d' % id)

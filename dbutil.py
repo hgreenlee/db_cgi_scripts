@@ -172,8 +172,8 @@ def get_project_id(cnx, project_name):
     # Query project id from database.
 
     c = cnx.cursor()
-    q = 'SELECT id, name FROM projects WHERE name=\'%s\'' % project_name
-    c.execute(q)
+    q = 'SELECT id, name FROM projects WHERE name=%s'
+    c.execute(q, (project_name,))
     rows = c.fetchall()
     if len(rows) > 0:
         result = rows[0][0]
@@ -192,8 +192,8 @@ def get_project_name(cnx, id):
     # Query project name from database.
 
     c = cnx.cursor()
-    q = 'SELECT id, name FROM projects WHERE id=%d' % id
-    c.execute(q)
+    q = 'SELECT id, name FROM projects WHERE id=%s'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) > 0:
         result = rows[0][1]
@@ -212,8 +212,8 @@ def get_project_experiment(cnx, id):
     # Query project experiment from database.
 
     c = cnx.cursor()
-    q = 'SELECT id, experiment FROM projects WHERE id=%d' % id
-    c.execute(q)
+    q = 'SELECT id, experiment FROM projects WHERE id=%s'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) > 0:
         result = rows[0][1]
@@ -232,8 +232,8 @@ def get_group_id(cnx, group_name):
     # Query group id from database.
 
     c = cnx.cursor()
-    q = 'SELECT id, name FROM groups WHERE name=\'%s\'' % group_name
-    c.execute(q)
+    q = 'SELECT id, name FROM groups WHERE name=%s'
+    c.execute(q, (group_name,))
     rows = c.fetchall()
     if len(rows) > 0:
         result = rows[0][0]
@@ -252,8 +252,8 @@ def get_group_name(cnx, id):
     # Query group name from database.
 
     c = cnx.cursor()
-    q = 'SELECT id, name FROM groups WHERE id=%d' % id
-    c.execute(q)
+    q = 'SELECT id, name FROM groups WHERE id=%s'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) > 0:
         result = rows[0][1]
@@ -272,8 +272,8 @@ def get_strings(cnx, array_id):
     # Query database.
 
     c = cnx.cursor()
-    q = 'SELECT array_id, value FROM strings WHERE array_id=%d' % array_id
-    c.execute(q)
+    q = 'SELECT array_id, value FROM strings WHERE array_id=%s'
+    c.execute(q, (array_id,))
     rows = c.fetchall()
     for row in rows:
         result.append(row[1])
@@ -306,8 +306,8 @@ def insert_strings(cnx, strings):
         # Insert values.
 
         for value in strings:
-            q = 'INSERT INTO strings SET array_id=%d, value=\'%s\'' % (array_id, value)
-            c.execute(q)
+            q = 'INSERT INTO strings SET array_id=%s, value=%s'
+            c.execute(q, (array_id, value))
 
     # Done.
 
@@ -335,8 +335,8 @@ def update_strings(cnx, strings):
         # Look for candidate array ids matching first string element.
 
         c_array_ids = []
-        q = 'SELECT array_id, value FROM strings WHERE value=\'%s\'' % strings[0]
-        c.execute(q)
+        q = 'SELECT array_id, value FROM strings WHERE value=%s'
+        c.execute(q, (strings[0],))
         rows = c.fetchall()
         for row in rows:
             c_array_ids.append(row[0])
@@ -344,8 +344,8 @@ def update_strings(cnx, strings):
         # Loop over candidate array ids to look for matches.
 
         for array_id in c_array_ids:
-            q = 'SELECT array_id, value FROM strings WHERE array_id=%d' % array_id
-            c.execute(q)
+            q = 'SELECT array_id, value FROM strings WHERE array_id=%s'
+            c.execute(q, (array_id,))
             rows = c.fetchall()
             values = []
             for row in rows:
@@ -388,8 +388,8 @@ def refcount_strings(cnx, array_id):
 
                     # Construct query to count matching rows.
 
-                    q = 'SELECT COUNT(*) FROM %s WHERE %s=%d' % (table, colname, array_id)
-                    c.execute(q)
+                    q = 'SELECT COUNT(*) FROM %s WHERE %s=%%s' % (table, colname)
+                    c.execute(q, (array_id,))
                     row = c.fetchone()
                     result += row[0]
 
@@ -405,8 +405,8 @@ def delete_strings(cnx, array_id):
     # Delete string array.
 
     c = cnx.cursor()
-    q = 'DELETE FROM strings WHERE array_id=%d' % array_id
-    c.execute(q)
+    q = 'DELETE FROM strings WHERE array_id=%s'
+    c.execute(q, (array_id,))
 
     # Done.
 
@@ -442,8 +442,8 @@ def export_substage(cnx, substage_id, xml):
     # Query substage from database.
 
     c = cnx.cursor()
-    q = 'SELECT %s FROM substages WHERE id=%d' % (columns('substages'), substage_id)
-    c.execute(q)
+    q = 'SELECT %s FROM substages WHERE id=%%s' % columns('substages')
+    c.execute(q, (substage_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch substage id %d' % substage_id)
@@ -490,8 +490,8 @@ def export_stage(cnx, stage_id, xml):
     # Query stage from database.
 
     c = cnx.cursor()
-    q = 'SELECT %s FROM stages WHERE id=%d' % (columns('stages'), stage_id)
-    c.execute(q)
+    q = 'SELECT %s FROM stages WHERE id=%%s' % columns('stages')
+    c.execute(q, (stage_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch stage id %d' % stage_id)
@@ -527,8 +527,8 @@ def export_stage(cnx, stage_id, xml):
 
     # Query substage ids for this stage.
 
-    q = 'SELECT id FROM substages WHERE stage_id=%d ORDER BY seqnum' % stage_id
-    c.execute(q)
+    q = 'SELECT id FROM substages WHERE stage_id=%s ORDER BY seqnum'
+    c.execute(q, (stage_id,))
     rows = c.fetchall()
     for row in rows:
         substage_id = row[0]
@@ -553,8 +553,8 @@ def export_project(cnx, project_id, xml):
     # Query project from database.
 
     c = cnx.cursor()
-    q = 'SELECT %s FROM projects WHERE id=%d' % (columns('projects'), project_id)
-    c.execute(q)
+    q = 'SELECT %s FROM projects WHERE id=%%s' % columns('projects')
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch project id %d' % project_id)
@@ -610,8 +610,8 @@ def export_project(cnx, project_id, xml):
 
     # Query and loop over stage ids for this project.
 
-    q = 'SELECT id FROM stages WHERE project_id=%d ORDER BY seqnum' % project_id
-    c.execute(q)
+    q = 'SELECT id FROM stages WHERE project_id=%s ORDER BY seqnum'
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     for row in rows:
         stage_id = row[0]
@@ -633,8 +633,8 @@ def export_poms_project(cnx, project_id, dev, ini):
     c = cnx.cursor()
     q = '''SELECT name, release_tag, experiment,
            poms_campaign, poms_login_setup, poms_job_type, poms_role 
-           FROM projects WHERE id=%d''' % project_id
-    c.execute(q)
+           FROM projects WHERE id=%s'''
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     row = rows[0]
     name = row[0]
@@ -651,8 +651,8 @@ def export_poms_project(cnx, project_id, dev, ini):
 
     stage_ids = []
     stage_names = []
-    q = 'SELECT id, name FROM stages WHERE project_id=%d' % project_id
-    c.execute(q)
+    q = 'SELECT id, name FROM stages WHERE project_id=%s'
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     for row in rows:
         stage_ids.append(row[0])
@@ -693,8 +693,8 @@ def export_poms_project(cnx, project_id, dev, ini):
 
         # Query information about this stage.
 
-        q = 'SELECT name, poms_stage FROM stages WHERE id=%d' % stage_id
-        c.execute(q)
+        q = 'SELECT name, poms_stage FROM stages WHERE id=%s'
+        c.execute(q, (stage_id,))
         rows = c.fetchall()
         row = rows[0]
         stage_name = row[0]
@@ -720,8 +720,8 @@ def export_poms_project(cnx, project_id, dev, ini):
 
         # Query extra overrides.
 
-        q = 'SELECT name, value, override_type FROM overrides WHERE stage_id=%d AND override_type=\'regular\'' % stage_id
-        c.execute(q)
+        q = 'SELECT name, value, override_type FROM overrides WHERE stage_id=%s AND override_type=\'regular\''
+        c.execute(q, (stage_id,))
         rows = c.fetchall()
         for row in rows:
             name = row[0]
@@ -734,8 +734,8 @@ def export_poms_project(cnx, project_id, dev, ini):
 
         # Query test overrides.
 
-        q = 'SELECT name, value, override_type FROM overrides WHERE stage_id=%d AND override_type=\'test\'' % stage_id
-        c.execute(q)
+        q = 'SELECT name, value, override_type FROM overrides WHERE stage_id=%s AND override_type=\'test\''
+        c.execute(q, (stage_id,))
         rows = c.fetchall()
         for row in rows:
             name = row[0]
@@ -772,8 +772,8 @@ def delete_substage(cnx, substage_id):
     # Delete substage.
 
     c = cnx.cursor()
-    q = 'DELETE FROM substages WHERE id=%d' % substage_id
-    c.execute(q)
+    q = 'DELETE FROM substages WHERE id=%s'
+    c.execute(q, (substage_id,))
 
     # Done.
 
@@ -793,8 +793,8 @@ def delete_stage(cnx, stage_id):
     # Delete substages belonging to this stage.
 
     c = cnx.cursor()
-    q = 'SELECT id FROM substages WHERE stage_id=%d' % stage_id
-    c.execute(q)
+    q = 'SELECT id FROM substages WHERE stage_id=%s'
+    c.execute(q, (stage_id,))
     rows = c.fetchall()
     for row in rows:
         substage_id = row[0]
@@ -802,8 +802,8 @@ def delete_stage(cnx, stage_id):
 
     # Delete stage.
 
-    q = 'DELETE FROM stages WHERE id=%d' % stage_id
-    c.execute(q)
+    q = 'DELETE FROM stages WHERE id=%s'
+    c.execute(q, (stage_id,))
 
     # Done.
 
@@ -823,8 +823,8 @@ def delete_project(cnx, project_id):
     # Delete stages belonging to this project.
 
     c = cnx.cursor()
-    q = 'SELECT id FROM stages WHERE project_id=%d' % project_id
-    c.execute(q)
+    q = 'SELECT id FROM stages WHERE project_id=%s'
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     for row in rows:
         stage_id = row[0]
@@ -832,13 +832,13 @@ def delete_project(cnx, project_id):
 
     # Delete this project from groups.
 
-    q = 'DELETE FROM group_project WHERE project_id=%d' % project_id
-    c.execute(q)
+    q = 'DELETE FROM group_project WHERE project_id=%s'
+    c.execute(q, (project_id,))
 
     # Delete project.
 
-    q = 'DELETE FROM projects WHERE id=%d' % project_id
-    c.execute(q)
+    q = 'DELETE FROM projects WHERE id=%s'
+    c.execute(q, (project_id,))
 
     # Delete unreferenced string arrays.
 
@@ -862,13 +862,13 @@ def delete_group(cnx, group_id):
     # Delete group associations for this group.
 
     c = cnx.cursor()
-    q = 'DELETE FROM group_project WHERE group_id=%d' % group_id
-    c.execute(q)
+    q = 'DELETE FROM group_project WHERE group_id=%s'
+    c.execute(q, (group_id,))
 
     # Delete group.
 
-    q = 'DELETE FROM groups WHERE id=%d' % group_id
-    c.execute(q)
+    q = 'DELETE FROM groups WHERE id=%s'
+    c.execute(q, (group_id,))
 
     # Done.
 
@@ -883,8 +883,8 @@ def clone_substage(cnx, substage_id, stage_id):
     # Query substage from database.
 
     c = cnx.cursor()
-    q = 'SELECT %s FROM substages WHERE id=%d' % (columns('substages'), substage_id)
-    c.execute(q)
+    q = 'SELECT %s FROM substages WHERE id=%%s' % columns('substages')
+    c.execute(q, (substage_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch substage id %d' % substage_id)
@@ -906,23 +906,27 @@ def clone_substage(cnx, substage_id, stage_id):
     # a copy of the row that we just read.
 
     cols = databaseDict['substages']
-    q = 'INSERT INTO substages SET fclname=\'%s\',stage_id=%d,seqnum=%d' % \
-        (fclname, stage_id, seqnum)
+    q = 'INSERT INTO substages SET fclname=%s,stage_id=%s,seqnum=%s'
+    params = [fclname, stage_id, seqnum]
     for n in range(4, len(cols)):
         coltup = cols[n]
         colname = coltup[0]
         coltype = coltup[2]
         colarray = coltup[3]
         if colarray:
-            q += ',%s=%d' % (colname, row[n])
+            q += ',%s=%%s' % colname
+            params.append(row[n])
         elif coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, row[n])
+            q += ',%s=%%s' % colname
+            params.append(row[n])
         elif coltype[:7] == 'VARCHAR':
             if row[n] != None:
-                q += ',%s=\'%s\'' % (colname, row[n].replace('&', '&amp;').replace("'", "\\'"))
+                q += ',%s=%%s' % colname
+                params.append(row[n].replace('&', '&amp;'))
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, row[n])
-    c.execute(q)
+            q += ',%s=%%s' % colname
+            params.append(row[n])
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -944,8 +948,8 @@ def clone_stage(cnx, stage_id, project_id):
     # Query stage from database.
 
     c = cnx.cursor()
-    q = 'SELECT %s FROM stages WHERE id=%d' % (columns('stages'), stage_id)
-    c.execute(q)
+    q = 'SELECT %s FROM stages WHERE id=%%s' % columns('stages')
+    c.execute(q, (stage_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch stage id %d' % stage_id)
@@ -967,23 +971,27 @@ def clone_stage(cnx, stage_id, project_id):
     # a copy of the row that we just read.
 
     cols = databaseDict['stages']
-    q = 'INSERT INTO stages SET name=\'%s\',project_id=%d,seqnum=%d' % \
-        (stage_name, project_id, seqnum)
+    q = 'INSERT INTO stages SET name=%s,project_id=%s,seqnum=%s'
+    params = [stage_name, project_id, seqnum]
     for n in range(4, len(cols)):
         coltup = cols[n]
         colname = coltup[0]
         coltype = coltup[2]
         colarray = coltup[3]
         if colarray:
-            q += ',%s=%d' % (colname, row[n])
+            q += ',%s=%%s' % colname
+            params.append(row[n])
         elif coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, row[n])
+            q += ',%s=%%s' % colname
+            params.append(row[n])
         elif coltype[:7] == 'VARCHAR':
             if row[n] != None:
-                q += ',%s=\'%s\'' % (colname, row[n].replace('&', '&amp;').replace("'", "\\'"))
+                q += ',%s=%%s' % colname
+                params.append(row[n].replace('&', '&amp;'))
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, row[n])
-    c.execute(q)
+            q += ',%s=%%s' % colname
+            params.append(row[n])
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -994,8 +1002,8 @@ def clone_stage(cnx, stage_id, project_id):
 
     # Clone substages belonging to this stage.
 
-    q = 'SELECT id FROM substages WHERE stage_id=%d' % stage_id
-    c.execute(q)
+    q = 'SELECT id FROM substages WHERE stage_id=%s'
+    c.execute(q, (stage_id,))
     rows = c.fetchall()
     for row in rows:
         substage_id = row[0]
@@ -1015,8 +1023,8 @@ def clone_project(cnx, project_id, project_name):
     # See if the new project already exists.
 
     c = cnx.cursor()
-    q = 'SELECT COUNT(*) FROM projects WHERE name=\'%s\'' % project_name
-    c.execute(q)
+    q = 'SELECT COUNT(*) FROM projects WHERE name=%s'
+    c.execute(q, (project_name,))
     row = c.fetchone()
     n = row[0]
     if n > 0:
@@ -1025,8 +1033,8 @@ def clone_project(cnx, project_id, project_name):
 
     # Query project from database.
 
-    q = 'SELECT %s FROM projects WHERE id=%d' % (columns('projects'), project_id)
-    c.execute(q)
+    q = 'SELECT %s FROM projects WHERE id=%%s' % columns('projects')
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch project id %d' % project_id)
@@ -1036,10 +1044,12 @@ def clone_project(cnx, project_id, project_name):
     # a copy of the row that we just read.
 
     cols = databaseDict['projects']
-    q = 'INSERT INTO projects SET name=\'%s\'' % project_name
+    q = 'INSERT INTO projects SET name=%s'
+    params = [project_name]
     user = dbconfig.getuser()
     if user != '':
-        q += ',username=\'%s\'' % user
+        q += ',username=%s'
+        params.append(user)
     for n in range(3, len(cols)):
         coltup = cols[n]
         colname = coltup[0]
@@ -1053,15 +1063,19 @@ def clone_project(cnx, project_id, project_name):
             value = ''
 
         if colarray:
-            q += ',%s=%d' % (colname, value)
+            q += ',%s=%%s' % colname
+            params.append(value)
         elif coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, value)
+            q += ',%s=%%s' % colname
+            params.append(value)
         elif coltype[:7] == 'VARCHAR':
             if value != None:
-                q += ',%s=\'%s\'' % (colname, value.replace('&', '&amp;').replace("'", "\\'"))
+                q += ',%s=%%s' % colname
+                params.append(value.replace('&', '&amp;'))
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, value)
-    c.execute(q)
+            q += ',%s=%%s' % colname
+            params.append(value)
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -1073,8 +1087,8 @@ def clone_project(cnx, project_id, project_name):
     # Clone datasets belonging to this project.
     # Cloned datasets will have the same names as the original datasets.
 
-    q = 'SELECT id FROM datasets WHERE project_id=%d' % project_id
-    c.execute(q)
+    q = 'SELECT id FROM datasets WHERE project_id=%s'
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     for row in rows:
         dataset_id = row[0]
@@ -1083,8 +1097,8 @@ def clone_project(cnx, project_id, project_name):
     # Clone stages belonging to this project.
     # Cloned stages will have the same names as the original stages.
 
-    q = 'SELECT id FROM stages WHERE project_id=%d' % project_id
-    c.execute(q)
+    q = 'SELECT id FROM stages WHERE project_id=%s'
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     for row in rows:
         stage_id = row[0]
@@ -1104,8 +1118,8 @@ def clone_group(cnx, group_id, group_name):
     # See if the new group already exists.
 
     c = cnx.cursor()
-    q = 'SELECT COUNT(*) FROM groups WHERE name=\'%s\'' % group_name
-    c.execute(q)
+    q = 'SELECT COUNT(*) FROM groups WHERE name=%s'
+    c.execute(q, (group_name,))
     row = c.fetchone()
     n = row[0]
     if n > 0:
@@ -1114,8 +1128,8 @@ def clone_group(cnx, group_id, group_name):
 
     # Query group from database.
 
-    q = 'SELECT %s FROM groups WHERE id=%d' % (columns('groups'), group_id)
-    c.execute(q)
+    q = 'SELECT %s FROM groups WHERE id=%%s' % columns('groups')
+    c.execute(q, (group_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch group id %d' % group_id)
@@ -1125,7 +1139,8 @@ def clone_group(cnx, group_id, group_name):
     # a copy of the row that we just read.
 
     cols = databaseDict['groups']
-    q = 'INSERT INTO groups SET name=\'%s\'' % group_name
+    q = 'INSERT INTO groups SET name=%s'
+    params = [group_name]
     for n in range(2, len(cols)):
         coltup = cols[n]
         colname = coltup[0]
@@ -1134,15 +1149,19 @@ def clone_group(cnx, group_id, group_name):
         value = row[n]
 
         if colarray:
-            q += ',%s=%d' % (colname, value)
+            q += ',%s=%%s' % colname
+            params.append(value)
         elif coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, value)
+            q += ',%s=%%s' % colname
+            params.append(value)
         elif coltype[:7] == 'VARCHAR':
             if value != None:
-                q += ',%s=\'%s\'' % (colname, value.replace('&', '&amp;').replace("'", "\\'"))
+                q += ',%s=%%s' % colname
+                params.append(value.replace('&', '&amp;'))
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, value)
-    c.execute(q)
+            q += ',%s=%%s' % colname
+            params.append(value)
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -1166,8 +1185,8 @@ def free_seqnum_substage(cnx, stage_id, seqnum):
 
     # See if this sequence number is already used.
 
-    q = 'SELECT COUNT(*) FROM substages WHERE stage_id=%d AND seqnum=%d' % (stage_id, seqnum)
-    c.execute(q)
+    q = 'SELECT COUNT(*) FROM substages WHERE stage_id=%s AND seqnum=%s'
+    c.execute(q, (stage_id, seqnum))
     row = c.fetchone()
     n = row[0]
     if n > 0:
@@ -1175,9 +1194,8 @@ def free_seqnum_substage(cnx, stage_id, seqnum):
         # Got a match.
         # Query all sequence numbers equal or greater.
 
-        q = 'SELECT id, stage_id, seqnum FROM substages WHERE stage_id=%d AND seqnum>=%d' % \
-            (stage_id, seqnum)
-        c.execute(q)
+        q = 'SELECT id, stage_id, seqnum FROM substages WHERE stage_id=%s AND seqnum>=%s'
+        c.execute(q, (stage_id, seqnum))
         rows = c.fetchall()
         for row in rows:
             substage_id = row[0]
@@ -1185,8 +1203,8 @@ def free_seqnum_substage(cnx, stage_id, seqnum):
 
             # Increment sequence number.
 
-            q = 'UPDATE substages SET seqnum=%d WHERE id=%d' % (seq+1, substage_id)
-            c.execute(q)
+            q = 'UPDATE substages SET seqnum=%s WHERE id=%s'
+            c.execute(q, (seq+1, substage_id))
 
     # Done.
 
@@ -1202,8 +1220,8 @@ def free_seqnum_stage(cnx, project_id, seqnum):
 
     # See if this sequence number is already used.
 
-    q = 'SELECT COUNT(*) FROM stages WHERE project_id=%d AND seqnum=%d' % (project_id, seqnum)
-    c.execute(q)
+    q = 'SELECT COUNT(*) FROM stages WHERE project_id=%s AND seqnum=%s'
+    c.execute(q, (project_id, seqnum))
     row = c.fetchone()
     n = row[0]
     if n > 0:
@@ -1211,9 +1229,8 @@ def free_seqnum_stage(cnx, project_id, seqnum):
         # Got a match.
         # Query all sequence numbers equal or greater.
 
-        q = 'SELECT id, project_id, seqnum FROM stages WHERE project_id=%d AND seqnum>=%d' % \
-            (project_id, seqnum)
-        c.execute(q)
+        q = 'SELECT id, project_id, seqnum FROM stages WHERE project_id=%s AND seqnum>=%s'
+        c.execute(q, (project_id, seqnum))
         rows = c.fetchall()
         for row in rows:
             stage_id = row[0]
@@ -1221,8 +1238,8 @@ def free_seqnum_stage(cnx, project_id, seqnum):
 
             # Increment sequence number.
 
-            q = 'UPDATE stages SET seqnum=%d WHERE id=%d' % (seq+1, stage_id)
-            c.execute(q)
+            q = 'UPDATE stages SET seqnum=%s WHERE id=%s'
+            c.execute(q, (seq+1, stage_id))
 
     # Done.
 
@@ -1243,9 +1260,11 @@ def import_substage(cnx, substage, stage_id, seqnum):
 
     # Prepare query to insert this substage into database.
 
-    q = 'INSERT INTO substages SET stage_id=%d,seqnum=%d' % (stage_id, seqnum)
+    q = 'INSERT INTO substages SET stage_id=%s,seqnum=%s'
+    params = [stage_id, seqnum]
     if fclname != '':
-        q += ',fclname=\'%s\'' % fclname
+        q += ',fclname=%s'
+        params.append(fclname)
 
     # Loop over dictionary elements for table stages.
 
@@ -1270,19 +1289,25 @@ def import_substage(cnx, substage, stage_id, seqnum):
                 if child != None:
                     value = child.text
                     if coltype[:3] == 'INT':
-                        q += ',%s=%d' % (colname, int(value))
+                        q += ',%s=%%s' % colname
+                        params.append(int(value))
                     elif coltype[:6] == 'DOUBLE':
-                        q += ',%s=%8.6f' % (colname, float(value))
+                        q += ',%s=%%s' % colname
+                        params.append(float(value))
                     elif coltype[:7] == 'VARCHAR':
                         if value != None:
-                            q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+                            q += ',%s=%%s' % colname
+                            params.append(value)
                 else:
                     if coltype[:3] == 'INT':
-                        q += ',%s=%d' % (colname, coldefault)
+                        q += ',%s=%%s' % colname
+                        params.append(coldefault)
                     elif coltype[:6] == 'DOUBLE':
-                        q += ',%s=%8.6f' % (colname, coldefault)
+                        q += ',%s=%%s' % colname
+                        params.append(coldefault)
                     elif coltype[:7] == 'VARCHAR':
-                        q += ',%s=\'%s\'' % (colname, coldefault)
+                        q += ',%s=%%s' % colname
+                        params.append(coldefault)
 
             else:
 
@@ -1294,11 +1319,12 @@ def import_substage(cnx, substage, stage_id, seqnum):
                 for child in children:
                     values.append(child.text)
                 string_id = update_strings(cnx, values)
-                q += ',%s=%d' % (colname, string_id)
+                q += ',%s=%%s' % colname
+                params.append(string_id)
                     
     # Execute query.
 
-    c.execute(q)
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -1330,9 +1356,11 @@ def import_stage(cnx, stage, project_id, seqnum):
 
     # Prepare query to insert this stage into database.
 
-    q = 'INSERT INTO stages SET project_id=%d,seqnum=%d' % (project_id, seqnum)
+    q = 'INSERT INTO stages SET project_id=%s,seqnum=%s'
+    params = [project_id, seqnum]
     if name != '':
-        q += ',name=\'%s\'' % name
+        q += ',name=%s'
+        params.append(name)
 
     # Loop over dictionary elements for table stages.
 
@@ -1357,12 +1385,15 @@ def import_stage(cnx, stage, project_id, seqnum):
                 if child != None:
                     value = child.text
                     if coltype[:3] == 'INT':
-                        q += ',%s=%d' % (colname, int(value))
+                        q += ',%s=%%s' % colname
+                        params.append(int(value))
                     elif coltype[:6] == 'DOUBLE':
-                        q += ',%s=%8.6f' % (colname, float(value))
+                        q += ',%s=%%s' % colname
+                        params.append(float(value))
                     elif coltype[:7] == 'VARCHAR':
                         if value != None:
-                            q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+                            q += ',%s=%%s' % colname
+                            params.append(value)
 
                         # Add datasets.
 
@@ -1382,18 +1413,21 @@ def import_stage(cnx, stage, project_id, seqnum):
                             inherit = True
                             break
                     if inherit:
-                        q2 = 'SELECT %s FROM projects WHERE id=%d' % (colname, project_id)
-                        c.execute(q2)
+                        q2 = 'SELECT %s FROM projects WHERE id=%%s' % colname
+                        c.execute(q2, (project_id,))
                         rows = c.fetchall()
                         row = rows[0]
                         coldefault = row[0]
 
                     if coltype[:3] == 'INT':
-                        q += ',%s=%d' % (colname, coldefault)
+                        q += ',%s=%%s' % colname
+                        params.append(coldefault)
                     elif coltype[:6] == 'DOUBLE':
-                        q += ',%s=%8.6f' % (colname, coldefault)
+                        q += ',%s=%%s' % colname
+                        params.append(coldefault)
                     elif coltype[:7] == 'VARCHAR':
-                        q += ',%s=\'%s\'' % (colname, coldefault)
+                        q += ',%s=%%s' % colname
+                        params.append(coldefault)
 
             else:
 
@@ -1405,11 +1439,12 @@ def import_stage(cnx, stage, project_id, seqnum):
                 for child in children:
                     values.append(child.text)
                 string_id = update_strings(cnx, values)
-                q += ',%s=%d' % (colname, string_id)
+                q += ',%s=%%s' % colname
+                params.append(string_id)
                     
     # Execute query.
 
-    c.execute(q)
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -1465,11 +1500,14 @@ def import_project(cnx, xmlstring):
         # Prepare query to insert this project into database.
 
         q = 'INSERT INTO projects SET'
+        params = []
         if name != '':
-            q += ' name=\'%s\'' % name
+            q += ' name=%s'
+            params.append(name)
         user = dbconfig.getuser()
         if user != '':
-            q += ',username=\'%s\'' % user
+            q += ',username=%s'
+            params.append(user)
 
         # Loop over dictionary elements for table projects.
 
@@ -1494,19 +1532,25 @@ def import_project(cnx, xmlstring):
                     if child != None:
                         value = child.text
                         if coltype[:3] == 'INT':
-                            q += ',%s=%d' % (colname, int(value))
+                            q += ',%s=%%s' % colname
+                            params.append(int(value))
                         elif coltype[:6] == 'DOUBLE':
-                            q += ',%s=%8.6f' % (colname, float(value))
+                            q += ',%s=%%s' % colname
+                            params.append(float(value))
                         elif coltype[:7] == 'VARCHAR':
                             if value != None:
-                                q += ',%s=\'%s\'' % (colname, value.replace("'", "\\'"))
+                                q += ',%s=%%s' % colname
+                                params.append(value)
                     else:
                         if coltype[:3] == 'INT':
-                            q += ',%s=%d' % (colname, coldefault)
+                            q += ',%s=%%s' % colname
+                            params.append(coldefault)
                         elif coltype[:6] == 'DOUBLE':
-                            q += ',%s=%8.6f' % (colname, coldefault)
+                            q += ',%s=%%s' % colname
+                            params.append(coldefault)
                         elif coltype[:7] == 'VARCHAR':
-                            q += ',%s=\'%s\'' % (colname, coldefault)
+                            q += ',%s=%%s' % colname
+                            params.append(coldefault)
 
                 else:
 
@@ -1518,11 +1562,12 @@ def import_project(cnx, xmlstring):
                     for child in children:
                         values.append(child.text)
                     string_id = update_strings(cnx, values)
-                    q += ',%s=%d' % (colname, string_id)
+                    q += ',%s=%%s' % colname
+                    params.append(string_id)
                     
         # Execute query.
 
-        c.execute(q)
+        c.execute(q, params)
 
         # Get id of inserted row.
 
@@ -1589,9 +1634,8 @@ def add_dataset(cnx, project_id, dataset_type, dataset_name):
     # Query the maximum sequence number for this stage.
 
     c = cnx.cursor()
-    q = 'SELECT MAX(seqnum) FROM datasets WHERE project_id=%d AND type=\'%s\'' % \
-        (project_id, dataset_type)
-    c.execute(q)
+    q = 'SELECT MAX(seqnum) FROM datasets WHERE project_id=%s AND type=%s'
+    c.execute(q, (project_id, dataset_type))
     row = c.fetchone()
     seqnum = row[0]
     new_seqnum = 0
@@ -1602,8 +1646,8 @@ def add_dataset(cnx, project_id, dataset_type, dataset_name):
 
     # Construct a query to insert dataset.
 
-    q = 'INSERT INTO datasets SET project_id=%d,type=\'%s\',name=\'%s\',seqnum=%d' % \
-        (project_id, dataset_type, dataset_name, new_seqnum)
+    q = 'INSERT INTO datasets SET project_id=%s,type=%s,name=%s,seqnum=%s'
+    params = [project_id, dataset_type, dataset_name, new_seqnum]
 
     # Loop over remaining fields.
 
@@ -1614,13 +1658,16 @@ def add_dataset(cnx, project_id, dataset_type, dataset_name):
         coltype = coltup[2]
         coldefault = coltup[5]
         if coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
         elif coltype[:7] == 'VARCHAR':
-            q += ',%s=\'%s\'' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
 
-    c.execute(q)
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -1647,8 +1694,8 @@ def delete_dataset(cnx, dataset_id):
     # Delete dataset.
 
     c = cnx.cursor()
-    q = 'DELETE FROM datasets WHERE id=%d' % dataset_id
-    c.execute(q)
+    q = 'DELETE FROM datasets WHERE id=%s'
+    c.execute(q, (dataset_id,))
 
     # Done.
 
@@ -1666,8 +1713,8 @@ def insert_blank_substage(cnx, stage_id):
 
     # Query the maximum sequence number for this stage.
 
-    q = 'SELECT MAX(seqnum) FROM substages WHERE stage_id=%d' % stage_id
-    c.execute(q)
+    q = 'SELECT MAX(seqnum) FROM substages WHERE stage_id=%s'
+    c.execute(q, (stage_id,))
     row = c.fetchone()
     seqnum = row[0]
     new_seqnum = 0
@@ -1678,7 +1725,8 @@ def insert_blank_substage(cnx, stage_id):
 
     # Prepare query to insert stage row.
 
-    q = 'INSERT INTO substages SET fclname=\'blank.fcl\', stage_id=%d, seqnum=%d' % (stage_id, new_seqnum)
+    q = 'INSERT INTO substages SET fclname=\'blank.fcl\', stage_id=%s, seqnum=%s'
+    params = [stage_id, new_seqnum]
 
     # Loop over remaining fields.
 
@@ -1689,13 +1737,16 @@ def insert_blank_substage(cnx, stage_id):
         coltype = coltup[2]
         coldefault = coltup[5]
         if coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
         elif coltype[:7] == 'VARCHAR':
-            q += ',%s=\'%s\'' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
 
-    c.execute(q)
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -1720,8 +1771,8 @@ def insert_blank_stage(cnx, project_id):
 
     # Query the maximum sequence number for this stage.
 
-    q = 'SELECT MAX(seqnum) FROM stages WHERE project_id=%d' % project_id
-    c.execute(q)
+    q = 'SELECT MAX(seqnum) FROM stages WHERE project_id=%s'
+    c.execute(q, (project_id,))
     row = c.fetchone()
     seqnum = row[0]
     new_seqnum = 0
@@ -1732,7 +1783,8 @@ def insert_blank_stage(cnx, project_id):
 
     # Prepare query to insert stage row.
 
-    q = 'INSERT INTO stages SET name=\'blank\', project_id=%d, seqnum=%d' % (project_id, new_seqnum)
+    q = 'INSERT INTO stages SET name=\'blank\', project_id=%s, seqnum=%s'
+    params = [project_id, new_seqnum]
 
     # Loop over remaining fields.
 
@@ -1743,13 +1795,16 @@ def insert_blank_stage(cnx, project_id):
         coltype = coltup[2]
         coldefault = coltup[5]
         if coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
         elif coltype[:7] == 'VARCHAR':
-            q += ',%s=\'%s\'' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
 
-    c.execute(q)
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -1786,8 +1841,8 @@ def insert_blank_project(cnx):
 
         # See if this candidate name already exists.
 
-        q = 'SELECT COUNT(*) FROM projects WHERE name=\'%s\'' % project_name
-        c.execute(q)
+        q = 'SELECT COUNT(*) FROM projects WHERE name=%s'
+        c.execute(q, (project_name,))
         row = c.fetchone()
         count = row[0]
         if count == 0:
@@ -1797,10 +1852,12 @@ def insert_blank_project(cnx):
 
     # Prepare query to insert project row.
 
-    q = 'INSERT INTO projects SET name=\'%s\'' % project_name
+    q = 'INSERT INTO projects SET name=%s'
+    params = [project_name]
     user = dbconfig.getuser()
     if user != '':
-        q += ',username=\'%s\'' % user
+        q += ',username=%s'
+        params.append(user)
 
     # Loop over remaining fields.
 
@@ -1811,13 +1868,16 @@ def insert_blank_project(cnx):
         coltype = coltup[2]
         coldefault = coltup[5]
         if coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
         elif coltype[:7] == 'VARCHAR':
-            q += ',%s=\'%s\'' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, coldefault)
+            q += ',%s=%%s' % colname
+            params.append(coldefault)
 
-    c.execute(q)
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -1854,8 +1914,8 @@ def insert_blank_group(cnx):
 
         # See if this candidate name already exists.
 
-        q = 'SELECT COUNT(*) FROM groups WHERE name=\'%s\'' % group_name
-        c.execute(q)
+        q = 'SELECT COUNT(*) FROM groups WHERE name=%s'
+        c.execute(q, (group_name,))
         row = c.fetchone()
         count = row[0]
         if count == 0:
@@ -1865,8 +1925,8 @@ def insert_blank_group(cnx):
 
     # Prepare query to insert group row.
 
-    q = 'INSERT INTO groups SET name=\'%s\'' % group_name
-    c.execute(q)
+    q = 'INSERT INTO groups SET name=%s'
+    c.execute(q, (group_name,))
 
     # Get id of inserted row.
 
@@ -1890,9 +1950,8 @@ def free_seqnum_dataset(cnx, project_id, dataset_type, seqnum):
 
     # See if this sequence number is already used.
 
-    q = 'SELECT COUNT(*) FROM datasets WHERE project_id=%d AND type=\'%s\' AND seqnum=%d' % \
-        (project_id, dataset_type, seqnum)
-    c.execute(q)
+    q = 'SELECT COUNT(*) FROM datasets WHERE project_id=%s AND type=%s AND seqnum=%s'
+    c.execute(q, (project_id, dataset_type, seqnum))
     row = c.fetchone()
     n = row[0]
     if n > 0:
@@ -1900,9 +1959,8 @@ def free_seqnum_dataset(cnx, project_id, dataset_type, seqnum):
         # Got a match.
         # Query all sequence numbers equal or greater.
 
-        q = 'SELECT id, project_id, type, seqnum FROM datasets WHERE project_id=%d AND type=\'%s\' AND seqnum>=%d' % \
-            (project_id, dataset_type, seqnum)
-        c.execute(q)
+        q = 'SELECT id, project_id, type, seqnum FROM datasets WHERE project_id=%s AND type=%s AND seqnum>=%s'
+        c.execute(q, (project_id, dataset_type, seqnum))
         rows = c.fetchall()
         for row in rows:
             dataset_id = row[0]
@@ -1910,8 +1968,8 @@ def free_seqnum_dataset(cnx, project_id, dataset_type, seqnum):
 
             # Increment sequence number.
 
-            q = 'UPDATE datasets SET seqnum=%d WHERE id=%d' % (seq+1, dataset_id)
-            c.execute(q)
+            q = 'UPDATE datasets SET seqnum=%s WHERE id=%s'
+            c.execute(q, (seq+1, dataset_id))
 
     # Done.
 
@@ -1930,8 +1988,8 @@ def clone_dataset(cnx, dataset_id, project_id):
     # Query full dataset row from database.
 
     c = cnx.cursor()
-    q = 'SELECT %s FROM datasets WHERE id=%d' % (columns('datasets'), dataset_id)
-    c.execute(q)
+    q = 'SELECT %s FROM datasets WHERE id=%%s' % columns('datasets')
+    c.execute(q, (dataset_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch dataset id %d' % dataset_id)
@@ -1951,22 +2009,26 @@ def clone_dataset(cnx, dataset_id, project_id):
     # a copy of the row that we just read.
 
     cols = databaseDict['datasets']
-    q = 'INSERT INTO datasets SET name=\'%s\',project_id=%d,seqnum=%d,type=\'%s\'' % \
-        (dataset_name, project_id, seqnum, dataset_type)
+    q = 'INSERT INTO datasets SET name=%s,project_id=%s,seqnum=%s,type=%s'
+    params = [dataset_name, project_id, seqnum, dataset_type]
     for n in range(5, len(cols)):
         coltup = cols[n]
         colname = coltup[0]
         coltype = coltup[2]
         colarray = coltup[3]
         if colarray:
-            q += ',%s=%d' % (colname, row[n])
+            q += ',%s=%%s' % colname
+            params.append(row[n])
         elif coltype[:3] == 'INT':
-            q += ',%s=%d' % (colname, row[n])
+            q += ',%s=%%s' % colname
+            params.append(row[n])
         elif coltype[:7] == 'VARCHAR':
-            q += ',%s=\'%s\'' % (colname, row[n])
+            q += ',%s=%%s' % colname
+            params.append(row[n])
         elif coltype[:6] == 'DOUBLE':
-            q += ',%s=%8.6f' % (colname, row[n])
-    c.execute(q)
+            q += ',%s=%%s' % colname
+            params.append(row[n])
+    c.execute(q, params)
 
     # Get id of inserted row.
 
@@ -1996,8 +2058,8 @@ def restricted_access(cnx, table, id):
     # Table substages and overrides, check parent stage.
 
     if table == 'substages' or table == 'overrides':
-        q = 'SELECT stage_id FROM %s WHERE id=%d' % (table, id)
-        c.execute(q)
+        q = 'SELECT stage_id FROM %s WHERE id=%%s' % table
+        c.execute(q, (id,))
         rows = c.fetchall()
         if len(rows) > 0:
             stage_id = rows[0][0]
@@ -2006,8 +2068,8 @@ def restricted_access(cnx, table, id):
     # Tables stages and datasets, check parent project.
 
     elif table == 'stages' or table == 'datasets':
-        q = 'SELECT project_id FROM %s WHERE id=%d' % (table, id)
-        c.execute(q)
+        q = 'SELECT project_id FROM %s WHERE id=%%s' % table
+        c.execute(q, (id,))
         rows = c.fetchall()
         if len(rows) > 0:
             project_id = rows[0][0]
@@ -2016,8 +2078,8 @@ def restricted_access(cnx, table, id):
     # Projects table, check status.
     
     elif table == 'projects':
-        q = 'SELECT status FROM projects WHERE id=%d' % id
-        c.execute(q)
+        q = 'SELECT status FROM projects WHERE id=%s'
+        c.execute(q, (id,))
         rows = c.fetchall()
         if len(rows) > 0:
             status = rows[0][0]
@@ -2148,9 +2210,8 @@ def add_override(cnx, stage_id, name, override_type, value):
     # Construct a query to insert dataset.
 
     c = cnx.cursor()
-    q = 'INSERT INTO overrides SET stage_id=%d,name=\'%s\',override_type=\'%s\',value=\'%s\'' % \
-        (stage_id, name, override_type, value)
-    c.execute(q)
+    q = 'INSERT INTO overrides SET stage_id=%s,name=%s,override_type=%s,value=%s'
+    c.execute(q, (stage_id, name, override_type, value))
 
     # Get id of inserted row.
 
@@ -2177,8 +2238,8 @@ def delete_override(cnx, override_id):
     # Delete substage.
 
     c = cnx.cursor()
-    q = 'DELETE FROM overrides WHERE id=%d' % override_id
-    c.execute(q)
+    q = 'DELETE FROM overrides WHERE id=%s'
+    c.execute(q, (override_id,))
 
     # Done.
 
@@ -2193,15 +2254,16 @@ def clone_override(cnx, override_id):
     # Query overrode from database.
 
     c = cnx.cursor()
-    q = 'SELECT stage_id,name,value FROM overrides WHERE id=%d' % override_id
-    c.execute(q)
+    q = 'SELECT stage_id,name,override_type,value FROM overrides WHERE id=%s'
+    c.execute(q, (override_id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch override id %d' % override_id)
     row = rows[0]
     stage_id = row[0]
     name = row[1]
-    value = row[2]
+    override_type = row[2]
+    value = row[3]
 
     # Check access.
 
@@ -2211,9 +2273,8 @@ def clone_override(cnx, override_id):
     # Construct query to insert a new row into overrides table that is
     # a copy of the row that we just read.
 
-    q = 'INSERT INTO overrides SET stage_id=%d,name=\'%s\',value=\'%s\'' % \
-        (stage_id, name, value)
-    c.execute(q)
+    q = 'INSERT INTO overrides SET stage_id=%s,name=%s,override_type=%s,value=%s'
+    c.execute(q, (stage_id, name, override_type, value))
 
     # Get id of inserted row.
 
@@ -2241,16 +2302,16 @@ def xml_disabled(cnx, project_id):
     # Query stages of this project.
 
     c = cnx.cursor()
-    q = 'SELECT id FROM stages WHERE project_id=%d' % project_id
-    c.execute(q)
+    q = 'SELECT id FROM stages WHERE project_id=%s'
+    c.execute(q, (project_id,))
     rows = c.fetchall()
     for row in rows:
         stage_id = row[0]
 
         # Count substages for this stage.
 
-        q = 'SELECT COUNT(*) FROM substages WHERE stage_id=%d' % stage_id
-        c.execute(q)
+        q = 'SELECT COUNT(*) FROM substages WHERE stage_id=%s'
+        c.execute(q, (stage_id,))
         row = c.fetchone()
         num_substages = row[0]
         if num_substages > 0:

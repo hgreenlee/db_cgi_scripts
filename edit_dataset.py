@@ -33,8 +33,8 @@ def dataset_form(cnx, id, qdict):
     # Query project name and id from database.
 
     c = cnx.cursor()
-    q = 'SELECT id, name, project_id FROM datasets WHERE id=%d' % id
-    c.execute(q)
+    q = 'SELECT id, name, project_id FROM datasets WHERE id=%s'
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch dataset id %d' % id)
@@ -50,8 +50,8 @@ def dataset_form(cnx, id, qdict):
 
     # Query full dataset from database.
 
-    q = 'SELECT %s FROM datasets WHERE id=%d' % (dbutil.columns('datasets'), id)
-    c.execute(q)
+    q = 'SELECT %s FROM datasets WHERE id=%%s' % dbutil.columns('datasets')
+    c.execute(q, (id,))
     rows = c.fetchall()
     if len(rows) == 0:
         raise IOError('Unable to fetch dataset id %d' % id)
