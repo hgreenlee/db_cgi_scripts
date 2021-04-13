@@ -199,7 +199,7 @@ def view(qdict, argdict):
 
     # Done with form.
 
-    print '<form>'    
+    print '</form>'    
 
     # Generate document trailer.
 
