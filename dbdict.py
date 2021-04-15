@@ -65,7 +65,7 @@ databaseDict = {'projects': [('id', '', 'INT NOT NULL PRIMARY KEY AUTO_INCREMENT
                              ('merge', 'merge', 'VARCHAR(1000)', 0, 'Merge program/flag', ''),
                              ('anamerge', 'anamerge', 'VARCHAR(1000)', 0, 'Analyzie merge flag', ''),
                              ('release_tag', 'larsoft/tag', 'VARCHAR(1000)', 0, 'Release version', ''),
-                             ('release_qual', 'larsoft/qual', 'VARCHAR(1000)', 0, 'Release qualifier', ''),
+                             ('release_qual', 'larsoft/qual', 'VARCHAR(1000)', 0, 'Release qualifier', 'e19:prof'),
                              ('version', 'version', 'VARCHAR(1000)', 0, 'Sam version', ''),
                              ('local_release_tar', 'larsoft/local', 'VARCHAR(1000)', 0, 'Local release tarball', ''),
                              ('file_type', 'filetype', 'VARCHAR(1000)', 0, 'File type', ''),
