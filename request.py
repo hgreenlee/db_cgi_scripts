@@ -15,6 +15,7 @@
 
 import sys, os
 import dbconfig, dbargs, dbutil
+from dbdict import databaseDict
 import StringIO
 import subprocess
 import datetime
@@ -75,6 +76,27 @@ def gentext(argdict):
         exp = argdict['exp']
     buf.write('Experiment: %s\n' % exp)
 
+    # File type.
+
+    ftype = ''
+    if 'ftype' in argdict:
+        ftype = argdict['ftype']
+    buf.write('File type: %s\n' % ftype)
+
+    # File type.
+
+    role = ''
+    if 'role' in argdict:
+        role = argdict['role']
+    buf.write('Role: %s\n' % role)
+
+    # Campaign.
+
+    camp = ''
+    if 'camp' in argdict:
+        camp = argdict['camp']
+    buf.write('Campaign: %s\n' % camp)
+
     # Working group.
 
     wgroup = ''
@@ -102,6 +124,20 @@ def gentext(argdict):
     if 'num_events' in argdict:
         num_events = argdict['num_events']
     buf.write('Number of events: %s\n' % num_events)
+
+    # Number of jobs.
+
+    num_jobs = ''
+    if 'num_jobs' in argdict:
+        num_jobs = argdict['num_jobs']
+    buf.write('Number of jobs: %s\n' % num_jobs)
+
+    # Maximum files per job.
+
+    max_files = ''
+    if 'max_files' in argdict:
+        max_files = argdict['max_files']
+    buf.write('Maximum files per job: %s\n' % max_files)
 
     # Special instructions.
 
@@ -215,16 +251,64 @@ def view(qdict, argdict):
 
 def submit(qdict, argdict):
 
-    # This function is currently implemented to generate a text document containing
-    # summary of the form data.  The text document may be saved on the web server, or
-    # emailed.
+    # This function is currently implemented to do the following actions.
+    #
+    # 1.  Add a project to the production database.
+    # 2.  Optionally store a text document on the web server.
+    # 3.  Optionally send an email containing a text summary.
+    #
+    # Whether actions 2 and 3 are taken depends on parameters "email" and "request_dir"
+    # in dbconfig.py.
 
     # Generate a request name.
-    # The request name is generated based on the time stamp.
-    # The request name is used to generate the name of the saved file, and
-    # the subject of the email.
+    # The request name is used to generate the name of the saved text file,
+    # the subject of the email, and the project name in the database.
+    # The request name is required to be different from any existing project name
+    # in the database.  The request name is also required to be different from any
+    # request file in the request directory.
 
-    request_name = 'request_%s' % datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    # Generate a base project name based on project name specified in form, if specified,
+    # or based on a time stamp otherwise.
+
+    base_name = ''
+    if argdict.has_key('name'):
+        base_name = argdict['name']
+    else:
+        base_name = 'request_%s' % datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+
+    # Generate a non-existing project name based off base name.
+
+    n = 0
+    done = False
+    request_name = ''
+    cnx = dbconfig.connect(readonly = False, devel = qdict['dev'])
+    c = cnx.cursor()
+
+    while not done:
+
+        if n == 0:
+            request_name = base_name
+        else:
+            request_name = '%s_%d' % (base_name, n)
+
+        # See if this candidate name already exists.
+
+        q = 'SELECT COUNT(*) FROM projects WHERE name=%s'
+        c.execute(q, (request_name,))
+        row = c.fetchone()
+        count = row[0]
+        if count == 0:
+            done = True
+        else:
+            n += 1
+
+        # Check request directory.
+
+        if done and dbconfig.request_dir != '':
+            rfn = '%s/%s.txt' % (dbconfig.request_dir, request_name)
+            if os.path.exists(rfn):
+                done = False
+                n += 1
 
     # Generate html document header.
 
@@ -255,9 +339,233 @@ def submit(qdict, argdict):
         p.communicate(input=message)
         p.wait()
 
+    # Construct query to add project.
+    # Use values from form, or defaults.
+
+    cols = databaseDict['projects']
+    q = 'INSERT INTO projects SET name=%s'
+    params = [request_name]
+
+    # Loop over columns.
+
+    for n in range(2, len(cols)):
+        coltup = cols[n]
+        colname = coltup[0]
+        coltype = coltup[2]
+        colarray = coltup[3]
+        value = coltup[5]
+
+        # Update default values.
+
+        if colname == 'username' and argdict.has_key('user'):
+            value = argdict['user']
+        elif colname == 'description' and argdict.has_key('description'):
+            value = argdict['description']
+        elif colname == 'experiment' and argdict.has_key('exp'):
+            value = argdict['exp']
+        elif colname == 'file_type' and argdict.has_key('ftype'):
+            value = argdict['ftype']
+        elif colname == 'role' and argdict.has_key('role'):
+            value = argdict['role']
+        elif colname == 'campaign' and argdict.has_key('camp'):
+            value = argdict['camp']
+        elif colname == 'physics_group' and argdict.has_key('wgroup'):
+            value = argdict['wgroup']
+        elif colname == 'status':
+            value = 'Requested'
+        elif colname == 'num_events' and argdict.has_key('num_events'):
+            value = argdict['num_events']
+        elif colname == 'num_jobs' and argdict.has_key('num_jobs'):
+            value = argdict['num_jobs']
+        elif colname == 'max_files_per_job' and argdict.has_key('max_files'):
+            value = argdict['max_files']
+        elif colname == 'release_tag' and argdict.has_key('version'):
+            value = argdict['version']
+        elif colname == 'version' and argdict.has_key('version'):
+            value = 'test_%s' % argdict['version']
+        elif colname == 'validate_on_worker':
+            value = 1
+
+        # Update query to include this column
+
+        if colarray:
+            q += ',%s=%%s' % colname
+            params.append(value)
+        elif coltype[:3] == 'INT':
+            q += ',%s=%%s' % colname
+            params.append(value)
+        elif coltype[:7] == 'VARCHAR':
+            if value != None:
+                q += ',%s=%%s' % colname
+                params.append(value.replace('&', '&amp;'))
+        elif coltype[:6] == 'DOUBLE':
+            q += ',%s=%%s' % colname
+            params.append(value)
+
+    # Execute query.
+
+    c.execute(q, params)
+
+    # Get id of inserted row.
+
+    q = 'SELECT LAST_INSERT_ID()'
+    c.execute(q)
+    row = c.fetchone()
+    new_project_id = row[0]
+
+    # Generate a list of stage keys in argdict.
+
+    stage_keys = []
+    for key in argdict:
+        if key.startswith('stage_'):
+            stage_keys.append(key)
+
+    # Loop over stage keys in ascending order.
+
+    stage_names = set()
+    for stage_key in sorted(stage_keys):
+
+        # Get the stage name for this key.
+
+        stage_name = argdict[stage_key]
+
+        # Only process this stage name if it hasn't already been seen.
+
+        if stage_name not in stage_names:
+            stage_names.add(stage_name)
+
+            # Construct a query to insert a new stage row in database.
+
+            stage_cols = databaseDict['stages']
+            q = 'INSERT INTO stages SET name=%s,project_id=%s,seqnum=%s'
+            params = [stage_name, new_project_id, len(stage_names)]
+
+            # Loop over columns.
+
+            for n in range(4, len(stage_cols)):
+                stage_coltup = stage_cols[n]
+                stage_colname = stage_coltup[0]
+                stage_coltype = stage_coltup[2]
+                stage_colarray = stage_coltup[3]
+                value = stage_coltup[5]
+
+                # Update default values.
+
+                mem_key = 'memory_%s' % stage_key[6:]
+                project_name = ''
+                if argdict.has_key('name'):
+                    project_name = argdict['name']
+                else:
+                    project_name = request_name
+                if stage_colname == 'memory' and argdict.has_key(mem_key):
+                    value = argdict[mem_key]
+                elif stage_colname == 'inputdef' and len(stage_names) == 1 and argdict.has_key('input'):
+                    value = argdict['input']
+                elif (stage_colname == 'outdir' or stage_colname == 'logdir') and \
+                     argdict.has_key('user') and argdict.has_key('exp'):
+                    value = '/pnfs/%s/scratch/users/%s/output/%s/%s' % (
+                        argdict['exp'], argdict['user'], project_name, stage_name)
+                elif stage_colname == 'workdir' and argdict.has_key('user') and argdict.has_key('exp'):
+                    value = '/pnfs/%s/resilient/users/%s/work/%s/%s' % (
+                        argdict['exp'], argdict['user'], project_name, stage_name)
+                elif stage_colname == 'bookdir' and argdict.has_key('user') and argdict.has_key('exp'):
+                    value = '/%s/data/users/%s/book/%s/%s' % (
+                        argdict['exp'], argdict['user'], project_name, stage_name)
+                elif stage_colname == 'num_events' and argdict.has_key('num_events'):
+                    value = argdict['num_events']
+                elif stage_colname == 'num_jobs' and argdict.has_key('num_jobs'):
+                    value = argdict['num_jobs']
+                elif stage_colname == 'max_files_per_job' and argdict.has_key('max_files'):
+                    value = argdict['max_files']
+
+                # Update query to include this column
+
+                if stage_colarray:
+                    q += ',%s=%%s' % stage_colname
+                    params.append(value)
+                elif stage_coltype[:3] == 'INT':
+                    q += ',%s=%%s' % stage_colname
+                    params.append(value)
+                elif stage_coltype[:7] == 'VARCHAR':
+                    if value != None:
+                        q += ',%s=%%s' % stage_colname
+                        params.append(value.replace('&', '&amp;'))
+                elif stage_coltype[:6] == 'DOUBLE':
+                    q += ',%s=%%s' % stage_colname
+                    params.append(value)
+
+            # Execute query.
+
+            c.execute(q, params)
+
+            # Get id of inserted row.
+
+            q = 'SELECT LAST_INSERT_ID()'
+            c.execute(q)
+            row = c.fetchone()
+            new_stage_id = row[0]
+
+            # Find fcl files associated with this stage name.
+
+            fcl_keys = []
+            for key in argdict.keys():
+                if key.startswith('stage_') and argdict[key] == stage_name:
+                    fcl_key = 'fcl_%s' % key[6:]
+                    if argdict.has_key(fcl_key):
+                        fcl_keys.append(fcl_key)
+
+            # Loop over fcl keys in ascending order.
+
+            seq = 0
+            for fcl_key in sorted(fcl_keys):
+                seq += 1
+
+                # Get fcl name for this key.
+
+                fcl_name = argdict[fcl_key]
+
+                # Construct a query to insert a new substage row in the database.
+
+                substage_cols = databaseDict['substages']
+                q = 'INSERT INTO substages SET fclname=%s,stage_id=%s,seqnum=%s'
+                params = [fcl_name, new_stage_id, seq]
+
+                # Loop over columns.
+
+                for n in range(4, len(substage_cols)):
+                    substage_coltup = substage_cols[n]
+                    substage_colname = substage_coltup[0]
+                    substage_coltype = substage_coltup[2]
+                    substage_colarray = substage_coltup[3]
+                    value = substage_coltup[5]
+
+                    # Update query to include this column
+
+                    if substage_colarray:
+                        q += ',%s=%%s' % substage_colname
+                        params.append(value)
+                    elif substage_coltype[:3] == 'INT':
+                        q += ',%s=%%s' % substage_colname
+                        params.append(value)
+                    elif substage_coltype[:7] == 'VARCHAR':
+                        if value != None:
+                            q += ',%s=%%s' % substage_colname
+                            params.append(value.replace('&', '&amp;'))
+                    elif substage_coltype[:6] == 'DOUBLE':
+                        q += ',%s=%%s' % substage_colname
+                        params.append(value)
+
+                # Execute query.
+
+                c.execute(q, params)
+
+    # Commit database updates.
+
+    cnx.commit()
+
     # Generate message.
 
-    print 'Sample request submitted.'
+    print 'Sample request %s submitted.' % request_name
     print '<br><br>'
 
     # Add hidden form data with some buttons.
@@ -399,6 +707,54 @@ def request_form(cnx, qdict, argdict):
     print '</select></td>'
     print '</tr>'
 
+    # File type field.
+
+    selftype = ''
+    if 'ftype' in argdict:
+        selftype = argdict['ftype']
+    print '<tr>'
+    print '<td><label for="ftype">File type: </label></td>'
+    print '<td><select id="ftype" name="ftype" size=0>'
+    for file_type in dbconfig.pulldowns['file_type']:
+        sel = ''
+        if file_type == selftype:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (file_type, sel, file_type)
+    print '</select></td>'
+    print '</tr>'
+
+    # Role field.
+
+    selrole = ''
+    if 'role' in argdict:
+        selrole = argdict['role']
+    print '<tr>'
+    print '<td><label for="role">Role: </label></td>'
+    print '<td><select id="role" name="role" size=0>'
+    for role in dbconfig.pulldowns['role']:
+        sel = ''
+        if role == selrole:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (role, sel, role)
+    print '</select></td>'
+    print '</tr>'
+
+    # Campaign field.
+
+    selcamp = ''
+    if 'camp' in argdict:
+        selcamp = argdict['camp']
+    print '<tr>'
+    print '<td><label for="camp">Campaign: </label></td>'
+    print '<td><select id="camp" name="camp" size=0>'
+    for campaign in dbconfig.pulldowns['campaign']:
+        sel = ''
+        if campaign == selcamp:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (campaign, sel, campaign)
+    print '</select></td>'
+    print '</tr>'
+
     # Working group field.
 
     selgrp = ''
@@ -443,12 +799,32 @@ def request_form(cnx, qdict, argdict):
 
     # Number of events field.
 
-    numev = 0
+    num_events = 0
     if 'num_events' in argdict:
-        numev = int(argdict['num_events'])
+        num_events = int(argdict['num_events'])
     print '<tr>'
     print '<td><label for="num_events">Number of events: </label></td>'
-    print '<td><input type="number" id="num_events" name="num_events" value=%d></td>' % numev
+    print '<td><input type="number" id="num_events" name="num_events" value=%d></td>' % num_events
+    print '</tr>'
+
+    # Number of jobs.
+
+    num_jobs = 0
+    if 'num_jobs' in argdict:
+        num_jobs = int(argdict['num_jobs'])
+    print '<tr>'
+    print '<td><label for="num_jobs">Number of jobs: </label></td>'
+    print '<td><input type="number" id="num_jobs" name="num_jobs" value=%d></td>' % num_jobs
+    print '</tr>'
+
+    # Maximum files per job.
+
+    max_files = 0
+    if 'max_files' in argdict:
+        max_files = int(argdict['max_files'])
+    print '<tr>'
+    print '<td><label for="max_files">Maximum files per job: </label></td>'
+    print '<td><input type="number" id="max_files" name="max_files" value=%d></td>' % max_files
     print '</tr>'
 
     # Sample instructions field.

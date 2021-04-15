@@ -65,6 +65,7 @@ pulldowns = {'physics_group':    ['', 'OSC', 'XS', 'APE', 'DPC', 'DL', 'Wire Cel
              'type':             ['', 'input', 'output'],
              'override_type':    ['regular', 'test'],
              'experiment':       ['', 'uboone', 'sbnd', 'icarus'],
+             'role':             ['', 'Production', 'Analysis'],
              'poms_role':        ['production', 'analysis'],
              'poms_completion_type': ['completed', 'located'],
              'poms_login_setup': {'uboone': ['',
