@@ -59,13 +59,14 @@ auth2 = '%s/dm.txt' % auth_dir
 # Pull downs.
 
 pulldowns = {'physics_group':    ['', 'OSC', 'XS', 'APE', 'DPC', 'DL', 'Wire Cell','gLEE', 'PeLEE', 'Common'],
-             'status':           ['', 'Requested', 'Approved', 'Processing', 'Suspended', 'Completed'],
+             'status':           ['', 'Requested', 'Approved', 'Rejected', 'Processing', 'Suspended', 'Completed'],
              'file_type':        ['', 'data', 'mc', 'overlay'],
              'campaign':         ['', 'MCC8', 'MCC9', 'MCC 9.reco1', 'MCC 9.0', 'MCC 9.1', 'swizzle'],
              'type':             ['', 'input', 'output'],
              'override_type':    ['regular', 'test'],
              'experiment':       ['', 'uboone', 'sbnd', 'icarus'],
              'role':             ['', 'Production', 'Analysis'],
+             'schema':           ['', 'root', 'gsiftp'],
              'poms_role':        ['production', 'analysis'],
              'poms_completion_type': ['completed', 'located'],
              'poms_login_setup': {'uboone': ['',
@@ -92,6 +93,7 @@ pulldowns = {'physics_group':    ['', 'OSC', 'XS', 'APE', 'DPC', 'DL', 'Wire Cel
 
 colors = {'Requested':  '#a0ffff',
           'Approved':   '#ffd090',
+          'Rejected':   '#c0c0c0',
           'Processing': '#ffff90',
           'Suspended':  '#ffc0c0',
           'Completed':  '#c0ffb0'}
