@@ -624,6 +624,19 @@ def export_project(cnx, project_id, xml):
     return
 
 
+# Export fife_launch config file.
+
+def export_fife_project(cnx, project_id, cfg):
+
+    # Open cfg file.
+
+    cfg.write('Not yet implemented\n')
+
+    # Done.
+
+    return
+
+
 # Export poms ini file corresponding to project.
 
 def export_poms_project(cnx, project_id, dev, ini):
