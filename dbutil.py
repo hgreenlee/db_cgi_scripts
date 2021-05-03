@@ -52,6 +52,110 @@ def convert_str(s):
     return result
 
 
+# Split string containing jobsub options into a list of tuples.
+
+def parse_jobsub(s):
+
+    words = []
+
+    # Loop over characters.
+
+    f = -1               # First character in current word (-1 if not in word).
+    backslash = False    # True of previous character was backslash.
+    singlequote = False  # True if we are in a single-quoted phrase.
+    doublequote = False  # True if we are in a double-quoted phrase.
+
+    for n in range(len(s)):
+
+        ch = s[n]
+
+        # Check if we are currently in a word.
+
+        if f >= 0:
+
+            # In a word.
+            # Check if the current character has been quoted,
+            # and whether the current quote should be ended.
+
+            if backslash:
+                backslash = False
+            elif singlequote:
+                if ch == '\'':
+                    singlequote = False
+            elif doublequote:
+                if ch == '"':
+                    doublequote = False
+
+            # Check if we should start a quote.
+
+            elif ch == '\\':
+                backslash = True
+            elif ch == '\'':
+                singlequote = True
+            elif ch == '"':
+                doublequote = True
+
+            # Check if we should end the current word because the
+            # current character is whitespace.
+
+            elif ch.isspace():
+                word = s[f:n]
+                eq = word.find('=')
+                if word[0] == '-' and eq >= 0:
+                    words.append(word[:eq])
+                    words.append(word[eq+1:])
+                else:
+                    words.append(word)
+                f = -1
+
+        else:
+
+            # Not in a word.
+            # Check if we should start a word and maybe a quote.
+
+            assert(not backslash)
+            assert(not singlequote)
+            assert(not doublequote)
+            if ch == '\\':
+                backslash = True
+                f = n
+            elif ch == '\'':
+                singlequote = True
+                f = n
+            elif ch == '"':
+                doublequote = True
+                f = n
+            elif not ch.isspace():
+                f = n
+
+    # If we ended the loop in a word, add the final word to words.
+
+    if f >= 0:
+        word = s[f:]
+        eq = word.find('=')
+        if word[0] == '-' and eq >= 0:
+            words.append(word[:eq])
+            words.append(word[eq+1:])
+        else:
+            words.append(word)
+
+    # Combine words into tuples depending on which words represent options.
+
+    result = []
+    while len(words) > 0:
+        option = words[0]
+        del words[0]
+        if len(words) > 0 and option[0] == '-' and words[0][0] != '-':
+            result.append((option, words[0]))
+            del words[0]
+        else:
+            result.append((option,))
+
+    # Done.
+
+    return result
+
+
 # Check whether connection is read only or read/write.
 
 def is_readonly(cnx):
@@ -628,9 +732,262 @@ def export_project(cnx, project_id, xml):
 
 def export_fife_project(cnx, project_id, cfg):
 
-    # Open cfg file.
+    # Query stuff from projects table.
 
-    cfg.write('Not yet implemented\n')
+    c = cnx.cursor()
+    q = '''SELECT name, experiment, release_tag, release_qual, num_jobs, max_files_per_job, os, resource, role, lines_, server, site, blacklist, cpu, disk, memory 
+           FROM projects WHERE id=%s'''
+    c.execute(q, (project_id,))
+    rows = c.fetchall()
+    if len(rows) == 0:
+        raise IOError('Unable to fetch project id %d' % project_id)
+    row = rows[0]
+    pname = row[0]
+    experiment = row[1]
+    version = row[2]
+    qual = row[3]
+    num_jobs = row[4]
+    limit = row[5]
+    os = row[6]
+    resource = row[7]
+    role = row[8]
+    lines = row[9]
+    server = row[10]
+    site = row[11]
+    blacklist = row[12]
+    cpu = row[13]
+    disk = row[14]
+    memory = row[15]
+    product = 'unknown'
+    if experiment in dbconfig.ups:
+        product = dbconfig.ups[experiment]
+        
+
+    # Compose [global] section.
+
+    cfg.write('[global]\n')
+    cfg.write('group = %s\n' % experiment)
+    cfg.write('experiment = %s\n' % experiment)
+    cfg.write('wrapper = file:///${FIFE_UTILS_DIR}/libexec/fife_wrap\n')
+    cfg.write('basedir = override_me\n')
+    cfg.write('outdir = %(basedir)s/\${CLUSTER}_\${PROCESS}\n')
+
+    # Compose [job_setup] section.
+
+    cfg.write('\n[job_setup]\n')
+    if experiment in dbconfig.init:
+        cfg.write('source = %s\n' % dbconfig.init[experiment])
+    cfg.write('setup = %s -q %s %s\n' % (product, qual, version))
+    cfg.write('ifdh_art = False   # Override in [stage_xxx]\n')
+    cfg.write('postscript_1 = ifdh mkdir_p %(outdir)s\n')
+    cfg.write('postscript_2 = ls\n')
+
+    # Compose [env_pass] section.
+
+    cfg.write('\n[env_pass]\n')
+    cfg.write('IFDH_CP_MAXRETRIES = 5\n')
+
+    # Compose [prelaunch] section.
+
+    cfg.write('\n[prelaunch]\n')
+    cfg.write('script = mkdir -p %(basedir)s\n')
+
+    # Compose [submit] section.
+
+    cfg.write('\n[submit]\n')
+    cfg.write('group = %(group)s\n')
+    cfg.write('dataset = override_me\n')
+    if num_jobs != 0:
+        cfg.write('N = %d\n' % num_jobs)
+    if os != '':
+        cfg.write('OS = %s\n' % os)
+    if resource != '':
+        cfg.write('resource-provides = usage_model=%s\n' % resource)
+    if role != '':
+        cfg.write('role = %s\n' % role)
+    if lines != '':
+        cfg.write('lines = %s\n' % lines)
+    if server != '' and server != '-':
+        cfg.write('jobsub-server = %s\n' % server)
+    if site != '':
+        cfg.write('site = %s\n' % site)
+    if blacklist != '':
+        cfg.write('blacklist = %s\n' % blacklist)
+    if cpu != 0:
+        cfg.write('cpu = %d\n' % cpu)
+    if disk != '':
+        cfg.write('disk = %s\n' % disk)
+    if memory != 0:
+        cfg.write('memory = %d\n' % memory)
+
+    # Compose [sam_consumer] section.
+
+    cfg.write('\n[sam_consumer]\n')
+    if limit != 0:
+        cfg.write('limit = %d\n' % limit)
+
+    # Compose [job_output] section.
+
+    cfg.write('\n[job_output]\n')
+    cfg.write('dest = %(outdir)s\n')
+    cfg.write('addoutput = *.root\n')
+    cfg.write('addoutput_1 = *.out\n')
+    cfg.write('addoutput_2 = *.err\n')
+    cfg.write('addoutput_3 = *.txt\n')
+
+    # Add dummy [executable] sections.
+    # The number of dummy sections is the maximum number of substages of any stage.
+
+    nexe = 0
+    q = 'SELECT id FROM stages WHERE project_id=%s'
+    c.execute(q, (project_id,))
+    rows = c.fetchall()
+    for row in rows:
+        stage_id = row[0]
+        q = 'SELECT COUNT(*) FROM substages WHERE stage_id=%s'
+        c.execute(q, (stage_id,))
+        row = c.fetchone()
+        n = row[0]
+        if n > nexe:
+            nexe = n
+
+    for iexe in range(nexe):
+        cfg.write('\n# Dummy\n')
+        if iexe == 0:
+            cfg.write('[executable]\n')
+        else:
+            cfg.write('[executable_%d]\n' % iexe)
+        cfg.write('name = true\n')
+
+    # Compose [stage_xxx] sections.
+
+    q = '''SELECT id, name, outdir, inputdef, recurdef, num_jobs, max_files_per_job, resource, lines_, site, blacklist, cpu, disk, memory, jobsub, schema_, init_sources, init_scripts, end_scripts
+           FROM stages WHERE project_id=%s ORDER BY seqnum'''
+    c.execute(q, (project_id,))
+    rows = c.fetchall()
+    for row in rows:
+        stage_id = row[0]
+        stage_name = row[1]
+        outdir = row[2]
+        inputdef = row[3]
+        recurdef = row[4]
+        num_jobs = row[5]
+        limit = row[6]
+        resource = row[7]
+        lines = row[8]
+        site = row[9]
+        blacklist = row[10]
+        cpu = row[11]
+        disk = row[12]
+        memory = row[13]
+        jobsub = row[14]
+        schema = row[15]
+        init_source_id = row[16]
+        init_script_id = row[17]
+        end_script_id = row[18]
+
+        # Recurdef has higher priority than inputdef.
+
+        if recurdef != '':
+            inputdef = recurdef
+
+        cfg.write('\n[stage_%s]\n' % stage_name)
+        cfg.write('global.basedir = %s\n' % outdir)
+        if inputdef != '':
+            cfg.write('job_setup.ifdh_art = True\n')
+            cfg.write('submit.dataset = %s\n' % inputdef)
+        if num_jobs != 0:
+            cfg.write('submit.N = %d\n' % num_jobs)
+        if limit != 0:
+            cfg.write('sam_consumer.limit = %d\n' % limit)
+        if resource != '':
+            cfg.write('submit.resource-provides = %s\n' % resource)
+        if lines != '':
+            cfg.write('submit.lines = %s\n' % lines)
+        if site != '':
+            cfg.write('submit.site = %s\n' % site)
+        if blacklist != '':
+            cfg.write('submit.blacklist = %s\n' % blacklist)
+        if cpu != 0:
+            cfg.write('submit.cpu = %d\n' % cpu)
+        if disk != '':
+            cfg.write('submit.disk = %s\n' % disk)
+        if memory != 0:
+            cfg.write('submit.memory = %d\n' % memory)
+        if jobsub != '':
+            #cfg.write('jobsub = %s\n' % jobsub)
+            #cfg.write('jobsub = %s\n' % parse_jobsub(jobsub))
+
+            # Parse jobsub options into format preferred by fife_launch.
+
+            args = parse_jobsub(jobsub)
+            while len(args) > 0:
+                tup = args[0]
+                del args[0]
+                option = tup[0]
+                if option.startswith('--'):
+                    if len(tup) > 1:
+                        cfg.write('submit.%s = %s\n' % (option[2:], tup[1]))
+                    else:
+                        cfg.write('submit.%s\n' % option[2:])
+                elif option.startswith('-'):
+                    if len(tup) > 1:
+                        cfg.write('submit.%s = %s\n' % (option[1:], tup[1]))
+                    else:
+                        cfg.write('submit.%s\n' % option[1:])
+                else:
+
+                    # Thie one shouldn't ever happen...
+
+                    cfg.write('submit.%s\n' % option)
+        if schema != '':
+            cfg.write('sam_consumer.schema = %s\n' % schema)
+        if init_source_id != 0:
+            init_sources = get_strings(cnx, init_source_id)
+            for n in range(len(init_sources)):
+                init_source = init_sources[n]
+                if n == 0:
+                    cfg.write('job_setup.source = %s\n' % init_source)
+                else:
+                    cfg.write('job_setup.source_%d = %s\n' % (n, init_source))
+        if init_script_id != 0:
+            init_scripts = get_strings(cnx, init_script_id)
+            for n in range(len(init_scripts)):
+                init_script = init_scripts[n]
+                if n == 0:
+                    cfg.write('job_setup.prescript = %s\n' % init_script)
+                else:
+                    cfg.write('job_setup.prescript_%d = %s\n' % (n, init_script))
+        if end_script_id != 0:
+            end_scripts = get_strings(cnx, end_script_id)
+            for n in range(len(end_scripts)):
+                end_script = end_scripts[n]
+                if n == 0:
+                    cfg.write('job_setup.postscript = %s\n' % end_script)
+                else:
+                    cfg.write('job_setup.postscript_%d = %s\n' % (n, end_script))
+
+        # Loop over substages of this stage.
+
+        q = '''SELECT fclname, exe
+               FROM substages WHERE stage_id=%s ORDER BY seqnum'''
+        c.execute(q, (stage_id,))
+        subrows = c.fetchall()
+        for ifcl in range(len(subrows)):
+            exesec = 'executable'
+            if ifcl > 0:
+                exesec = 'executable_%d' % ifcl
+            subrow = subrows[ifcl]
+            fclname = subrow[0]
+            exe = subrow[1]
+
+            if exe == '':
+                exe = 'lar'
+            cfg.write('%s.name = %s\n' % (exesec, exe))
+            if fclname != '':
+                cfg.write('%s.arg_1 = -c\n' % exesec)
+                cfg.write('%s.arg_2 = %s\n' % (exesec, fclname))
+
 
     # Done.
 

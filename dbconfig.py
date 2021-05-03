@@ -89,6 +89,18 @@ pulldowns = {'physics_group':    ['', 'OSC', 'XS', 'APE', 'DPC', 'DL', 'Wire Cel
                                              'MCC8 Reconstruction',
                                              'MCC9 Reconstruction']}}
 
+# Default top level ups products.
+
+ups = {'uboone': 'uboonecode',
+       'sbnd': 'sbndcode',
+       'icarus': 'icaruscode'}
+
+# Initialization source scripts.
+
+init = {'uboone': '/cvmfs/uboone.opensciencegrid.org/products/setup_uboone.sh',
+        'sbnd': '/cvmfs/sbnd.opensciencegrid.org/products/sbnd/setup_sbnd.sh',
+        'icarus': '/cvmfs/icarus.opensciencegrid.org/products/icarus/setup_icarus.sh'}
+
 # Status colors.
 
 colors = {'Requested':  '#a0ffff',
