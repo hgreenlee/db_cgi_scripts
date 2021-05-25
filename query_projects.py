@@ -627,8 +627,22 @@ def main(qdict):
         print '<td>'
         print '<form target="_self" action="%s/export_project.py?id=%d&%s" method="post">' % \
             (dbconfig.rel_url, id, dbargs.convert_args(qdict))
-        print '<div title="Generate XML">'
+        print '<div title="Generate project.py XML">'
         print '<input type="submit" value="XML" %s>' % xml_disabled
+        print '</div>'
+        print '</form>'
+        print '</td>'        
+
+        # Add FIFE button/column
+
+        fife_disabled = ''
+        if dbutil.xml_disabled(cnx, id):
+            fife_disabled = 'disabled'
+        print '<td>'
+        print '<form target="_self" action="%s/export_fife.py?id=%d&%s" method="post">' % \
+            (dbconfig.rel_url, id, dbargs.convert_args(qdict))
+        print '<div title="Generate fife_launch config">'
+        print '<input type="submit" value="FIFE" %s>' % xml_disabled
         print '</div>'
         print '</form>'
         print '</td>'        

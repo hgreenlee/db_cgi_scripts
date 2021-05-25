@@ -139,6 +139,13 @@ def gentext(argdict):
         max_files = argdict['max_files']
     buf.write('Maximum files per job: %s\n' % max_files)
 
+    # Schema
+
+    schema = ''
+    if 'schema' in argdict:
+        schema = argdict['schema']
+    buf.write('Schema: %s\n' % schema)
+
     # Special instructions.
 
     instructions = ''
@@ -477,6 +484,8 @@ def submit(qdict, argdict):
                     value = argdict['num_jobs']
                 elif stage_colname == 'max_files_per_job' and argdict.has_key('max_files'):
                     value = argdict['max_files']
+                elif stage_colname == 'schema_' and argdict.has_key('schema'):
+                    value = argdict['schema']
 
                 # Update query to include this column
 
@@ -825,6 +834,22 @@ def request_form(cnx, qdict, argdict):
     print '<tr>'
     print '<td><label for="max_files">Maximum files per job: </label></td>'
     print '<td><input type="number" id="max_files" name="max_files" value=%d></td>' % max_files
+    print '</tr>'
+
+    # Schema field.
+
+    selschema = ''
+    if 'schema' in argdict:
+        selschema = argdict['schema']
+    print '<tr>'
+    print '<td><label for="schema">Schema: </label></td>'
+    print '<td><select id="schema" name="schema" size=0>'
+    for schema in dbconfig.pulldowns['schema']:
+        sel = ''
+        if schema == selschema:
+            sel = 'selected'
+        print '<option value="%s" %s>%s</option>' % (schema, sel, schema)
+    print '</select></td>'
     print '</tr>'
 
     # Sample instructions field.

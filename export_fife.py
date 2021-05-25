@@ -1,16 +1,16 @@
 #! /usr/bin/python
 #==============================================================================
 #
-# Name: export_project.py
+# Name: export_fife.py
 #
-# Purpose: CGI script to export a project to XML to standard output.
+# Purpose: CGI script to export a project to fife_launch config to standard output.
 #
 # CGI arguments:
 #
 # id      - Project id.
 # <qdict> - Standard query_projects.py arguments.
 #
-# Created: 15-Oct-2020  H. Greenlee
+# Created: 15-Apr-2021  H. Greenlee
 #
 #==============================================================================
 
@@ -33,20 +33,20 @@ def main(id, qdict):
 
     # Generate document header.
 
-    print 'Content-type: text/xml'
+    print 'Content-type: text/plain'
     print
 
-    # Generate main part of xml document.
+    # Generate main part of text document.
 
     if id == 0 or name == '':
         print 'No such project.'
     else:
 
-        # Generate XML.
+        # Generate text.
 
-        xml = StringIO.StringIO()
-        dbutil.export_project(cnx, id, xml)
-        print xml.getvalue()
+        cfg = StringIO.StringIO()
+        dbutil.export_fife_project(cnx, id, cfg)
+        print cfg.getvalue()
 
     # Done.
 

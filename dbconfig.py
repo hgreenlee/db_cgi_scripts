@@ -61,12 +61,14 @@ auth2 = '%s/sbn_dm.txt' % auth_dir
 
 pulldowns = {'physics_group':    ['', 'OSC', 'XS', 'APE', 'DPC', 'Common'],
              'status':           ['', 'Requested', 'Approved', 'Processing', 'Suspended', 'Completed'],
+             'status':           ['', 'Requested', 'Approved', 'Rejected', 'Processing', 'Suspended', 'Completed'],
              'file_type':        ['', 'data', 'mc', 'overlay'],
              'campaign':         ['', 'MCP0.9', 'MCP1.0', 'MCP2.0', 'MCP2.1', 'MCP2.2', 'MCP2020A'],
              'type':             ['', 'input', 'output'],
              'override_type':    ['regular', 'test'],
              'experiment':       ['', 'uboone', 'sbnd', 'icarus'],
              'role':             ['', 'Production', 'Analysis'],
+             'schema':           ['', 'root', 'gsiftp'],
              'poms_role':        ['production', 'analysis'],
              'poms_completion_type': ['completed', 'located'],
              'poms_login_setup': {'sbnd': ['',
@@ -89,10 +91,23 @@ pulldowns = {'physics_group':    ['', 'OSC', 'XS', 'APE', 'DPC', 'Common'],
                                            'sbnd_official_MCP2020A_reco'],
                                   'icarus': ['']}}
 
+# Default top level ups products.
+
+ups = {'uboone': 'uboonecode',
+       'sbnd': 'sbndcode',
+       'icarus': 'icaruscode'}
+
+# Initialization source scripts.
+
+init = {'uboone': '/cvmfs/uboone.opensciencegrid.org/products/setup_uboone.sh',
+        'sbnd': '/cvmfs/sbnd.opensciencegrid.org/products/sbnd/setup_sbnd.sh',
+        'icarus': '/cvmfs/icarus.opensciencegrid.org/products/icarus/setup_icarus.sh'}
+
 # Status colors.
 
 colors = {'Requested':  '#a0ffff',
           'Approved':   '#ffd090',
+          'Rejected':   '#c0c0c0',
           'Processing': '#ffff90',
           'Suspended':  '#ffc0c0',
           'Completed':  '#c0ffb0'}
