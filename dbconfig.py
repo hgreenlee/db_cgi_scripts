@@ -187,11 +187,31 @@ def connect(readonly=True, devel=False):
     else:
         db = db_prd
 
-    cnx = mysql.connector.connect(database=db,
-                                  host=host,
-                                  port=port,
-                                  user=user,
-                                  password=pw)
+    cnx = None
+    ntry = 100
+    while cnx == None and ntry > 0:
+        ntry -= 1
+        try:
+            cnx = mysql.connector.connect(database=db,
+                                          host=host,
+                                          port=port,
+                                          user=user,
+                                          password=pw)
+        except:
+            cnx = None
+
+    if cnx == None:
+        print 'Content-type: text/html'
+        print 'Status: 503 Service Unavailable'
+        print
+        print '<html>'
+        print '<title>503 Service Unavailable</title>'
+        print '<body>'
+        print '<h1>503 Service Unavailable</h1>'
+        print 'Connection to database failed.'
+        print '</body>'
+        print '</html>'
+        sys.exit(0)
 
     # Done.
 
