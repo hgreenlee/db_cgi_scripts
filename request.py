@@ -146,6 +146,21 @@ def gentext(argdict):
         schema = argdict['schema']
     buf.write('Schema: %s\n' % schema)
 
+    # Validation.
+
+    ans = 'No'
+    if 'gridtest' in argdict:
+        ans = 'Yes'
+    buf.write('Work flow has been tested on grid: %s\n' % ans)
+    ans = 'No'
+    if 'samtest' in argdict:
+        ans = 'Yes'
+    buf.write('Output files have proper sam metadata: %s\n' % ans)
+    ans = 'No'
+    if 'nametest' in argdict:
+        ans = 'Yes'
+    buf.write('Artroot output files have unique names: %s\n' % ans)
+
     # Special instructions.
 
     instructions = ''
@@ -850,6 +865,31 @@ def request_form(cnx, qdict, argdict):
             sel = 'selected'
         print '<option value="%s" %s>%s</option>' % (schema, sel, schema)
     print '</select></td>'
+    print '</tr>'
+
+    # Valication check 1 - Grid
+
+    print '<tr>'
+    print '<td><label for="validation">Validation: </label></td>'
+    print '<td>'
+    checked = ''
+    if 'gridtest' in argdict:
+        checked = 'checked'
+    print '<input type="checkbox" id="gridtest" name="gridtest" value="yes" %s>' % checked
+    print '<label for="gridtest"> Work flow has been tested on grid</label>'
+    print '<br>'
+    checked = ''
+    if 'samtest' in argdict:
+        checked = 'checked'
+    print '<input type="checkbox" id="samtest" name="samtest" value="yes" %s>' % checked
+    print '<label for="samtest"> Output files have proper sam metadata</label>'
+    print '<br>'
+    checked = ''
+    if 'nametest' in argdict:
+        checked = 'checked'
+    print '<input type="checkbox" id="nametest" name="nametest" value="yes" %s>' % checked
+    print '<label for="nametest"> Artroot output files have unique names</label>'
+    print '</td>'
     print '</tr>'
 
     # Sample instructions field.
