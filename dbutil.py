@@ -1887,7 +1887,7 @@ def import_project(cnx, xmlstring):
             coltype = coltup[2]
             colarray = coltup[3]
             coldefault = coltup[5]
-            #print colname, coltag, coltype, colarray
+            #print colname, coltag, coltype, colarray, coldefault
 
             # Hunt for subelements with matching tag.
 
@@ -1934,6 +1934,10 @@ def import_project(cnx, xmlstring):
                     string_id = update_strings(cnx, values)
                     q += ',%s=%%s' % colname
                     params.append(string_id)
+
+            elif colname == 'experiment':
+                q += ',%s=%%s' % colname
+                params.append(coldefault)
                     
         # Execute query.
 
